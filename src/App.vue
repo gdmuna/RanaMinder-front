@@ -1,80 +1,55 @@
+<template>
+    <div class="w-full flex flex-col dark:text-[#FEFCE4]">
+        <!-- 页眉 -->
+        <Header />
+        <!-- 消息弹窗挂载点 -->
+        <Toaster />
+        <!-- 主内容区 -->
+        <main id="content">
+            <router-view />
+        </main>
+    </div>
+</template>
+
 <script setup lang="ts">
-import { gsap } from "gsap";
-import { CustomEase } from "gsap/CustomEase";
-import { CustomBounce } from "gsap/CustomBounce";
-import { SlowMo } from "gsap/EasePack";
-import { Draggable } from "gsap/Draggable";
-import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
-import { Flip } from "gsap/Flip";
-import { InertiaPlugin } from "gsap/InertiaPlugin";
-import { MotionPathHelper } from "gsap/MotionPathHelper";
-import { MotionPathPlugin } from "gsap/MotionPathPlugin";
-import { MorphSVGPlugin } from "gsap/MorphSVGPlugin";
-import { Observer } from "gsap/Observer";
-import { Physics2DPlugin } from "gsap/Physics2DPlugin";
-import { PhysicsPropsPlugin } from "gsap/PhysicsPropsPlugin";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ScrollToPlugin } from "gsap/ScrollToPlugin";
-import { SplitText } from "gsap/SplitText";
-import { TextPlugin } from "gsap/TextPlugin";
 
-import HelloWorld from './components/HelloWorld.vue'
-import { Toaster, toast } from 'vue-sonner'
-import 'vue-sonner/style.css'
+// 导入 vue-sonner
+import { Toaster } from 'vue-sonner'
 
-import { onBeforeMount, ref } from 'vue'
+// 导入组件
+import Header from '@/components/header.vue'
 
+import { onMounted, onBeforeMount, ref } from 'vue'
 
-onBeforeMount((): void => {
-  // Initialize GSAP plugins
-  gsap.registerPlugin(
-    CustomEase,
-    CustomBounce,
-    SlowMo,
-    Draggable,
-    DrawSVGPlugin,
-    Flip,
-    InertiaPlugin,
-    MotionPathHelper,
-    MotionPathPlugin,
-    MorphSVGPlugin,
-    Observer,
-    Physics2DPlugin,
-    PhysicsPropsPlugin,
-    ScrollTrigger,
-    ScrollToPlugin,
-    SplitText,
-    TextPlugin
-  );
+import { ScrollSmoother } from "gsap/ScrollSmoother";
+
+// 动态设置根元素字体大小
+function setRootFontSize() {
+    const html = document.documentElement;
+    const val = Math.max((html.clientWidth / 1280) * 12, 16)
+    console.log(val)
+    html.style.fontSize = val + 'px'
+
+}
+window.addEventListener('resize', setRootFontSize);
+
+onBeforeMount(() => {
+    // 初始化根字体大小
+    setRootFontSize();
+})
+
+onMounted(() => {
+    // 初始化 GSAP ScrollSmoother
+    ScrollSmoother.create({
+        wrapper: '#app',
+        content: '#content',
+        smooth: 0.75
+    })
+    
 })
 
 
 </script>
 
-<template>
-  <div>
-    <Toaster />
-    <a href="https://vite.dev" target="_blank" class="flex justify-center">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank" class="flex justify-center">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-  <HelloWorld msg="Vite + Vue" />
-</template>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>
+<style scoped></style>
