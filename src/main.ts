@@ -56,17 +56,6 @@ import './index.css' // shadcn-ui
 import './main.css' // 全局样式
 import 'vue-sonner/style.css' // vue-sonner
 
-// 导入 PrismJS 代码高亮库
-import 'prismjs/components/prism-clike';
-// import 'prismjs/components/prism-cpp'; // 该代码高亮样式存在问题
-import 'prismjs/components/prism-javascript';
-import 'prismjs/components/prism-typescript';
-import 'prismjs/components/prism-python';
-import 'prismjs/components/prism-java';
-import 'prismjs/components/prism-go';
-import './prism-vsc-dark-plus.css';
-import 'prismjs/plugins/line-numbers/prism-line-numbers.css'
-
 const pinia = createPinia()
 const app = createApp(App)
 

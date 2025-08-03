@@ -14,22 +14,16 @@
                         首页
                     </Button>
                     <div class="h-10 w-[1px] m-0 bg-neutral-200 dark:bg-neutral-700 select-none"></div>
-                    <Button variant="link" @click="routerGoTo('/announcements')"
+                    <Button variant="link" @click="routerGoTo('/person')"
                         class="text-lg font-[500] m-0 select-none cursor-pointer dark:text-[#FEFCE4]">
-                        <Megaphone />
-                        公告
+                        <UsersRound />
+                        人员管理
                     </Button>
                     <div class="h-10 w-[1px] m-0 bg-neutral-200 dark:bg-neutral-700 select-none"></div>
-                    <Button variant="link" @click="routerGoTo('/articles')"
+                    <Button variant="link" @click="routerGoTo('/interview')"
                         class="text-lg font-[500] m-0 select-none cursor-pointer dark:text-[#FEFCE4]">
-                        <ScrollText />
-                        文章
-                    </Button>
-                    <div class="h-10 w-[1px] m-0 bg-neutral-200 dark:bg-neutral-700 select-none"></div>
-                    <Button variant="link" @click="routerGoTo('/resourcesHub')"
-                        class="text-lg font-[500] m-0 select-none cursor-pointer dark:text-[#FEFCE4]">
-                        <Database />
-                        资源站
+                        <FileUser />
+                        面试管理
                     </Button>
                 </nav>
             </div>
@@ -84,11 +78,10 @@ import { Github } from 'lucide-vue-next';
 import { LogIn } from 'lucide-vue-next';
 import { Smile } from 'lucide-vue-next';
 import { Mail } from 'lucide-vue-next';
-import { Database } from 'lucide-vue-next';
-import { ScrollText } from 'lucide-vue-next';
 import { Sun } from 'lucide-vue-next';
 import { Moon } from 'lucide-vue-next';
-import { Megaphone } from 'lucide-vue-next';
+import { UsersRound } from 'lucide-vue-next';
+import { FileUser } from 'lucide-vue-next';
 
 // 导入状态管理
 import { useSystemStore } from '@/stores/system'

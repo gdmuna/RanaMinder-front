@@ -1,13 +1,13 @@
 <template>
     <div>
-        resourcesHub
+        <!-- 页面内容 -->
     </div>
 </template>
 
 <script setup lang="ts">
-
+// 逻辑代码
 </script>
 
 <style scoped>
-@import './index.css';
+/* 样式 */
 </style>

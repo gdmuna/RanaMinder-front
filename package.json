@@ -25,7 +25,6 @@
     "lucide-vue-next": "^0.525.0",
     "markdown-it": "^14.1.0",
     "pinia": "^3.0.3",
-    "prismjs": "^1.28.0",
     "reka-ui": "^2.4.1",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.11",
