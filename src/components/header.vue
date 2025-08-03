@@ -44,12 +44,6 @@
                         <Mail />
                     </Button>
                 </div>
-                <div class="h-14 w-[1px] mx-2 bg-neutral-800 dark:bg-neutral-400 select-none"></div>
-                <Button
-                    class="bg-violet-700 hover:bg-violet-800 dark:bg-violet-600 dark:hover:bg-violet-700 cursor-pointer font-bold">
-                    <Smile />
-                    加入我们
-                </Button>
                 <div class="h-10 w-[1px] mx-2 bg-neutral-200 dark:bg-neutral-700 select-none"></div>
                 <Button variant="outline" class="cursor-pointer">
                     <LogIn />
