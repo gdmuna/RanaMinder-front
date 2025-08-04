@@ -1,5 +1,5 @@
 <template>
-    <div class="marquee-container" @mouseenter="pause" @mouseleave="resume">
+    <div class="marquee-container select-none" @mouseenter="pause" @mouseleave="resume">
         <div class="marquee-content" :style="{
             animationDuration: duration + 's',
             animationPlayState: isPaused ? 'paused' : 'running'
@@ -60,6 +60,19 @@ const resume = () => {
         6px 6px 0 #0E100F,    /* 右下阴影 */
         10px 10px 0 #FEFCE4,    /* 更深的右下阴影 */
         1px 1px 0 #0E100F;    /* 轻微阴影 */
+}
+
+/* 小屏适配 */
+@media (max-width: 768px) {
+    .marquee-item {
+        font-size: 2.2rem;
+        padding: 0 0.8rem;
+        letter-spacing: 0.2rem;
+        text-shadow:
+            2px 2px 0 #0E100F,
+            4px 4px 0 #FEFCE4,
+            1px 1px 0 #0E100F;
+    }
 }
 
 @keyframes scroll-left {
