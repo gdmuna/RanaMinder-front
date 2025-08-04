@@ -70,7 +70,6 @@ import { toggleThemeButton } from '@/components/ui/switch'
 import { Home } from 'lucide-vue-next';
 import { Github } from 'lucide-vue-next';
 import { LogIn } from 'lucide-vue-next';
-import { Smile } from 'lucide-vue-next';
 import { Mail } from 'lucide-vue-next';
 import { Sun } from 'lucide-vue-next';
 import { Moon } from 'lucide-vue-next';

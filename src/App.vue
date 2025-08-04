@@ -1,11 +1,11 @@
 <template>
-    <div class="w-full flex flex-col dark:text-[#FEFCE4]">
+    <div class="w-full flex flex-col dark:text-[#FEFCE4] min-h-screen">
         <!-- 页眉 -->
         <Header />
         <!-- 消息弹窗挂载点 -->
         <Toaster />
         <!-- 主内容区 -->
-        <main id="content">
+        <main id="content" class="flex-1">
             <router-view />
         </main>
     </div>

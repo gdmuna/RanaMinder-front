@@ -1,23 +1,24 @@
 <template>
-    <div class="flex rounded-lg aspect-[26/16] max-w-[26rem] max-h-[16rem] bg-[#EFE8DE] text-black uppercase cursor-pointer"
+    <div class="flex rounded-lg aspect-[26/16] max-w-[26rem] max-h-[16rem] bg-[#EFE8DE] text-black cursor-pointer select-none"
         @click="navigate">
         <!-- 左侧竖直文字 -->
         <div class="flex items-center h-full">
-            <div class="font-black tracking-tighter writing-vertical-lr text-[2.6rem]">
+            <div
+                class="font-black tracking-tight writing-vertical-lr text-[2.6rem]">
                 {{ sideLabel }}
             </div>
         </div>
-
         <div class="flex flex-col">
             <!-- 主体区 -->
-            <div class="min-h-[16rem] flex items-center justify-center pr-[1.5rem]">
+            <div class="min-h-[16rem] flex items-center justify-center pr-[1.5rem] cursor-pointer select-none
+        transition-all duration-400 hover:shadow-lg hover:-translate-y-1 hover:scale-103">
                 <div class="w-full h-[74%] rounded-lg px-[2.5rem] py-[2rem] flex space-x-5 "
                     :style="{ backgroundColor: backgroundColor }">
                     <!-- 图标 -->
-                    <div>
+                    <div class="icon-animate">
                         <component :is="icon" class="w-15 h-15 text-black mt-3" />
                     </div>
-                    <div class="flex flex-col items-center justify-center text-center">
+                    <div class="flex flex-col justify-center">
                         <!-- 标题 -->
                         <div class="flex items-center space-x-4 mb-4">
                             <span class="text-[40px] font-black">{{ title }}</span>
@@ -27,20 +28,20 @@
                             {{ subtitle }}
                         </div>
                         <!-- 分割线 -->
-                        <div class="w-15 h-0.5 bg-black mx-auto mr-24"></div>
+                        <div class="w-16 h-0.5 bg-black ml-1"></div>
                     </div>
                 </div>
             </div>
         </div>
         <!-- 右侧 enter 提示 -->
-        <div class="flex items-end justify-end text-right text-2xl font-black -ml-27">
-            ENTER
+        <div class="flex items-end justify-end text-right text-2xl font-black -ml-23">
+            Enter
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue'
+import { defineProps, ref } from 'vue'
 
 const props = defineProps<{
     title: string
@@ -56,6 +57,8 @@ const navigate = () => {
         window.location.href = props.link
     }
 }
+
+const isHover = ref(false)
 </script>
 
 <style scoped>
@@ -63,9 +66,10 @@ const navigate = () => {
     writing-mode: vertical-lr;
     transform: rotate(360deg);
 }
-
-/* .side-label {
-    font-size: clamp(2.3rem, 5vw, 2.6rem);
-    color: #000;
-} */
+.icon-animate {
+    transition: transform 0.4s cubic-bezier(.22,.68,.54,1.01);
+}
+.min-h-\[16rem\]:hover .icon-animate {
+    transform: rotate(-8deg) scale(1.12);
+}
 </style>
