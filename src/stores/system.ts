@@ -12,7 +12,7 @@ export const useSystemStore = defineStore('system', () => {
             document.documentElement.classList.remove('dark')
             isDark.value = false
         } else {
-            // 默认主题为浅色
+            // 默认主题
             document.documentElement.classList.remove('dark')
             isDark.value = false
             localStorage.setItem('isDark', 'light')

@@ -58,5 +58,4 @@ import MarqueeText from '@/components/ui/MarqueeText.vue'
 </script>
 
 <style scoped>
-@import './home.css';
 </style>

@@ -4,7 +4,7 @@
             animationDuration: duration + 's',
             animationPlayState: isPaused ? 'paused' : 'running'
         }">
-            <span v-for="n in repeatCount" :key="n" class="marquee-item">
+            <span v-for="n in repeatCount" :key="n" class="marquee-item will-change-transform">
                 {{ text }}
             </span>
         </div>
