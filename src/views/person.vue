@@ -12,14 +12,14 @@ const personList = [
     {
         stuId: '24201111000',
         name: '张三',
-        department: ['网络协会', '摸鱼部', '部长','网络协会', '摸鱼部', '部长'],
+        department: ['网络协会', '摸鱼部', '部长'],
         grade: '2024级',
         major: '计算机'
     },
     {
         stuId: '24201111001',
         name: '李四',
-        department: ['ACM协会', '摸鱼部', '部长'],
+        department: ['ACM协会', '摸鱼部', '部长','网络协会', '摸鱼部', '部长'],
         grade: '2024级',
         major: '数学'
     },

@@ -40,7 +40,7 @@
                 </div>
             </div>
             <!-- 右侧装饰三角 -->
-            <div class="absolute right-[5px] pl-7 pr-5 2xl:block hidden">
+            <div class="absolute right-[5px] pr-5 2xl:block hidden">
                 <div class="w-6 h-7 bg-[#6F6E6C]" style="clip-path: polygon(0 0, 100% 50%, 0 100%);"></div>
             </div>
         </div>
