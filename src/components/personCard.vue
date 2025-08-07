@@ -1,6 +1,6 @@
 <template>
-    <div class="card dark:bg-[#E8E7E2] rounded-xl overflow-hidden cursor-pointer select-none" @mouseenter="hover = true"
-        @mouseleave="hover = false">
+    <div class="relative card dark:bg-[#E8E7E2] rounded-xl overflow-hidden cursor-pointer select-none"
+        @mouseenter="hover = true" @mouseleave="hover = false">
         <!-- 顶部装饰 -->
         <div class="w-full h-15 flex">
             <div class="w-full h-15 bg-[#6F6E6C]"></div>
@@ -21,8 +21,9 @@
                 <!-- 部门 -->
                 <div class="flex">
                     <span class="w-[5rem] inline-block text-[#A6A6A6]">部门</span>
-                    <div class="flex flex-1 flex-wrap gap-2">
-                        <div v-for="(item, index) in department" :key="'dept-' + index">
+                    <div
+                        class="flex flex-1 gap-2 w-[17rem] min-w-[17rem] max-w-[17rem] overflow-x-auto whitespace-nowrap hide-scrollbar">
+                        <div v-for="(item, index) in department" :key="'dept-' + index" class="inline-block">
                             <Badge>{{ item }}</Badge>
                         </div>
                     </div>
@@ -39,7 +40,7 @@
                 </div>
             </div>
             <!-- 右侧装饰三角 -->
-            <div class="pl-7 pr-4">
+            <div class="absolute right-[5px] pl-7 pr-5 2xl:block hidden">
                 <div class="w-6 h-7 bg-[#6F6E6C]" style="clip-path: polygon(0 0, 100% 50%, 0 100%);"></div>
             </div>
         </div>
@@ -63,7 +64,7 @@ const props = defineProps<{
 const {
     stuId = '24201111000',
     name = '测试',
-    department = ['网络协会', '会长团', '会长'],
+    department = ['网络协会', '宣传部', '会长'],
     grade = '2024级',
     major = '导弹维修与技术',
 } = props;
@@ -83,4 +84,17 @@ const hover = ref(false);
 .card:hover {
     transform: translateY(-5px) rotateX(5deg);
 }
+
+.hide-scrollbar {
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE 10+ */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari/Opera */
+}
+
 </style>

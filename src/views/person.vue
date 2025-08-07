@@ -1,14 +1,118 @@
 <template>
-    <div class="mb-[3.5rem] w-full flex flex-col items-center gap-5 overflow-auto">
-        <PersonCard />
-        <PersonCard />
-        <PersonCard />
-        <PersonCard />
-        <PersonCard />
+    <div class="grid grid-cols-3 gap-14 px-15 py-5 mb-[3.5rem]">
+        <PersonCard v-for="person in personList" :key="person.stuId" :name="person.name" :department="person.department"
+            :grade="person.grade" :major="person.major" :stuId="person.stuId" />
     </div>
 </template>
 
 <script setup lang="ts">
 import PersonCard from '@/components/personCard.vue'
 
+const personList = [
+    {
+        stuId: '24201111000',
+        name: '张三',
+        department: ['网络协会', '摸鱼部', '部长','网络协会', '摸鱼部', '部长'],
+        grade: '2024级',
+        major: '计算机'
+    },
+    {
+        stuId: '24201111001',
+        name: '李四',
+        department: ['ACM协会', '摸鱼部', '部长'],
+        grade: '2024级',
+        major: '数学'
+    },
+    {
+        stuId: '24201111002',
+        name: '王五',
+        department: ['ACM协会', '摸鱼部', '干部'],
+        grade: '2025级',
+        major: '物理'
+    },
+        {
+        stuId: '24201111000',
+        name: '张三',
+        department: ['网络协会', '摸鱼部', '部长'],
+        grade: '2024级',
+        major: '计算机'
+    },
+    {
+        stuId: '24201111001',
+        name: '李四',
+        department: ['ACM协会', '摸鱼部', '部长'],
+        grade: '2024级',
+        major: '数学'
+    },
+    {
+        stuId: '24201111002',
+        name: '王五',
+        department: ['ACM协会', '摸鱼部', '干部'],
+        grade: '2025级',
+        major: '物理'
+    },
+        {
+        stuId: '24201111000',
+        name: '张三',
+        department: ['网络协会', '摸鱼部', '部长'],
+        grade: '2024级',
+        major: '计算机'
+    },
+    {
+        stuId: '24201111001',
+        name: '李四',
+        department: ['ACM协会', '摸鱼部', '部长'],
+        grade: '2024级',
+        major: '数学'
+    },
+    {
+        stuId: '24201111002',
+        name: '王五',
+        department: ['ACM协会', '摸鱼部', '干部'],
+        grade: '2025级',
+        major: '物理'
+    },
+        {
+        stuId: '24201111000',
+        name: '张三',
+        department: ['网络协会', '摸鱼部', '部长'],
+        grade: '2024级',
+        major: '计算机'
+    },
+    {
+        stuId: '24201111001',
+        name: '李四',
+        department: ['ACM协会', '摸鱼部', '部长'],
+        grade: '2024级',
+        major: '数学'
+    },
+    {
+        stuId: '24201111002',
+        name: '王五',
+        department: ['ACM协会', '摸鱼部', '干部'],
+        grade: '2025级',
+        major: '物理'
+    },
+        {
+        stuId: '24201111000',
+        name: '张三',
+        department: ['网络协会', '摸鱼部', '部长'],
+        grade: '2024级',
+        major: '计算机'
+    },
+    {
+        stuId: '24201111001',
+        name: '李四',
+        department: ['ACM协会', '摸鱼部', '部长'],
+        grade: '2024级',
+        major: '数学'
+    },
+    {
+        stuId: '24201111002',
+        name: '王五',
+        department: ['ACM协会', '摸鱼部', '干部'],
+        grade: '2025级',
+        major: '物理'
+    }
+]
 </script>
