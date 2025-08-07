@@ -1,5 +1,5 @@
 <template>
-    <div class="grid grid-cols-3 gap-14 px-15 py-5 mb-[3.5rem]">
+    <div class="grid xl:grid-cols-3 md:grid-cols-2 grid-cols-1 md:gap-14 gap-5 md:px-15 px-5 py-5 mb-[3.5rem]">
         <PersonCard v-for="person in personList" :key="person.stuId" :name="person.name" :department="person.department"
             :grade="person.grade" :major="person.major" :stuId="person.stuId" />
     </div>
