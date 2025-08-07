@@ -10,7 +10,7 @@
         <div class="flex flex-col">
             <!-- 主体区 -->
             <div class="min-h-[16rem] flex items-center justify-center pr-[1.5rem] cursor-pointer select-none ">
-                <div class="w-full h-[74%] rounded-lg px-[2.5rem] py-[2rem] flex space-x-5 "
+                <div class="w-full h-[74%] rounded-lg px-[3.5rem] py-[2rem] flex space-x-5 "
                     :style="{ backgroundColor: backgroundColor }">
                     <!-- 图标 -->
                     <div class="icon-animate">
@@ -39,7 +39,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref } from 'vue'
 
 const props = defineProps<{
     title: string
@@ -56,7 +55,6 @@ const navigate = () => {
     }
 }
 
-const isHover = ref(false)
 </script>
 
 <style scoped>

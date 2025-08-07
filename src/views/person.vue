@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-[3.5rem] w-full flex flex-col items-center gap-5 overflow-auto">
+    <div class="mb-[3.5rem] w-full flex flex-col items-center gap-5 overflow-auto">
         <PersonCard />
         <PersonCard />
         <PersonCard />

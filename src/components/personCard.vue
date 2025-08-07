@@ -47,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps } from 'vue';
+import { ref } from 'vue';
 import Badge from '@/components/ui/badge/Badge.vue';
 
 // 定义组件导出Props

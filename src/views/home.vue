@@ -43,7 +43,7 @@
             <!-- 功能卡片 -->
             <div class="flex flex-col items-center justify-center gap-8">
                 <functionCard title="人员管理" subtitle="PERSONNEL MANAGEMENT" sideLabel="PERSONNEL" :icon="UsersRound"
-                    backgroundColor="#656A8B" link="/personnel" />
+                    backgroundColor="#656A8B" link="/person" />
                 <functionCard title="面试管理" subtitle="INTERVIEW MANAGEMENT" sideLabel="INTERVIEW" :icon="FileUser"
                     backgroundColor="#AF8E73" link="/interview" />
             </div>
