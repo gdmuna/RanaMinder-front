@@ -54,7 +54,7 @@
 <script setup lang="ts">
 import functionCard from '@/components/functionCard.vue'
 import { UsersRound, FileUser } from 'lucide-vue-next';
-import MarqueeText from '@/components/ui/MarqueeText.vue'
+import MarqueeText from '@/components/MarqueeText.vue'
 </script>
 
 <style scoped>
