@@ -4,6 +4,7 @@
         <!-- <TagSelect /> -->
         <div class="flex flex-col items-center">
             <PersonDetail />
+            <!-- <kunkun /> -->
         </div>
     </div>
 </template>
@@ -12,6 +13,8 @@
 // 逻辑代码
 import TagSelect from '@/components/tagSelect.vue'
 import PersonDetail from '@/components/personDetail.vue';
+import kunkun from '@/components/kunkun.vue'
+
 
 </script>
 

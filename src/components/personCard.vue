@@ -1,6 +1,5 @@
 <template>
-    <div class="relative card dark:bg-[#E8E7E2] rounded-xl overflow-hidden cursor-pointer select-none"
-                @mouseenter="hover = true" @mouseleave="hover = false">
+    <div class="relative card dark:bg-[#E8E7E2] rounded-xl overflow-hidden cursor-pointer select-none">
         <!-- 顶部装饰 -->
         <div class="w-full h-15 flex">
             <div class="w-full h-15  dark:bg-[#A3A2A0]"></div>
@@ -48,7 +47,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import Badge from '@/components/ui/badge/Badge.vue';
 
 // 定义组件导出Props
@@ -69,7 +67,6 @@ const {
     major = '导弹维修与技术',
 } = props;
 
-const hover = ref(false);
 </script>
 
 <style scoped>
