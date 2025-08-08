@@ -1,14 +1,17 @@
 <template>
     <div>
         <!-- 页面内容 -->
-        <TagSelect />
-
+        <!-- <TagSelect /> -->
+        <div class="flex flex-col items-center">
+            <PersonDetail />
+        </div>
     </div>
 </template>
 
 <script setup lang="ts">
 // 逻辑代码
 import TagSelect from '@/components/tagSelect.vue'
+import PersonDetail from '@/components/personDetail.vue';
 
 </script>
 

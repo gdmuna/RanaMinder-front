@@ -35,7 +35,7 @@
             </div>
         </div>
         <!-- 右侧区域 -->
-        <div class="h-full w-3/5 flex flex-col">
+        <div class="h-full w-3/5 flex flex-col"> 
             <!-- 滚动文字 -->
             <div class="mt-[-30px] mb-[60px]">
                 <MarqueeText text="RANAMINDER" :duration="60" :repeatCount="6"/>

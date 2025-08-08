@@ -1,5 +1,5 @@
 <template>
-    <div class="flex">
+    <div class="flex select-none">
         <!-- 标签展示 -->
         <TagsInput v-model="tags" class="w-auto">
             <div class="flex flex-wrap gap-2">
