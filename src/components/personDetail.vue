@@ -17,11 +17,66 @@
             <div class="space-y-13 lg:p-6 p-3">
                 <!-- 姓名 -->
                 <div class="flex">
-                    <span class="md:w-[5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C]">姓名</span>
+                    <span class="md:w-[5.5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C]">姓名</span>
                     <span class="md:text-xl text-[#000000] font-extrabold md:tracking-wide md:-mt-0.5">{{ name }}</span>
                 </div>
+                <div class="flex space-x-5">
+                    <!-- 协会 -->
+                    <FormField v-slot="{ componentField }" name="association">
+                        <FormItem class="flex items-center">
+                            <FormLabel class="md:w-[5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">部门
+                            </FormLabel>
+                            <FormControl>
+                                <Select v-bind="componentField">
+                                    <SelectTrigger class="select-trigger">
+                                        <SelectValue :placeholder="association" class="select-value" />
+                                    </SelectTrigger>
+                                    <SelectContent class="dark:bg-[#A3A2A0] border-0 dark:text-[#000000]">
+                                        <SelectItem value="网络协会">网络协会</SelectItem>
+                                        <SelectItem value="ACM协会">ACM协会</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    </FormField>
+                    <!-- 具体部门 -->
+                    <FormField v-slot="{ componentField }" name="department">
+                        <FormItem>
+                            <FormControl>
+                                <Select v-bind="componentField">
+                                    <SelectTrigger class="select-trigger">
+                                        <SelectValue :placeholder="department" class="select-value" />
+                                    </SelectTrigger>
+                                    <SelectContent class="dark:bg-[#A3A2A0] border-0 dark:text-[#000000]">
+                                        <SelectItem value="会长团">会长团</SelectItem>
+                                        <SelectItem value="宣传部">宣传部</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    </FormField>
+                    <!-- 职位 -->
+                    <FormField v-slot="{ componentField }" name="position">
+                        <FormItem>
+                            <FormControl>
+                                <Select v-bind="componentField">
+                                    <SelectTrigger class="select-trigger">
+                                        <SelectValue :placeholder="position" class="select-value" />
+                                    </SelectTrigger>
+                                    <SelectContent class="dark:bg-[#A3A2A0] border-0 dark:text-[#000000]">
+                                        <SelectItem value="会长">会长</SelectItem>
+                                        <SelectItem value="副会长">副会长</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    </FormField>
+                </div>
                 <!-- 部门 -->
-                <div class="flex">
+                <!-- <div class="flex">
                     <span class="md:w-[5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C]">部门</span>
                     <div class="flex flex-1 gap-2 w-[17rem] min-w-[17rem] max-w-[17rem] overflow-x-
                         auto whitespace-nowrap hide-scrollbar">
@@ -29,7 +84,7 @@
                             <Badge>{{ item }}</Badge>
                         </div>
                     </div>
-                </div>
+                </div> -->
                 <!-- 年级 -->
                 <FormField v-slot="{ componentField }" name="grade">
                     <FormItem class="flex items-center">
@@ -96,6 +151,9 @@
                     </FormItem>
                 </FormField>
             </div>
+            <Button type="submit">
+                Submit
+            </Button>
         </form>
     </div>
 </template>
@@ -108,7 +166,9 @@ import { Minimize2 } from 'lucide-vue-next';
 // 定义组件导出Props
 const props = defineProps<{
     name?: string
-    department?: string[]
+    association?: string
+    department?: string
+    position?: string
     grade?: string
     major?: string
     stuId?: string
@@ -118,8 +178,10 @@ const props = defineProps<{
 
 // 设置默认值
 const {
-    name = '测试',
-    department = ['网络协会', '会长团', '会长'],
+    name = '琪亚娜 · 卡斯兰娜',
+    association = '圣芙蕾雅学园',
+    department = '女武神',
+    position = '白炼',
     grade = '2024级',
     major = '导弹维修与技术',
     stuId = '24201111000',
@@ -133,6 +195,7 @@ const {
 
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
+import { h, markRaw } from 'vue'
 import * as z from 'zod'
 
 import { Button } from '@/components/ui/button'
@@ -145,18 +208,40 @@ import {
     FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { toast } from 'vue-sonner';
+
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 const formSchema = toTypedSchema(z.object({
     username: z.string().min(2).max(50),
 }))
 
-const form = useForm({
+const { handleSubmit } = useForm({
     validationSchema: formSchema,
 })
 
-const onSubmit = form.handleSubmit((values) => {
-    console.log('Form submitted!', values)
+const onSubmit = handleSubmit((values) => {
+    toast(
+        markRaw(
+            h("pre", { class: "mt-2 w-[340px] rounded-md bg-slate-950 p-4" },
+                h("code", { class: "text-white" }, JSON.stringify(values, null, 2))
+            )
+        ),
+        {
+            title: "You submitted the following values:"
+        }
+    )
 })
+
+
 import { ref, onMounted, watch } from 'vue'
 
 const gradeBadgeWidth = ref<string>('auto')
@@ -231,5 +316,19 @@ watch(
     transform: scale(1.1);
     transition: transform 0.25s ease-in-out;
     outline: none;
+}
+
+.select-value {
+    font-size: 0.875rem;
+    font-weight: bold;
+    color: #000000;
+}
+
+.select-trigger {
+    border-radius: 999px;
+    background-color: #8FAFC4;
+    border: none;
+    outline: none;
+    box-shadow: none;
 }
 </style>

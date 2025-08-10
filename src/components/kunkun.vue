@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { useForm } from 'vee-validate'
-import { toTypedSchema } from '@vee-validate/zod'
-import * as z from 'zod'
+import { toTypedSchema } from "@vee-validate/zod"
+import { useForm } from "vee-validate"
+import { h, markRaw } from "vue"
+import * as z from "zod"
 
-import { Button } from '@/components/ui/button'
+import { Button } from "@/components/ui/button"
 import {
     FormControl,
     FormDescription,
@@ -11,24 +12,34 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { toast } from 'vue-sonner'
 
 const formSchema = toTypedSchema(z.object({
     username: z.string().min(2).max(50),
 }))
 
-const form = useForm({
+const { handleSubmit } = useForm({
     validationSchema: formSchema,
 })
 
-const onSubmit = form.handleSubmit((values) => {
-    console.log('Form submitted!', values)
+const onSubmit = handleSubmit((values) => {
+    toast(
+        markRaw(
+            h("pre", { class: "mt-2 w-[340px] rounded-md bg-slate-950 p-4" },
+                h("code", { class: "text-white" }, JSON.stringify(values, null, 2))
+            )
+        ),
+        {
+            title: "You submitted the following values:"
+        }
+    )
 })
 </script>
 
 <template>
-    <form @submit="onSubmit">
+    <form class="w-2/3 space-y-6" @submit="onSubmit">
         <FormField v-slot="{ componentField }" name="username">
             <FormItem>
                 <FormLabel>Username</FormLabel>

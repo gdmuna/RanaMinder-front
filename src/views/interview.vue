@@ -4,7 +4,7 @@
         <!-- <TagSelect /> -->
         <div class="flex flex-col items-center">
             <PersonDetail />
-            <!-- <kunkun /> -->
+            <kunkun />
         </div>
     </div>
 </template>
