@@ -4,9 +4,13 @@
             :grade="person.grade" :major="person.major" :stuId="person.stuId" @click="showDetail(person)" />
     </div>
     <!-- 人员详细卡片弹窗 -->
-    <div v-if="showPersonDetail" class="fixed inset-0 dark:bg-black/50 backdrop-blur-xs z-10 flex items-center justify-center" @click.self="closeDetail">
-        <PersonDetail :person="selectedPerson" />
-    </div>
+    <teleport to="body">
+        <div v-if="showPersonDetail"
+            class="fixed inset-0 dark:bg-black/50 backdrop-blur-xs z-10 flex items-center justify-center"
+            @click.self="closeDetail">
+            <PersonDetail :person="selectedPerson" />
+        </div>
+    </teleport>
 </template>
 
 <script setup lang="ts">
