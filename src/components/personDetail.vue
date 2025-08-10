@@ -75,16 +75,6 @@
                         </FormItem>
                     </FormField>
                 </div>
-                <!-- 部门 -->
-                <!-- <div class="flex">
-                    <span class="md:w-[5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C]">部门</span>
-                    <div class="flex flex-1 gap-2 w-[17rem] min-w-[17rem] max-w-[17rem] overflow-x-
-                        auto whitespace-nowrap hide-scrollbar">
-                        <div v-for="(item, index) in department" :key="'dept-' + index" class="inline-block">
-                            <Badge>{{ item }}</Badge>
-                        </div>
-                    </div>
-                </div> -->
                 <!-- 年级 -->
                 <FormField v-slot="{ componentField }" name="grade">
                     <FormItem class="flex items-center">
@@ -150,18 +140,53 @@
                         <FormMessage />
                     </FormItem>
                 </FormField>
+                <div class="flex">
+                    <div class="flex justify-start">
+                        <Button type="submit"
+                            class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold px-[5rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md">
+                            修改
+                        </Button>
+                    </div>
+                    <div class="flex flex-1 justify-end">
+                        <Button
+                            class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold px-[5rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md">
+                            取消
+                        </Button>
+                    </div>
+                </div>
             </div>
-            <Button type="submit">
-                Submit
-            </Button>
         </form>
     </div>
 </template>
 
 <script setup lang="ts">
-import Badge from '@/components/ui/badge/Badge.vue';
-import TagSelect from '@/components/tagSelect.vue'
 import { Minimize2 } from 'lucide-vue-next';
+
+import { ref, onMounted, watch } from 'vue'
+
+import { useForm } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/zod'
+import { h, markRaw } from 'vue'
+import * as z from 'zod'
+
+import { Button } from '@/components/ui/button'
+import {
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { toast } from 'vue-sonner';
+
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 // 定义组件导出Props
 const props = defineProps<{
@@ -183,45 +208,21 @@ const {
     department = '女武神',
     position = '白炼',
     grade = '2024级',
-    major = '导弹维修与技术',
+    major = '崩坏兽的十万种做法',
     stuId = '24201111000',
     email = '123456789@qq.com',
     phoneNum = '13800000000',
-} = props;
-
-
-
-
-
-import { useForm } from 'vee-validate'
-import { toTypedSchema } from '@vee-validate/zod'
-import { h, markRaw } from 'vue'
-import * as z from 'zod'
-
-import { Button } from '@/components/ui/button'
-import {
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { toast } from 'vue-sonner';
-
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
+} = props ?? {};
 
 const formSchema = toTypedSchema(z.object({
-    username: z.string().min(2).max(50),
+    association: z.string().min(2).max(50),
+    department: z.string().min(2).max(50),
+    position: z.string().min(2).max(50),
+    grade: z.string().min(2).max(50),
+    major: z.string().min(2).max(50),
+    stuId: z.string().min(2).max(50),
+    email: z.string().min(2).max(50),
+    phoneNum: z.string().min(2).max(50),
 }))
 
 const { handleSubmit } = useForm({
@@ -234,15 +235,9 @@ const onSubmit = handleSubmit((values) => {
             h("pre", { class: "mt-2 w-[340px] rounded-md bg-slate-950 p-4" },
                 h("code", { class: "text-white" }, JSON.stringify(values, null, 2))
             )
-        ),
-        {
-            title: "You submitted the following values:"
-        }
+        )
     )
 })
-
-
-import { ref, onMounted, watch } from 'vue'
 
 const gradeBadgeWidth = ref<string>('auto')
 const majorBadgeWidth = ref<string>('auto')
@@ -271,11 +266,11 @@ onMounted(() => {
 })
 
 function updateAllBadgeWidths() {
-    gradeBadgeWidth.value = calcPlaceholderWidth(grade)
-    majorBadgeWidth.value = calcPlaceholderWidth(major)
-    stuIdBadgeWidth.value = calcPlaceholderWidth(stuId)
-    emailBadgeWidth.value = calcPlaceholderWidth(email)
-    phoneNumBadgeWidth.value = calcPlaceholderWidth(phoneNum)
+    gradeBadgeWidth.value = calcPlaceholderWidth(grade ?? '')
+    majorBadgeWidth.value = calcPlaceholderWidth(major ?? '')
+    stuIdBadgeWidth.value = calcPlaceholderWidth(stuId ?? '')
+    emailBadgeWidth.value = calcPlaceholderWidth(email ?? '')
+    phoneNumBadgeWidth.value = calcPlaceholderWidth(phoneNum ?? '')
 }
 
 watch(
@@ -286,18 +281,6 @@ watch(
 </script>
 
 <style scoped>
-.hide-scrollbar {
-    scrollbar-width: none;
-    /* Firefox */
-    -ms-overflow-style: none;
-    /* IE 10+ */
-}
-
-.hide-scrollbar::-webkit-scrollbar {
-    display: none;
-    /* Chrome/Safari/Opera */
-}
-
 .inputBadge {
     display: inline-block;
     border-radius: 999px;
@@ -315,6 +298,7 @@ watch(
 .inputBadge:focus {
     transform: scale(1.1);
     transition: transform 0.25s ease-in-out;
+    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.15);
     outline: none;
 }
 

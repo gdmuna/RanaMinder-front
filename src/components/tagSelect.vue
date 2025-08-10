@@ -1,3 +1,5 @@
+<!-- 废弃的自封装组件 -->
+
 <template>
     <div class="flex select-none">
         <!-- 标签展示 -->
