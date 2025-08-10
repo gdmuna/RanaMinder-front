@@ -1,5 +1,5 @@
 <template>
-    <div class="relative dark:bg-[#E8E7E2] rounded-xl overflow-hidden select-none w-[35%]">
+    <div class="relative dark:bg-[#E8E7E2] rounded-xl overflow-hidden select-none w-[36%]">
         <!-- 顶部装饰 -->
         <div class="w-full h-16 flex">
             <div class="dark:bg-[#A3A2A0] text-[#000000] px-6 py-5">
