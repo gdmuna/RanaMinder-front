@@ -1,8 +1,7 @@
 <template>
-    <div class="marquee-container select-none" @mouseenter="pause" @mouseleave="resume">
+    <div class="marquee-container select-none">
         <div class="marquee-content" :style="{
             animationDuration: duration + 's',
-            animationPlayState: isPaused ? 'paused' : 'running'
         }">
             <span v-for="n in repeatCount" :key="n" class="marquee-item will-change-transform">
                 {{ text }}
@@ -20,17 +19,9 @@ const props = defineProps<{
     repeatCount?: number
 }>()
 
-const isPaused = ref(false)
-
 const duration = props.duration || 15
 const repeatCount = props.repeatCount || 5
 
-const pause = () => {
-    isPaused.value = true
-}
-const resume = () => {
-    isPaused.value = false
-}
 </script>
 
 <style scoped>
