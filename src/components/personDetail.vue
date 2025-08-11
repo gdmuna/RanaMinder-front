@@ -14,22 +14,22 @@
         <!-- 卡片主体 -->
         <form @submit="onSubmit">
             <!-- 卡片内容 -->
-            <div class="space-y-13 lg:p-6 p-3">
+            <div class="xl:space-y-13 md:space-y-8 xl:p-6 p-5">
                 <!-- 姓名 -->
                 <div class="flex">
-                    <span class="md:w-[5.5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C]">姓名</span>
-                    <span class="md:text-xl text-[#000000] font-extrabold md:tracking-wide md:-mt-0.5">{{ name }}</span>
+                    <span class="xl:w-[5rem] w-[4rem] inline-block dark:text-[#6F6E6C]">姓名</span>
+                    <span class="text-xl text-[#000000] font-extrabold md:tracking-wide md:-mt-0.5">{{ name }}</span>
                 </div>
                 <div class="flex space-x-5">
                     <!-- 协会 -->
                     <FormField v-slot="{ componentField }" name="association">
                         <FormItem class="flex items-center">
-                            <FormLabel class="md:w-[5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">部门
+                            <FormLabel class="xl:w-[4.5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">部门
                             </FormLabel>
                             <FormControl>
                                 <Select v-bind="componentField">
                                     <SelectTrigger class="select-trigger">
-                                        <SelectValue :placeholder="association" class="select-value" />
+                                        <SelectValue :placeholder="association" class="select-value xl:text-[0.875rem] text-[0.675rem]" />
                                     </SelectTrigger>
                                     <SelectContent class="dark:bg-[#A3A2A0] border-0 dark:text-[#000000]">
                                         <SelectItem value="网络协会">网络协会</SelectItem>
@@ -46,7 +46,7 @@
                             <FormControl>
                                 <Select v-bind="componentField">
                                     <SelectTrigger class="select-trigger">
-                                        <SelectValue :placeholder="department" class="select-value" />
+                                        <SelectValue :placeholder="department" class="select-value xl:text-[0.875rem] text-[0.675rem]" />
                                     </SelectTrigger>
                                     <SelectContent class="dark:bg-[#A3A2A0] border-0 dark:text-[#000000]">
                                         <SelectItem value="会长团">会长团</SelectItem>
@@ -63,7 +63,7 @@
                             <FormControl>
                                 <Select v-bind="componentField">
                                     <SelectTrigger class="select-trigger">
-                                        <SelectValue :placeholder="position" class="select-value" />
+                                        <SelectValue :placeholder="position" class="select-value xl:text-[0.875rem] text-[0.675rem]" />
                                     </SelectTrigger>
                                     <SelectContent class="dark:bg-[#A3A2A0] border-0 dark:text-[#000000]">
                                         <SelectItem value="会长">会长</SelectItem>
@@ -78,11 +78,11 @@
                 <!-- 年级 -->
                 <FormField v-slot="{ componentField }" name="grade">
                     <FormItem class="flex items-center">
-                        <FormLabel class="md:w-[5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">年级
+                        <FormLabel class="xl:w-[4.5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">年级
                         </FormLabel>
                         <FormControl>
                             <Input type="text" :placeholder="grade" v-bind="componentField"
-                                class="inputBadge dark:placeholder:text-[#000000]"
+                                class="inputBadge dark:placeholder:text-[#000000] xl:text-[0.875rem]! text-[0.675rem]!"
                                 :style="{ width: gradeBadgeWidth }" />
                         </FormControl>
                         <FormMessage />
@@ -91,11 +91,11 @@
                 <!-- 专业 -->
                 <FormField v-slot="{ componentField }" name="major">
                     <FormItem class="flex items-center">
-                        <FormLabel class="md:w-[5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">专业
+                        <FormLabel class="xl:w-[4.5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">专业
                         </FormLabel>
                         <FormControl>
                             <Input type="text" :placeholder="major" v-bind="componentField"
-                                class="inputBadge dark:placeholder:text-[#000000]"
+                                class="inputBadge dark:placeholder:text-[#000000] xl:text-[0.875rem]! text-[0.675rem]!"
                                 :style="{ width: majorBadgeWidth }" />
                         </FormControl>
                         <FormMessage />
@@ -104,11 +104,11 @@
                 <!-- 学号 -->
                 <FormField v-slot="{ componentField }" name="stuId">
                     <FormItem class="flex items-center">
-                        <FormLabel class="md:w-[5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">学号
+                        <FormLabel class="xl:w-[4.5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">学号
                         </FormLabel>
                         <FormControl>
                             <Input type="text" :placeholder="stuId" v-bind="componentField"
-                                class="inputBadge dark:placeholder:text-[#000000]"
+                                class="inputBadge dark:placeholder:text-[#000000] xl:text-[0.875rem]! text-[0.675rem]!"
                                 :style="{ width: stuIdBadgeWidth }" />
                         </FormControl>
                         <FormMessage />
@@ -117,11 +117,11 @@
                 <!-- 邮箱 -->
                 <FormField v-slot="{ componentField }" name="email">
                     <FormItem class="flex items-center">
-                        <FormLabel class="md:w-[5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">邮箱
+                        <FormLabel class="xl:w-[4.5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">邮箱
                         </FormLabel>
                         <FormControl>
                             <Input type="text" :placeholder="email" v-bind="componentField"
-                                class="inputBadge dark:placeholder:text-[#000000]"
+                                class="inputBadge dark:placeholder:text-[#000000] xl:text-[0.875rem]! text-[0.675rem]!"
                                 :style="{ width: emailBadgeWidth }" />
                         </FormControl>
                         <FormMessage />
@@ -130,11 +130,11 @@
                 <!-- 手机号 -->
                 <FormField v-slot="{ componentField }" name="phoneNum">
                     <FormItem class="flex items-center">
-                        <FormLabel class="md:w-[5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">手机号
+                        <FormLabel class="xl:w-[4.5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">手机
                         </FormLabel>
                         <FormControl>
                             <Input type="text" :placeholder="phoneNum" v-bind="componentField"
-                                class="inputBadge dark:placeholder:text-[#000000]"
+                                class="inputBadge dark:placeholder:text-[#000000] xl:text-[0.875rem]! text-[0.675rem]!"
                                 :style="{ width: phoneNumBadgeWidth }" />
                         </FormControl>
                         <FormMessage />
@@ -143,13 +143,14 @@
                 <div class="flex">
                     <div class="flex justify-start">
                         <Button type="submit"
-                            class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold px-[5rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
+                            class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
                             修改
                         </Button>
                     </div>
                     <div class="flex flex-1 justify-end">
                         <Button
-                            class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold px-[5rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer" @click="deliverCloseDetail">
+                            class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer"
+                            @click="deliverCloseDetail">
                             取消
                         </Button>
                     </div>
@@ -190,6 +191,13 @@ import {
 
 // 定义组件导出Props
 const props = defineProps<{
+    person?: {
+        stuId: string;
+        name: string;
+        department: string[];
+        grade: string;
+        major: string;
+    } | null;
     name?: string
     association?: string
     department?: string
@@ -204,13 +212,14 @@ const props = defineProps<{
 
 // 设置默认值
 const {
-    name = '琪亚娜 · 卡斯兰娜',
-    association = '圣芙蕾雅学园',
-    department = '女武神',
-    position = '白炼',
-    grade = '2024级',
-    major = '崩坏兽的十万种做法',
-    stuId = '24201111000',
+    person = null,
+    name = person?.name || '琪亚娜 · 卡斯兰娜',
+    association = person?.department?.[0] || '圣芙蕾雅学园',
+    department = person?.department?.[1] || '女武神',
+    position = person?.department?.[2] || '白炼',
+    grade = person?.grade || '2024级',
+    major = person?.major || '崩坏兽的十万种做法',
+    stuId = person?.stuId || '24201111000',
     email = '123456789@qq.com',
     phoneNum = '13800000000',
 } = props ?? {};
@@ -251,7 +260,11 @@ function calcPlaceholderWidth(text: string) {
     const span = document.createElement('span')
     span.style.visibility = 'hidden'
     span.style.position = 'absolute'
-    span.style.fontSize = '0.875rem'
+    if (window.innerWidth >= 1280) { // xl 及以上
+        span.style.fontSize = '0.875rem'
+    } else { // 小屏
+        span.style.fontSize = '0.675rem'
+    }
     span.style.fontWeight = 'bold'
     span.style.padding = '0.25rem 0.75rem'
     span.style.fontFamily = 'inherit'
@@ -287,7 +300,6 @@ watch(
     border-radius: 999px;
     background-color: #8FAFC4;
     color: #000000;
-    font-size: 0.875rem;
     font-weight: bold;
     border: none;
     outline: none;
@@ -304,7 +316,6 @@ watch(
 }
 
 .select-value {
-    font-size: 0.875rem;
     font-weight: bold;
     color: #000000;
 }
@@ -312,6 +323,7 @@ watch(
 .select-trigger {
     border-radius: 999px;
     background-color: #8FAFC4;
+    height: auto;
     border: none;
     outline: none;
     box-shadow: none;
