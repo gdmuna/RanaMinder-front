@@ -1,7 +1,7 @@
 <template>
     <div>
         <!-- 页面内容 -->
-        <div class="flex flex-col items-center">
+        <div class="flex flex-col items-center mt-[3.5rem]">
                 <PersonDetail />
         </div>
     </div>

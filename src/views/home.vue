@@ -1,5 +1,5 @@
 <template>
-    <div class="h-screen w-full flex bg-[#0E100F]">
+    <div class="h-screen w-full flex bg-[#0E100F] mt-[3.5rem] -mb-[3.5rem]">
         <!-- 左侧区域 -->
         <div class="h-full w-2/5 flex items-center justify-start relative overflow-hidden">
             <!-- 蓝色背景 -->
