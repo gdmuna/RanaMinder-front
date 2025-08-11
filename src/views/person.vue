@@ -5,11 +5,13 @@
     </div>
     <!-- 人员详细卡片弹窗 -->
     <teleport to="body">
+        <Transition name="fade">
         <div v-if="showPersonDetail"
             class="fixed inset-0 dark:bg-black/50 backdrop-blur-xs z-10 flex items-center justify-center"
             @click.self="closeDetail">
-            <PersonDetail :person="selectedPerson" />
+            <PersonDetail :person="selectedPerson" :deliverCloseDetail="closeDetail" />
         </div>
+        </Transition>
     </teleport>
 </template>
 
@@ -147,3 +149,24 @@ watch(showPersonDetail, (Val) => {
     }
 })
 </script>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+    transition: 
+        opacity 0.30s cubic-bezier(.4,0,.2,1),
+        transform 0.30s cubic-bezier(.4,0,.2,1);
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+    transform: translateY(40px);
+}
+
+.fade-enter-to,
+.fade-leave-from {
+    opacity: 1;
+    transform: translateY(0);
+}
+</style>

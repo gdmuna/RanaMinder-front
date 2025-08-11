@@ -2,7 +2,7 @@
     <div class="relative dark:bg-[#E8E7E2] rounded-xl overflow-hidden select-none w-[36%]">
         <!-- 顶部装饰 -->
         <div class="w-full h-16 flex">
-            <div class="dark:bg-[#A3A2A0] text-[#000000] px-6 py-5">
+            <div class="dark:bg-[#A3A2A0] text-[#000000] px-6 py-5 cursor-pointer" @click="deliverCloseDetail">
                 <Minimize2 />
             </div>
             <div class="w-full h-16 dark:bg-[#A3A2A0]"></div>
@@ -143,13 +143,13 @@
                 <div class="flex">
                     <div class="flex justify-start">
                         <Button type="submit"
-                            class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold px-[5rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md">
+                            class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold px-[5rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
                             修改
                         </Button>
                     </div>
                     <div class="flex flex-1 justify-end">
                         <Button
-                            class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold px-[5rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md">
+                            class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold px-[5rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer" @click="deliverCloseDetail">
                             取消
                         </Button>
                     </div>
@@ -199,6 +199,7 @@ const props = defineProps<{
     stuId?: string
     email?: string
     phoneNum?: string
+    deliverCloseDetail?: () => void
 }>();
 
 // 设置默认值
