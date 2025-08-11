@@ -15,46 +15,15 @@
                     <Button variant="link" class="cursor-pointer p-2 text-lg dark:text-[#FEFCE4]" @click="routerGoTo('/home')">首页</Button>
                     <img :src="boundary" alt="">
                     <Button variant="link" class="cursor-pointer p-2 text-lg dark:text-[#FEFCE4]"
-                        @click="routerGoTo('/announcements')">公告</Button>
+                        @click="routerGoTo('/person')">人员管理</Button>
                     <img :src="boundary" alt="">
                     <Button variant="link" class="cursor-pointer p-2 text-lg dark:text-[#FEFCE4]"
-                        @click="routerGoTo('/articles')">文章</Button>
-                    <img :src="boundary" alt="">
-                    <Button variant="link" class="cursor-pointer p-2 text-lg dark:text-[#FEFCE4]"
-                        @click="routerGoTo('/replay')">课程回放</Button>
-                    <img :src="boundary" alt="">
-                    <Button variant="link" class="cursor-pointer p-2 text-lg dark:text-[#FEFCE4]"
-                        @click="routerGoTo('/resourcesHub')">资源站</Button>
+                        @click="routerGoTo('/interview')">面试管理</Button>
                 </nav>
             </div>
             <!-- 页眉右侧内容 -->
             <div class="md:ml-6 ml-2 flex items-center">
                 <div class="flex items-center space-x-2">
-                    <!-- <toggleThemeButton :disabled="disableSwitchTheme" :model-value="isDark"
-                        @update:model-value="toggleTheme" class="cursor-pointer dark:bg-[#FEFCE4]">
-                        <template #thumb>
-                            <Moon v-if="isDark" class="size-5" />
-                            <Sun v-else class="size-5" />
-                        </template>
-                    </toggleThemeButton> -->
-                    <Button variant="ghost" class="rounded-full size-10" as="a" href="https://github.com/gdmuna"
-                        target="_blank" rel="noopener noreferer">
-                        <Github class="size-6" />
-                    </Button>
-                    <Button variant="ghost" class="rounded-full size-10 cursor-pointer">
-                        <Mail class="size-6" />
-                    </Button>
-                    <Button variant="ghost" class="rounded-full size-10 cursor-pointer">
-                        <CalendarFold class="size-6" />
-                    </Button>
-                </div>
-                <img :src="boundary" alt="" class="ml-2 mr-4">
-                <div class="flex items-center space-x-4">
-                    <Button class="join-us-button cursor-pointer font-bold">
-                        <Smile class="size-6" />
-                        加入我们
-                    </Button>
-                    <img :src="boundary" alt="">
                     <Button class="cursor-pointer border-2 dark:border-[#FEFCE4] dark:bg-[#0E100F] dark:text-[#FEFCE4]">
                         <LogIn class="size-6" />
                         登录

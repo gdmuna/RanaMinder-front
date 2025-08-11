@@ -1,5 +1,5 @@
 <template>
-    <div class="relative dark:bg-[#E8E7E2] rounded-xl overflow-hidden select-none w-[36%]">
+    <div class="relative dark:bg-[#E8E7E2] rounded-xl overflow-hidden select-none md:w-auto min-w-[36%] w-full h-auto">
         <!-- 顶部装饰 -->
         <div class="w-full h-16 flex">
             <div class="dark:bg-[#A3A2A0] text-[#000000] px-6 py-5 cursor-pointer" @click="deliverCloseDetail">
@@ -14,7 +14,7 @@
         <!-- 卡片主体 -->
         <form @submit="onSubmit">
             <!-- 卡片内容 -->
-            <div class="xl:space-y-13 md:space-y-8 xl:p-6 p-5">
+            <div class="xl:space-y-13 md:space-y-8 space-y-9 xl:p-6 p-5">
                 <!-- 姓名 -->
                 <div class="flex">
                     <span class="xl:w-[5rem] w-[4rem] inline-block dark:text-[#6F6E6C]">姓名</span>

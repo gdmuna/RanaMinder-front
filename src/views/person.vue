@@ -7,9 +7,9 @@
     <teleport to="body">
         <Transition name="fade">
         <div v-if="showPersonDetail"
-            class="fixed inset-0 dark:bg-black/50 backdrop-blur-xs z-10 flex items-center justify-center"
+            class="fixed inset-0 dark:bg-black/50 backdrop-blur-xs z-10 flex items-center md:justify-center flex-col justify-end"
             @click.self="closeDetail">
-            <PersonDetail :person="selectedPerson" :deliverCloseDetail="closeDetail" />
+            <PersonDetail :person="selectedPerson" :deliverCloseDetail="closeDetail"/>
         </div>
         </Transition>
     </teleport>
