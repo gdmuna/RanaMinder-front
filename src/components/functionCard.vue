@@ -10,7 +10,7 @@
         <div class="flex flex-col">
             <!-- 主体区 -->
             <div class="min-h-[16rem] flex items-center justify-center pr-[1.5rem] cursor-pointer select-none ">
-                <div class="w-full h-[74%] rounded-lg px-[2.5rem] py-[2rem] flex space-x-5 "
+                <div class="w-full h-[74%] rounded-lg px-[2.5rem] py-[2rem] flex space-x-5"
                     :style="{ backgroundColor: backgroundColor }">
                     <!-- 图标 -->
                     <div class="icon-animate">
@@ -26,7 +26,7 @@
                             {{ subtitle }}
                         </div>
                         <!-- 分割线 -->
-                        <div class="w-16 h-0.5 bg-black ml-[0.1rem]"></div>
+                        <div class="w-16 h-0.5 bg-black ml-[0.5rem]"></div>
                     </div>
                 </div>
             </div>

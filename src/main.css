@@ -16,3 +16,7 @@ body::-webkit-scrollbar {
     display: none;
     /* Chrome/Safari/Webkit */
 }
+
+body, html {
+    font-family: sans-serif, "Microsoft YaHei", Arial;
+}
