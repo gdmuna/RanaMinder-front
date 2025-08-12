@@ -1,5 +1,6 @@
 <template>
-    <div class="md:w-[47rem] md:h-[20rem] w-auto h-[19rem] md:px-0 px-[0.7rem] border-3 border-transparent bg-transparent relative select-none">
+    <div
+        class="md:w-[47rem] md:h-[20rem] w-auto h-[19rem] md:px-0 px-[0.7rem] border-3 border-transparent bg-transparent relative select-none">
         <div
             class="md:absolute relative bottom-0 left-0 md:w-[44rem] md:h-[14rem] w-full h-full border-2 border-[#EEEEEE] rounded-lg bg-transparent flex flex-col justify-between p-8">
             <!-- 标题 -->
@@ -10,34 +11,27 @@
                 </span>
             </div>
             <!-- 底部按钮和时间 -->
-            <div class="w-full items-end flex -mb-[0.5rem]">
+            <div class="w-full items-end flex -mb-[0.8rem]">
                 <!-- 按钮 -->
-                <div class="flex space-x-8">
-                    <div class="relative group flex items-center justify-center">
-                        <svg
-                            class="absolute left-[-1.5rem] top-[0.1rem] h-8 w-24 opacity-0 group-hover:opacity-100 transition-all duration-200 z-0">
-                            <path :fill="color" d="M24 0 H96 L72 32 H0 Z"
-                                style="-webkit-clip-path: polygon(25% 0%, 100% 1%, 100% 100%, 25% 100%, 0% 50%);clip-path: polygon(25% 0%, 100% 1%, 100% 100%, 25% 100%, 0% 50%);" />
-                        </svg>
+                <div class="flex space-x-5 cursor-pointer">
+                    <div class="relative flex items-center justify-center rounded-lg px-[1.5rem] py-[0.3rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md" 
+                        :style="{ backgroundColor: color }">
                         <div
-                            class="text-[1.3rem] font-extrabold dark:text-[#EEEEEE] tracking-wide cursor-pointer relative z-10 group-hover-black">
+                            class="text-[1rem] font-extrabold dark:text-[#000000] tracking-wide relative z-10">
                             查看
                         </div>
                     </div>
-                    <div class="relative group flex items-center justify-center">
-                        <svg
-                            class="absolute left-[-1.5rem] top-[0.1rem] h-8 w-24 opacity-0 group-hover:opacity-100 transition-all duration-200 z-0">
-                            <path :fill="color" d="M24 0 H96 L72 32 H0 Z"
-                                style="-webkit-clip-path: polygon(0% 0%, 75% 0%, 100% 50%, 75% 100%, 0% 100%);clip-path: polygon(0% 0%, 75% 0%, 100% 50%, 75% 100%, 0% 100%);" />
-                        </svg>
+                    <div class="relative flex items-center justify-center rounded-lg px-[1.5rem] py-[0.3rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md"
+                        :style="{ backgroundColor: color }">
                         <div
-                            class="text-[1.3rem] font-extrabold dark:text-[#EEEEEE] tracking-wide cursor-pointer relative z-10 group-hover-black">
+                            class="text-[1rem] font-extrabold dark:text-[#000000] tracking-wide relative z-10">
                             修改
                         </div>
                     </div>
                 </div>
                 <!-- 时间 -->
-                <span class="text-[1rem] font-extrabold text-[#EEEEEE] tracking-widest ml-auto md:mr-[5rem] mb-[0.25rem]">
+                <span
+                    class="text-[1rem] font-extrabold text-[#EEEEEE] tracking-widest ml-auto mr-[5rem] mb-[0.3rem] md:block hidden">
                     {{ formatDate(time) }}
                 </span>
             </div>
@@ -57,10 +51,10 @@ const props = defineProps<{
     color?: string
 }>()
 
-const { 
+const {
     title = '这是一个面试活动',
     time = new Date(),
-    color = '#FADCD9'
+    color = '#0A90B4'
 } = props;
 
 function formatDate(date: Date) {
@@ -86,10 +80,6 @@ function formatDate(date: Date) {
 .hide-scrollbar::-webkit-scrollbar {
     display: none;
     /* Chrome/Safari/Opera */
-}
-
-.group:hover .group-hover-black {
-    color: #000000;
 }
 
 .text-gradient {
