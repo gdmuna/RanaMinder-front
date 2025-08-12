@@ -1,26 +1,27 @@
 <template>
-    <div>
-        <div class="flex flex-col items-center mt-[5rem] mb-[2rem]">
-            <div>
+        <div class="flex flex-col items-center mt-[5rem] mb-[2rem]"> 
                 <div v-for="(item, index) in interviews" :key="item.id" class="mb-8">
                     <InterviewShow
+                        :id="item.id"
                         :title="item.title"
                         :time="item.time"
-                        :color="colors[index % colors.length]"
-                        :gradient="gradients[index % gradients.length]"
+                           :style="{
+                    '--main-color': colors[index % colors.length],
+                    '--main-gradient': gradients[index % gradients.length]
+                }"
+                        @view-detail="goToDetail"
                     />
                 </div>
-                <!-- 创建新面试 --><NewInterview/>
-                
-            </div>
+                <NewInterview/>
         </div>
-    </div>
 </template>
 
 <script setup lang="ts">
 // 逻辑代码
 import InterviewShow from '@/components/interviewShow.vue';
 import NewInterview from '@/components/newInterview.vue';
+import { useRouter } from 'vue-router';
+
 // 伪数据
 const interviews = [
     { id: 1, title: '2024年干事招新面试干事招新面试', time: new Date('2024-09-12T14:00:00') },
@@ -45,6 +46,12 @@ const gradients = [
     'linear-gradient(270deg, #71B280 0%, #FBC2EB 100%)',
     'linear-gradient(270deg, #DECBA4 0%, #BDC3C7 100%)',
 ];
+
+const router = useRouter();
+
+function goToDetail(id: number) {
+    router.push({ name: 'interviewInformation', params: { id } });
+}
 </script>
 
 <style scoped>

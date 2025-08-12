@@ -1,12 +1,11 @@
 <template>
     <div
-        class="md:w-[47rem] md:h-[20rem] w-auto h-[19rem] md:px-0 px-[0.7rem] border-3 border-transparent bg-transparent relative select-none">
+        class="md:w-[47rem] md:h-[20rem] w-[100vw] h-[19rem] md:px-0 px-[0.7rem] border-3 border-transparent bg-transparent relative select-none">
         <div
             class="md:absolute relative bottom-0 left-0 md:w-[44rem] md:h-[14rem] w-full h-full border-2 border-[#EEEEEE] rounded-lg bg-transparent flex flex-col justify-between p-8">
             <!-- 标题 -->
             <div class="w-full flex items-start mb-4 overflow-x-auto md:whitespace-nowrap hide-scrollbar">
-                <span class="font-[优设标题黑] md:text-[4rem] text-[3.8rem] tracking-wide text-gradient drop-shadow-lg"
-                    :style="{ '--main-color': color }">
+                <span class="font-[优设标题黑] md:text-[4rem] text-[3.8rem] tracking-wide text-gradient drop-shadow-lg">
                     {{ title }}
                 </span>
             </div>
@@ -15,14 +14,15 @@
                 <!-- 按钮 -->
                 <div class="flex space-x-5 cursor-pointer">
                     <div class="relative flex items-center justify-center rounded-lg px-[1.5rem] py-[0.3rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md" 
-                        :style="{ backgroundColor: color }">
+                    :style="{ backgroundColor: 'var(--main-color)' }"
+                        @click="handleViewDetail">
                         <div
                             class="text-[1rem] font-extrabold dark:text-[#000000] tracking-wide relative z-10">
                             查看
                         </div>
                     </div>
                     <div class="relative flex items-center justify-center rounded-lg px-[1.5rem] py-[0.3rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md"
-                        :style="{ backgroundColor: color }">
+                    :style="{ backgroundColor: 'var(--main-color)' }">
                         <div
                             class="text-[1rem] font-extrabold dark:text-[#000000] tracking-wide relative z-10">
                             修改
@@ -46,20 +46,27 @@
 <script setup lang="ts">
 
 const props = defineProps<{
+    id: number
     title: string
     time: Date
-    color?: string
 }>()
 
 const {
     title = '这是一个面试活动',
     time = new Date(),
-    color = '#0A90B4'
 } = props;
 
 function formatDate(date: Date) {
     return `${date.getFullYear()} - ${date.getMonth() + 1} - ${date.getDate()}`
 }
+
+const emit = defineEmits(['view-detail']);
+
+function handleViewDetail() {
+    emit('view-detail', props.id);
+}
+
+
 </script>
 
 <style scoped>
