@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="flex flex-col items-center mt-[4rem]">
+        <div class="flex flex-col items-center mt-[5rem] mb-[2rem]">
             <div>
                 <div v-for="(item, index) in interviews" :key="item.id" class="mb-8">
                     <InterviewShow
