@@ -6,15 +6,28 @@
                 '--main-gradient': gradients[index % gradients.length]
             }" @view-detail="goToDetail" />
         </div>
+        <!-- 新增面试 -->
         <NewInterview />
+        <!-- 人员详细卡片弹窗 -->
+        <teleport to="body">
+            <Transition name="fade">
+                <div v-if="showPersonDetail"
+                    class="fixed inset-0 dark:bg-black/50 backdrop-blur-xs z-10 flex items-center md:justify-center flex-col justify-end"
+                    @click.self="closeDetail">
+                    <interviewRevise :person="selectedPerson" :deliverCloseDetail="closeDetail" />
+                </div>
+            </Transition>
+        </teleport>
     </div>
 </template>
 
 <script setup lang="ts">
 // 逻辑代码
+import { ref, watch } from 'vue';
 import InterviewShow from '@/components/interviewShow.vue';
 import NewInterview from '@/components/newInterview.vue';
 import { useRouter } from 'vue-router';
+import interviewCreate from '@/components/interviewCreate.vue';
 
 // 伪数据
 const interviews = [
@@ -46,8 +59,62 @@ const router = useRouter();
 function goToDetail(id: number) {
     router.push({ name: 'interviewInformation', params: { id } });
 }
+
+const showPersonDetail = ref(false)
+const selectedPerson = ref<{
+    stuId: string;
+    name: string;
+    department: string[];
+    grade: string;
+    major: string;
+    email: string;
+    phoneNum: string;
+} | undefined>(undefined);
+
+function showDetail(person: {
+    stuId: string;
+    name: string;
+    department: string[];
+    grade: string;
+    major: string;
+    email: string;
+    phoneNum: string;
+}) {
+    selectedPerson.value = person
+    showPersonDetail.value = true
+}
+
+function closeDetail() {
+    showPersonDetail.value = false
+    selectedPerson.value = undefined
+}
+
+watch(showPersonDetail, (Val) => {
+    if (Val) {
+        document.body.style.overflow = 'hidden'
+    } else {
+        document.body.style.overflow = ''
+    }
+})
 </script>
 
 <style scoped>
-/* 样式 */
+.fade-enter-active,
+.fade-leave-active {
+    transition:
+        opacity 0.30s cubic-bezier(.4, 0, .2, 1),
+        transform 0.30s cubic-bezier(.4, 0, .2, 1);
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+    transform: translateY(40px);
+}
+
+.fade-enter-to,
+.fade-leave-from {
+    opacity: 1;
+    transform: translateY(0);
+}
 </style>
