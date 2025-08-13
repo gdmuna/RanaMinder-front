@@ -13,7 +13,7 @@
         <!-- 卡片主体 --> 
         <div class="flex items-center justify-center lg:-mt-[0.5rem]">
             <!-- 照片 -->
-            <div class="bg-[#438EDB] aspect-[5/7] lg:w-[8.2rem] w-[7.2rem] rounded-lg shadow-lg -ml-[1rem]">
+            <div class="bg-[#438EDB] aspect-[5/7] lg:w-[8.2rem] w-[7.2rem] rounded-lg shadow-md -ml-[1rem]">
                 <img src="@/assets/人律爱莉.png" alt="" class="w-full h-full object-cover rounded-lg">
             </div>
             <!-- 信息内容 -->

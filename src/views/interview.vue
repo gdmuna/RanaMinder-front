@@ -1,19 +1,13 @@
 <template>
-        <div class="flex flex-col items-center mt-[5rem] mb-[2rem]"> 
-                <div v-for="(item, index) in interviews" :key="item.id" class="mb-8">
-                    <InterviewShow
-                        :id="item.id"
-                        :title="item.title"
-                        :time="item.time"
-                           :style="{
-                    '--main-color': colors[index % colors.length],
-                    '--main-gradient': gradients[index % gradients.length]
-                }"
-                        @view-detail="goToDetail"
-                    />
-                </div>
-                <NewInterview/>
+    <div class="flex flex-col items-center mt-[5rem] mb-[2rem]">
+        <div v-for="(item, index) in interviews" :key="item.id" class="mb-8">
+            <InterviewShow :id="item.id" :title="item.title" :time="item.time" :style="{
+                '--main-color': colors[index % colors.length],
+                '--main-gradient': gradients[index % gradients.length]
+            }" @view-detail="goToDetail" />
         </div>
+        <NewInterview />
+    </div>
 </template>
 
 <script setup lang="ts">

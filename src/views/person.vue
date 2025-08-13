@@ -6,11 +6,11 @@
     <!-- 人员详细卡片弹窗 -->
     <teleport to="body">
         <Transition name="fade">
-        <div v-if="showPersonDetail"
-            class="fixed inset-0 dark:bg-black/50 backdrop-blur-xs z-10 flex items-center md:justify-center flex-col justify-end"
-            @click.self="closeDetail">
-            <PersonDetail :person="selectedPerson" :deliverCloseDetail="closeDetail"/>
-        </div>
+            <div v-if="showPersonDetail"
+                class="fixed inset-0 dark:bg-black/50 backdrop-blur-xs z-10 flex items-center md:justify-center flex-col justify-end"
+                @click.self="closeDetail">
+                <PersonDetail :person="selectedPerson" :deliverCloseDetail="closeDetail" />
+            </div>
         </Transition>
     </teleport>
 </template>
@@ -26,119 +26,165 @@ const personList = [
         name: '张三',
         department: ['网络协会', '摸鱼部', '部长'],
         grade: '2024级',
-        major: '计算机'
+        major: '计算机',
+        email: '123@qq.com',
+        phoneNum: '12345678901'
     },
     {
         stuId: '24201111001',
         name: '李四',
         department: ['ACM协会', '摸鱼部', '部长', '网络协会', '摸鱼部', '部长'],
         grade: '2024级',
-        major: '数学'
+        major: '数学',
+        email: '123@qq.com',
+        phoneNum: '12345678901'
     },
     {
         stuId: '24201111002',
         name: '王五',
         department: ['ACM协会', '摸鱼部', '干部'],
         grade: '2025级',
-        major: '物理'
+        major: '物理',
+        email: '123@qq.com',
+        phoneNum: '12345678901'
     },
-    {
+        {
         stuId: '24201111000',
         name: '张三',
         department: ['网络协会', '摸鱼部', '部长'],
         grade: '2024级',
-        major: '计算机'
+        major: '计算机',
+        email: '123@qq.com',
+        phoneNum: '12345678901'
     },
     {
         stuId: '24201111001',
         name: '李四',
-        department: ['ACM协会', '摸鱼部', '部长'],
+        department: ['ACM协会', '摸鱼部', '部长', '网络协会', '摸鱼部', '部长'],
         grade: '2024级',
-        major: '数学'
+        major: '数学',
+        email: '123@qq.com',
+        phoneNum: '12345678901'
     },
     {
         stuId: '24201111002',
         name: '王五',
         department: ['ACM协会', '摸鱼部', '干部'],
         grade: '2025级',
-        major: '物理'
+        major: '物理',
+        email: '123@qq.com',
+        phoneNum: '12345678901'
     },
-    {
+        {
         stuId: '24201111000',
         name: '张三',
         department: ['网络协会', '摸鱼部', '部长'],
         grade: '2024级',
-        major: '计算机'
+        major: '计算机',
+        email: '123@qq.com',
+        phoneNum: '12345678901'
     },
     {
         stuId: '24201111001',
         name: '李四',
-        department: ['ACM协会', '摸鱼部', '部长'],
+        department: ['ACM协会', '摸鱼部', '部长', '网络协会', '摸鱼部', '部长'],
         grade: '2024级',
-        major: '数学'
+        major: '数学',
+        email: '123@qq.com',
+        phoneNum: '12345678901'
     },
     {
         stuId: '24201111002',
         name: '王五',
         department: ['ACM协会', '摸鱼部', '干部'],
         grade: '2025级',
-        major: '物理'
+        major: '物理',
+        email: '123@qq.com',
+        phoneNum: '12345678901'
     },
-    {
+        {
         stuId: '24201111000',
         name: '张三',
         department: ['网络协会', '摸鱼部', '部长'],
         grade: '2024级',
-        major: '计算机'
+        major: '计算机',
+        email: '123@qq.com',
+        phoneNum: '12345678901'
     },
     {
         stuId: '24201111001',
         name: '李四',
-        department: ['ACM协会', '摸鱼部', '部长'],
+        department: ['ACM协会', '摸鱼部', '部长', '网络协会', '摸鱼部', '部长'],
         grade: '2024级',
-        major: '数学'
+        major: '数学',
+        email: '123@qq.com',
+        phoneNum: '12345678901'
     },
     {
         stuId: '24201111002',
         name: '王五',
         department: ['ACM协会', '摸鱼部', '干部'],
         grade: '2025级',
-        major: '物理'
+        major: '物理',
+        email: '123@qq.com',
+        phoneNum: '12345678901'
     },
-    {
+        {
         stuId: '24201111000',
         name: '张三',
         department: ['网络协会', '摸鱼部', '部长'],
         grade: '2024级',
-        major: '计算机'
+        major: '计算机',
+        email: '123@qq.com',
+        phoneNum: '12345678901'
     },
     {
         stuId: '24201111001',
         name: '李四',
-        department: ['ACM协会', '摸鱼部', '部长'],
+        department: ['ACM协会', '摸鱼部', '部长', '网络协会', '摸鱼部', '部长'],
         grade: '2024级',
-        major: '数学'
+        major: '数学',
+        email: '123@qq.com',
+        phoneNum: '12345678901'
     },
     {
         stuId: '24201111002',
         name: '王五',
         department: ['ACM协会', '摸鱼部', '干部'],
         grade: '2025级',
-        major: '物理'
+        major: '物理',
+        email: '123@qq.com',
+        phoneNum: '12345678901'
     }
 ]
 
 const showPersonDetail = ref(false)
-const selectedPerson = ref(null)
+const selectedPerson = ref<{
+    stuId: string;
+    name: string;
+    department: string[];
+    grade: string;
+    major: string;
+    email: string;
+    phoneNum: string;
+} | undefined>(undefined);
 
-function showDetail(person: any) {
+function showDetail(person: {
+    stuId: string;
+    name: string;
+    department: string[];
+    grade: string;
+    major: string;
+    email: string;
+    phoneNum: string;
+}) {
     selectedPerson.value = person
     showPersonDetail.value = true
 }
 
 function closeDetail() {
     showPersonDetail.value = false
-    selectedPerson.value = null
+    selectedPerson.value = undefined
 }
 
 watch(showPersonDetail, (Val) => {
@@ -153,9 +199,9 @@ watch(showPersonDetail, (Val) => {
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
-    transition: 
-        opacity 0.30s cubic-bezier(.4,0,.2,1),
-        transform 0.30s cubic-bezier(.4,0,.2,1);
+    transition:
+        opacity 0.30s cubic-bezier(.4, 0, .2, 1),
+        transform 0.30s cubic-bezier(.4, 0, .2, 1);
 }
 
 .fade-enter-from,
