@@ -13,20 +13,12 @@
             </div>
         </Transition>
     </teleport>
-    <!--  -->
-    <div class="w-[35rem] ml-[30rem]">
-    <interviewCreate />
-    </div>
-    <!--  -->
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import PersonCard from '@/components/personCard.vue'
 import PersonDetail from '@/components/personDetail.vue'
-// 
-import interviewCreate from '@/components/interviewCreate.vue';
-// 
 
 const personList = [
     {

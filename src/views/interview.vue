@@ -27,7 +27,6 @@ import { ref, watch } from 'vue';
 import InterviewShow from '@/components/interviewShow.vue';
 import NewInterview from '@/components/newInterview.vue';
 import { useRouter } from 'vue-router';
-import interviewCreate from '@/components/interviewCreate.vue';
 
 // 伪数据
 const interviews = [

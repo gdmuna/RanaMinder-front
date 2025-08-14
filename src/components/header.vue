@@ -45,7 +45,6 @@ import { storeToRefs } from 'pinia'
 
 // 导入 shadcn UI 组件
 import { Button } from '@/components/ui/button'
-import { toggleThemeButton } from '@/components/ui/switch'
 
 // 导入图标
 import { Github } from 'lucide-vue-next';

@@ -1,1 +1,1 @@
-export { default as toggleThemeButton } from './toggleTheme.vue'
+export { default as Switch } from "./Switch.vue"

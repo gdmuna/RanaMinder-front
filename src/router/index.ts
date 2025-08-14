@@ -3,6 +3,7 @@ import home from '../views/home.vue'
 import person from '../views/person.vue'
 import interview from '../views/interview.vue'
 import interviewInformation from '../views/interviewInformation.vue'
+import test from '../views/test.vue'
 
 const routes = [
   { path: '/', component: home },
@@ -14,6 +15,7 @@ const routes = [
     name: 'interviewInformation', 
     component: interviewInformation 
   },
+  { path: '/test', component: test },
 ]
 
 const router = createRouter({
