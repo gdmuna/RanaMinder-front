@@ -1,7 +1,8 @@
 <template>
     <div class="md:w-[47rem] md:h-[20rem] w-[100vw] h-[19rem] md:px-0 px-[0.7rem] border-3 border-transparent bg-transparent relative select-none">
         <!-- 添加按钮 -->
-        <div class="md:absolute relative bottom-0 left-0 md:w-[44rem] md:h-[14rem] w-full h-full border-2 border-[#EEEEEE] rounded-lg bg-transparent flex items-center justify-center">
+        <div class="md:absolute relative bottom-0 left-0 md:w-[44rem] md:h-[14rem] w-full h-full border-2 border-[#EEEEEE] rounded-lg bg-transparent flex items-center justify-center cursor-pointer"
+        @click="$emit('click')">
             <svg width="80" height="80" viewBox="0 0 48 48">
                 <path d="M24 12 V36 M12 24 H36" stroke="#EEEEEE" stroke-width="4" stroke-linecap="round" />
             </svg>

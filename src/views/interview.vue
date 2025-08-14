@@ -4,17 +4,17 @@
             <InterviewShow :id="item.id" :title="item.title" :time="item.time" :style="{
                 '--main-color': colors[index % colors.length],
                 '--main-gradient': gradients[index % gradients.length]
-            }" @view-detail="goToDetail" />
+            }" @view-detail="goToInfo" />
         </div>
         <!-- 新增面试 -->
-        <NewInterview />
-        <!-- 人员详细卡片弹窗 -->
+        <NewInterview @click="showCreate = true" />
+        <!-- 新增面试弹窗 -->
         <teleport to="body">
             <Transition name="fade">
-                <div v-if="showPersonDetail"
-                    class="fixed inset-0 dark:bg-black/50 backdrop-blur-xs z-10 flex items-center md:justify-center flex-col justify-end"
-                    @click.self="closeDetail">
-                    <interviewRevise :person="selectedPerson" :deliverCloseDetail="closeDetail" />
+                <div v-if="showCreate"
+                    class="fixed inset-0 dark:bg-black/50 backdrop-blur-xs z-10 flex items-center md:justify-center flex-col justify-end "
+                    @click.self="closeCreate">
+                    <InterviewCreate :deliverClose="closeCreate" />
                 </div>
             </Transition>
         </teleport>
@@ -27,6 +27,7 @@ import { ref, watch } from 'vue';
 import InterviewShow from '@/components/interviewShow.vue';
 import NewInterview from '@/components/newInterview.vue';
 import { useRouter } from 'vue-router';
+import InterviewCreate from '@/components/interviewCreate.vue';
 
 // 伪数据
 const interviews = [
@@ -55,40 +56,17 @@ const gradients = [
 
 const router = useRouter();
 
-function goToDetail(id: number) {
+function goToInfo(id: number) {
     router.push({ name: 'interviewInformation', params: { id } });
 }
 
-const showPersonDetail = ref(false)
-const selectedPerson = ref<{
-    stuId: string;
-    name: string;
-    department: string[];
-    grade: string;
-    major: string;
-    email: string;
-    phoneNum: string;
-} | undefined>(undefined);
+const showCreate = ref(false)
 
-function showDetail(person: {
-    stuId: string;
-    name: string;
-    department: string[];
-    grade: string;
-    major: string;
-    email: string;
-    phoneNum: string;
-}) {
-    selectedPerson.value = person
-    showPersonDetail.value = true
+function closeCreate() {
+    showCreate.value = false
 }
 
-function closeDetail() {
-    showPersonDetail.value = false
-    selectedPerson.value = undefined
-}
-
-watch(showPersonDetail, (Val) => {
+watch(showCreate, (Val) => {
     if (Val) {
         document.body.style.overflow = 'hidden'
     } else {

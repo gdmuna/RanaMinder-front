@@ -2,7 +2,7 @@
     <div class="relative dark:bg-[#E8E7E2] rounded-xl overflow-hidden select-none md:w-auto min-w-[36%] w-full h-auto">
         <!-- 顶部装饰 -->
         <div class="w-full h-16 flex">
-            <div class="dark:bg-[#A3A2A0] text-[#000000] px-6 py-5 cursor-pointer" @click="deliverCloseDetail">
+            <div class="dark:bg-[#A3A2A0] text-[#000000] px-6 py-5 cursor-pointer flex items-center" @click="deliverCloseDetail">
                 <Minimize2 />
             </div>
             <div class="w-full h-16 dark:bg-[#A3A2A0]"></div>

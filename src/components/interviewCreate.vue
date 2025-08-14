@@ -1,258 +1,422 @@
 <template>
-    <div class="relative dark:bg-[#E8E7E2] rounded-xl overflow-hidden select-none md:w-auto min-w-[36%] w-full h-auto">
-        <!-- 顶部装饰 -->
-        <div class="w-full h-16 flex">
-            <div class="dark:bg-[#A3A2A0] text-[#000000] px-6 py-5 cursor-pointer" @click="deliverCloseDetail">
-                <Minimize2 />
+    <div class="rounded-t-lg dark:bg-[#A3A2A0] text-[#000000] md:w-[22rem] min-w-[35%] w-full">
+        <div class="w-full h-13 flex">
+            <div class="px-6 py-5 cursor-pointer flex items-center" @click="props.deliverClose && props.deliverClose()">
+                <Minimize2 :size="22" />
             </div>
-            <div class="w-full h-16 dark:bg-[#A3A2A0]"></div>
-            <div class="dark:bg-[#A3A2A0] text-[#000000] px-6 font-normal text-xs" style="letter-spacing: 0.2em;">
-                <img src="@/assets/barcode.svg" alt="Barcode" class="w-full pt-1.5 object-contain" />
-                {{ person.stuId }}
-            </div>
+            <div class="rounded-tr-lg w-full h-13"></div>
         </div>
-        <!-- 卡片主体 -->
-        <form @submit="onSubmit">
-            <!-- 卡片内容 -->
-            <div class="xl:space-y-13 md:space-y-8 space-y-9 xl:p-6 p-5">
-                <!-- 名称 -->
-                <FormField v-slot="{ componentField }" name="title">
-                    <FormItem class="flex items-center">
-                        <FormLabel class="xl:w-[4.5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">名称
-                        </FormLabel>
-                        <FormControl>
-                            <Input type="text" :placeholder="person.grade" v-bind="componentField"
-                                class="inputBadge dark:placeholder:text-[#000000] xl:text-[0.875rem]! text-[0.675rem]!"
-                                :style="{ width: gradeBadgeWidth }" />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                </FormField>
-                <!-- 描述 -->
-                <FormField v-slot="{ componentField }" name="description">
-                    <FormItem class="flex items-center">
-                        <FormLabel class="xl:w-[4.5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">描述
-                        </FormLabel>
-                        <FormControl>
-                            <Input type="text" :placeholder="person.major" v-bind="componentField"
-                                class="inputBadge dark:placeholder:text-[#000000] xl:text-[0.875rem]! text-[0.675rem]!"
-                                :style="{ width: majorBadgeWidth }" />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                </FormField>
-                <!-- 学号 -->
-                <FormField v-slot="{ componentField }" name="stuId">
-                    <FormItem class="flex items-center">
-                        <FormLabel class="xl:w-[4.5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">学号
-                        </FormLabel>
-                        <FormControl>
-                            <Input type="text" :placeholder="person.stuId" v-bind="componentField"
-                                class="inputBadge dark:placeholder:text-[#000000] xl:text-[0.875rem]! text-[0.675rem]!"
-                                :style="{ width: stuIdBadgeWidth }" />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                </FormField>
-                <!-- 邮箱 -->
-                <FormField v-slot="{ componentField }" name="email">
-                    <FormItem class="flex items-center">
-                        <FormLabel class="xl:w-[4.5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">邮箱
-                        </FormLabel>
-                        <FormControl>
-                            <Input type="text" :placeholder="person.email" v-bind="componentField"
-                                class="inputBadge dark:placeholder:text-[#000000] xl:text-[0.875rem]! text-[0.675rem]!"
-                                :style="{ width: emailBadgeWidth }" />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                </FormField>
-                <!-- 手机号 -->
-                <FormField v-slot="{ componentField }" name="phoneNum">
-                    <FormItem class="flex items-center">
-                        <FormLabel class="xl:w-[4.5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">手机
-                        </FormLabel>
-                        <FormControl>
-                            <Input type="text" :placeholder="person.phoneNum" v-bind="componentField"
-                                class="inputBadge dark:placeholder:text-[#000000] xl:text-[0.875rem]! text-[0.675rem]!"
-                                :style="{ width: phoneNumBadgeWidth }" />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                </FormField>
-                <div class="flex">
-                    <div class="flex justify-start">
-                        <Button type="submit"
-                            class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
-                            创建
-                        </Button>
+    </div>
+    <div
+        class="will-change-transform overflow-y-auto scrollbar-hide rounded-b-lg xl:p-6 p-5 dark:bg-[#E8E7E2] dark:text-[#000000] select-none md:w-auto min-w-[35%] w-full max-h-[75%] h-auto">
+        <Form @submit.prevent="submitForm" class="space-y-8">
+            <!-- 面试基础信息 -->
+
+            <FormField name="title">
+                <FormItem>
+                    <FormLabel
+                        class="text-sm font-bold tracking-wide bg-[#8FAFC4] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
+                        面试标题</FormLabel>
+                    <FormControl>
+                        <Input v-model="formData.title"
+                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                    </FormControl>
+                </FormItem>
+            </FormField>
+
+            <FormField name="description">
+                <FormItem>
+                    <FormLabel
+                        class="text-sm font-bold tracking-wide bg-[#D48587] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
+                        面试描述</FormLabel>
+                    <FormControl>
+                        <Textarea v-model="formData.description"
+                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                    </FormControl>
+                </FormItem>
+            </FormField>
+
+            <FormField name="startTime">
+                <FormItem>
+                    <FormLabel
+                        class="text-sm font-bold tracking-wide bg-[#C490BD] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
+                        开始时间</FormLabel>
+                    <FormControl>
+                        <Input type="datetime-local" v-model="formData.startTime"
+                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                    </FormControl>
+                </FormItem>
+            </FormField>
+
+
+            <FormField name="endTime">
+                <FormItem>
+                    <FormLabel
+                        class="text-sm font-bold tracking-wide bg-[#8EB38A] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
+                        结束时间</FormLabel>
+                    <FormControl>
+                        <Input type="datetime-local" v-model="formData.endTime"
+                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                    </FormControl>
+                </FormItem>
+            </FormField>
+
+            <FormField name="isActive">
+                <FormItem>
+                    <FormLabel
+                        class="text-sm font-bold tracking-wide bg-[#BFCF91] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
+                        启动面试</FormLabel>
+                    <FormControl>
+                        <Switch v-model="formData.isActive" class="data-[state=checked]:bg-[#50C878] mt-1" />
+                    </FormControl>
+                </FormItem>
+            </FormField>
+
+            <!-- 面试环节 -->
+            <div>
+                <div class="flex justify-between items-center">
+                    <span
+                        class="text-sm font-bold tracking-wide bg-[#C2DFD1] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">面试环节</span>
+                    <div
+                        class="flex  gap-1 text-sm font-bold tracking-wide bg-[#8FB6D1] rounded-lg px-[0.7rem] py-[0.3rem] w-auto text-[#f0eeee] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
+                        <CirclePlus class="w-5 h-5" />
+                        <div @click="addStage">添加环节</div>
                     </div>
-                    <div class="flex flex-1 justify-end">
-                        <Button
-                            class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer"
-                            @click="deliverCloseDetail">
-                            取消
-                        </Button>
+                </div>
+
+                <div v-for="(stage, sIndex) in formData.stages" :key="sIndex"
+                    class="border border-[#817f75a2] p-4 mt-4 rounded-lg space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h1
+                            class="text-sm font-bold tracking-wide bg-[#F9D9A9] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[4rem]">
+                            环节 {{ sIndex + 1 }}</h1>
+                        <div v-if="sIndex !== 0"
+                            class="flex  gap-1 text-sm font-bold tracking-wide bg-[#A06B6B] rounded-lg px-[0.7rem] py-[0.3rem] w-auto text-[#f0eeee] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
+                            <CircleX class="w-5 h-5" />
+                            <div @click="removeStage(sIndex)">
+                                删除环节
+                            </div>
+                        </div>
+                    </div>
+
+                    <h2
+                        class="text-sm font-bold tracking-wide bg-[#B6E3C4] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
+                        环节标题</h2>
+                    <Input v-model="stage.title"
+                        class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                    <h2
+                        class="text-sm font-bold tracking-wide bg-[#EDC7DB] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
+                        环节描述</h2>
+                    <Textarea v-model="stage.description"
+                        class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                    <h2
+                        class="text-sm font-bold tracking-wide bg-[#A5CEE9] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6.8rem]">
+                        环节开始时间</h2>
+                    <Input type="datetime-local" v-model="stage.startTime"
+                        class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                    <h2
+                        class="text-sm font-bold tracking-wide bg-[#F3E09C] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6.8rem]">
+                        环节结束时间</h2>
+                    <Input type="datetime-local" v-model="stage.endTime"
+                        class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                    <h2
+                        class="text-sm font-bold tracking-wide bg-[#E6CAA5] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
+                        进入环节</h2>
+                    <div class="flex items-center gap-2 mt-1">
+                        <Switch v-model:checked="stage.isRequried" class="data-[state=checked]:bg-[#50C878]" />
+                    </div>
+
+                    <!-- 场次 -->
+                    <div class="mt-9">
+                        <div class="flex justify-between items-center">
+                            <h1
+                                class="text-sm font-bold tracking-wide bg-[#A79679] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[3.2rem]">
+                                场次</h1>
+                            <div
+                                class="flex gap-1 text-sm font-bold tracking-wide bg-[#8FB6D1] rounded-lg px-[0.7rem] py-[0.3rem] w-auto text-[#f0eeee] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
+                                <CirclePlus class="w-5 h-5" />
+                                <div @click="addSession(sIndex)">添加场次</div>
+                            </div>
+                        </div>
+
+                        <div v-for="(session, seIndex) in stage.sessions" :key="seIndex"
+                            class="border border-[#817f75a2] p-3 mt-3 rounded-lg  space-y-4">
+                            <div class="flex justify-between items-center">
+                                <h1
+                                    class="text-sm font-bold tracking-wide bg-[#C1DBAB] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[4rem]">
+                                    场次 {{ seIndex + 1 }}</h1>
+                                <div v-if="seIndex !== 0"
+                                    class="flex  gap-1 text-sm font-bold tracking-wide bg-[#A06B6B] rounded-lg px-[0.7rem] py-[0.3rem] w-auto text-[#f0eeee] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
+                                    <CircleX class="w-5 h-5" />
+                                    <div @click="removeSession(sIndex, seIndex)">删除场次</div>
+                                </div>
+                            </div>
+
+                            <h2
+                                class="text-sm font-bold tracking-wide bg-[#BBB16A] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
+                                场次标题</h2>
+                            <Input v-model="session.title"
+                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                            <h2
+                                class="text-sm font-bold tracking-wide bg-[#85c29b] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
+                                场次地点</h2>
+                            <Input v-model="session.location"
+                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                            <h2
+                                class="text-sm font-bold tracking-wide bg-[#DBAAB4] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6.8rem]">
+                                场次开始时间</h2>
+                            <Input type="datetime-local" v-model="session.startTime"
+                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                            <h2
+                                class="text-sm font-bold tracking-wide bg-[#E4E1A0] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6.8rem]">
+                                场次结束时间</h2>
+                            <Input type="datetime-local" v-model="session.endTime"
+                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+
+                            <!-- 时间段 -->
+                            <div class="mt-9">
+                                <div class="flex justify-between items-center">
+                                    <h1
+                                        class="text-sm font-bold tracking-wide bg-[#9FC5B3] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[4.1rem]">
+                                        时间段</h1>
+                                    <div
+                                        class="flex  gap-1 text-sm font-bold tracking-wide bg-[#8FB6D1] rounded-lg px-[0.7rem] py-[0.3rem] w-auto text-[#f0eeee] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
+                                        <CirclePlus class="w-5 h-5" />
+                                        <div @click="addTimeSlot(sIndex, seIndex)">添加时间段</div>
+                                    </div>
+                                </div>
+
+                                <div v-for="(slot, tIndex) in session.timeSlots" :key="tIndex"
+                                    class="border border-[#817f75a2] p-2 mt-2 rounded-lg space-y-4">
+                                    <div class="flex justify-between">
+                                        <h1
+                                            class="text-sm font-bold tracking-wide bg-[#D8A7C5] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5rem]">
+                                            时间段 {{ tIndex + 1 }}</h1>
+                                        <div v-if="tIndex !== 0"
+                                            class="flex  gap-1 text-sm font-bold tracking-wide bg-[#A06B6B] rounded-lg px-[0.7rem] py-[0.3rem] w-auto text-[#f0eeee] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
+                                            <CircleX class="w-5 h-5" />
+                                            <div @click="removeTimeSlot(sIndex, seIndex, tIndex)">删除时间段</div>
+                                        </div>
+                                    </div>
+                                    <h2
+                                        class="text-sm font-bold tracking-wide bg-[#A0DFDA] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.9rem]">
+                                        最大座位数</h2>
+                                    <Input v-model="slot.maxSeats"
+                                        class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                                    <h2
+                                        class="text-sm font-bold tracking-wide bg-[#C1A7D8] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[7.7rem]">
+                                        时间段开始时间</h2>
+                                    <Input type="datetime-local" v-model="slot.startTime"
+                                        class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                                    <h2
+                                        class="text-sm font-bold tracking-wide bg-[#E6A5A0] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[7.7rem]">
+                                        时间段结束时间</h2>
+                                    <Input type="datetime-local" v-model="slot.endTime"
+                                        class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </form>
+            <!-- 按钮 -->
+            <div class="flex justify-between">
+                <Button type="submit"
+                    class="mt-5 dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer"
+                    @click="submitForm">提交</Button>
+                <Button type="reset"
+                    class="mt-5 dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer"
+                    @click="resetForm">重置</Button>
+            </div>
+        </Form>
     </div>
 </template>
 
 <script setup lang="ts">
-import { Minimize2 } from 'lucide-vue-next';
+import { reactive } from 'vue'
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Switch } from '@/components/ui/switch'
+import { Button } from "@/components/ui/button"
+import { CirclePlus } from 'lucide-vue-next';
+import { CircleX } from 'lucide-vue-next';
+import { Minimize2 } from 'lucide-vue-next'
 
-import { ref, onMounted, watch } from 'vue'
+const props = defineProps<{ deliverClose?: () => void }>()
 
-import { useForm } from 'vee-validate'
-import { toTypedSchema } from '@vee-validate/zod'
-import { h, markRaw } from 'vue'
-import * as z from 'zod'
-
-import { Button } from '@/components/ui/button'
-import {
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { toast } from 'vue-sonner';
-
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-
-// 定义组件导出Props
-const props = defineProps<{
-    title: string;
-    description: string;
-    startTime: string;
-    endTime: string;
-    deliverCloseDetail?: () => void
-}>();
-
-// 设置默认值
-const {
-    person = {
-        stuId: '',
-        name: '',
-        department: [],
-        grade: '',
-        major: '',
-        email: '',
-        phoneNum: ''
-    }
-} = props;
-
-const formSchema = toTypedSchema(z.object({
-    association: z.string().max(50).optional(),
-    department: z.string().max(50).optional(),
-    position: z.string().max(50).optional(),
-    grade: z.string().regex(/^\d{4}级$/, "年级格式错误").max(50).optional(),
-    major: z.string().max(50).optional(),
-    stuId: z.string().regex(/^\d{11}$/, "学号格式错误").max(50).optional(),
-    email: z.string().email("邮箱格式错误").optional(),
-    phoneNum: z.string().regex(/^1\d{10}$/, "手机号格式错误").max(50).optional(),
-}))
-
-const { handleSubmit } = useForm({
-    validationSchema: formSchema,
+const formData = reactive<InterviewForm>({
+    title: '',
+    description: '',
+    startTime: '',
+    endTime: '',
+    isActive: false,
+    stages: [
+        {
+            title: '',
+            description: '',
+            startTime: '',
+            endTime: '',
+            isRequried: false,
+            sessions: [
+                {
+                    title: '',
+                    startTime: '',
+                    endTime: '',
+                    location: '',
+                    timeSlots: [
+                        {
+                            startTime: '',
+                            endTime: '',
+                            maxSeats: undefined,
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
 })
 
-const onSubmit = handleSubmit((values) => {
-    toast(
-        markRaw(
-            h("pre", { class: "mt-2 w-[340px] rounded-md bg-slate-950 p-4" },
-                h("code", { class: "text-white" }, JSON.stringify(values, null, 2))
-            )
-        )
-    )
-})
-
-const gradeBadgeWidth = ref<string>('auto')
-const majorBadgeWidth = ref<string>('auto')
-const stuIdBadgeWidth = ref<string>('auto')
-const emailBadgeWidth = ref<string>('auto')
-const phoneNumBadgeWidth = ref<string>('auto')
-
-// 动态计算 placeholder 宽度
-function calcPlaceholderWidth(text: string) {
-    const span = document.createElement('span')
-    span.style.visibility = 'hidden'
-    span.style.position = 'absolute'
-    if (window.innerWidth >= 1280) { // xl 及以上
-        span.style.fontSize = '0.875rem'
-    } else { // 小屏
-        span.style.fontSize = '0.675rem'
-    }
-    span.style.fontWeight = 'bold'
-    span.style.padding = '0.25rem 0.75rem'
-    span.style.fontFamily = 'inherit'
-    span.innerText = text
-    document.body.appendChild(span)
-    const width = span.offsetWidth
-    document.body.removeChild(span)
-    return `${width + 3}px`
+interface InterviewForm {
+    title: string
+    description: string
+    startTime: string
+    endTime: string
+    isActive: boolean
+    stages: Stage[]
 }
 
-onMounted(() => {
-    updateAllBadgeWidths()
-})
-
-function updateAllBadgeWidths() {
-    gradeBadgeWidth.value = calcPlaceholderWidth(person.grade ?? '')
-    majorBadgeWidth.value = calcPlaceholderWidth(person.major ?? '')
-    stuIdBadgeWidth.value = calcPlaceholderWidth(person.stuId ?? '')
-    emailBadgeWidth.value = calcPlaceholderWidth(person.email ?? '')
-    phoneNumBadgeWidth.value = calcPlaceholderWidth(person.phoneNum ?? '')
+interface Stage {
+    title: string
+    description: string
+    startTime: string
+    endTime: string
+    isRequried: boolean
+    sessions: Session[]
 }
 
-watch(
-    [() => person.grade, () => person.major, () => person.stuId, () => person.email, () => person.phoneNum],
-    updateAllBadgeWidths
-)
+interface Session {
+    title: string
+    startTime: string
+    endTime: string
+    location: string
+    timeSlots: TimeSlot[]
+}
 
+interface TimeSlot {
+    startTime: string
+    endTime: string
+    maxSeats: number | undefined
+}
+
+function addStage() {
+    formData.stages.push({
+        title: '',
+        description: '',
+        startTime: '',
+        endTime: '',
+        isRequried: false,
+        sessions: [
+            {
+                title: '',
+                startTime: '',
+                endTime: '',
+                location: '',
+                timeSlots: [
+                    {
+                        startTime: '',
+                        endTime: '',
+                        maxSeats: undefined,
+                    }
+                ]
+            }
+        ]
+    })
+}
+
+function removeStage(index: number) {
+    formData.stages.splice(index, 1)
+}
+
+function addSession(stageIndex: number) {
+    formData.stages[stageIndex].sessions.push({
+        title: '',
+        startTime: '',
+        endTime: '',
+        location: '',
+        timeSlots: [
+            {
+                startTime: '',
+                endTime: '',
+                maxSeats: undefined,
+            }
+        ]
+    })
+}
+
+function removeSession(stageIndex: number, sessionIndex: number) {
+    formData.stages[stageIndex].sessions.splice(sessionIndex, 1)
+}
+
+function addTimeSlot(stageIndex: number, sessionIndex: number) {
+    formData.stages[stageIndex].sessions[sessionIndex].timeSlots.push({
+        startTime: '',
+        endTime: '',
+        maxSeats: undefined,
+    })
+}
+
+function removeTimeSlot(stageIndex: number, sessionIndex: number, slotIndex: number) {
+    formData.stages[stageIndex].sessions[sessionIndex].timeSlots.splice(slotIndex, 1)
+}
+
+function submitForm() {
+    console.log('提交数据：', JSON.stringify(formData, null, 2))
+}
+
+function resetForm() {
+    formData.title = ''
+    formData.description = ''
+    formData.startTime = ''
+    formData.endTime = ''
+    formData.isActive = false
+    formData.stages = [
+        {
+            title: '',
+            description: '',
+            startTime: '',
+            endTime: '',
+            isRequried: false,
+            sessions: [
+                {
+                    title: '',
+                    startTime: '',
+                    endTime: '',
+                    location: '',
+                    timeSlots: [
+                        {
+                            startTime: '',
+                            endTime: '',
+                            maxSeats: undefined,
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
 </script>
 
 <style scoped>
-.inputBadge {
-    display: inline-block;
-    border-radius: 999px;
-    background-color: #8FAFC4;
-    color: #000000;
-    font-weight: bold;
-    border: none;
-    outline: none;
-    box-shadow: none;
-    transform: scale(1);
-    transition: transform 0.25s ease-in-out;
+.scrollbar-hide {
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE 10+ */
 }
 
-.inputBadge:focus {
-    transform: scale(1.1);
-    transition: transform 0.25s ease-in-out;
-    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.15);
-    outline: none;
-}
-
-.select-value {
-    font-weight: bold;
-    color: #000000;
-}
-
-.select-trigger {
-    border-radius: 999px;
-    background-color: #8FAFC4;
-    height: auto;
-    border: none;
-    outline: none;
-    box-shadow: none;
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari/Opera */
 }
 </style>
