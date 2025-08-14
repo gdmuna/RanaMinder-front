@@ -1,103 +1,20 @@
-<script setup lang="ts">
-import { reactive } from 'vue'
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Switch } from '@/components/ui/switch'
-import { Button } from "@/components/ui/button"
-
-const formData = reactive<InterviewForm>({
-    active: false,
-    name: '',
-    description: '',
-    startTime: '',
-    stages: []
-})
-
-interface InterviewForm {
-    active: boolean
-    name: string
-    description: string
-    startTime: string
-    stages: Stage[]
-}
-
-interface Stage {
-    title: string
-    startTime: string
-    active: boolean
-    sessions: Session[]
-}
-
-interface Session {
-    title: string
-    location: string
-    timeSlots: TimeSlot[]
-}
-
-interface TimeSlot {
-    startTime: string
-    maxSeats: number
-}
-
-function addStage() {
-    formData.stages.push({
-        title: '',
-        startTime: '',
-        active: true,
-        sessions: []
-    })
-}
-
-function removeStage(index: number) {
-    formData.stages.splice(index, 1)
-}
-
-function addSession(stageIndex: number) {
-    formData.stages[stageIndex].sessions.push({
-        title: '',
-        location: '',
-        timeSlots: []
-    })
-}
-
-function removeSession(stageIndex: number, sessionIndex: number) {
-    formData.stages[stageIndex].sessions.splice(sessionIndex, 1)
-}
-
-function addTimeSlot(stageIndex: number, sessionIndex: number) {
-    formData.stages[stageIndex].sessions[sessionIndex].timeSlots.push({
-        startTime: '',
-        maxSeats: 0
-    })
-}
-
-function removeTimeSlot(stageIndex: number, sessionIndex: number, slotIndex: number) {
-    formData.stages[stageIndex].sessions[sessionIndex].timeSlots.splice(slotIndex, 1)
-}
-
-function submitForm() {
-    console.log('提交数据：', JSON.stringify(formData, null, 2))
-}
-</script>
-
 <template>
-    <Form @submit.prevent="submitForm">
+    <Form @submit.prevent="submitForm" class="mt-[5rem]">
         <!-- 面试基础信息 -->
         <FormField name="active">
             <FormItem>
-                <FormLabel>面试是否激活</FormLabel>
+                <FormLabel>启动面试</FormLabel>
                 <FormControl>
-                    <Switch v-model:checked="formData.active" />
+                    <Switch v-model:checked="formData.isActive" />
                 </FormControl>
             </FormItem>
         </FormField>
 
-        <FormField name="name">
+        <FormField name="title">
             <FormItem>
                 <FormLabel>面试名称</FormLabel>
                 <FormControl>
-                    <Input v-model="formData.name" />
+                    <Input v-model="formData.title" />
                 </FormControl>
             </FormItem>
         </FormField>
@@ -113,9 +30,19 @@ function submitForm() {
 
         <FormField name="startTime">
             <FormItem>
-                <FormLabel>面试起始时间</FormLabel>
+                <FormLabel>面试开始时间</FormLabel>
                 <FormControl>
                     <Input type="datetime-local" v-model="formData.startTime" />
+                </FormControl>
+            </FormItem>
+        </FormField>
+
+
+        <FormField name="endTime">
+            <FormItem>
+                <FormLabel>面试结束时间</FormLabel>
+                <FormControl>
+                    <Input type="datetime-local" v-model="formData.endTime" />
                 </FormControl>
             </FormItem>
         </FormField>
@@ -132,10 +59,12 @@ function submitForm() {
                 </div>
 
                 <Input placeholder="环节标题" v-model="stage.title" class="mt-2" />
+                <Textarea placeholder="环节描述" v-model="stage.description" class="mt-2" />
                 <Input type="datetime-local" placeholder="环节开始时间" v-model="stage.startTime" class="mt-2" />
+                <Input type="datetime-local" placeholder="环节结束时间" v-model="stage.endTime" class="mt-2" />
                 <div class="flex items-center gap-2 mt-2">
-                    <Switch v-model:checked="stage.active" />
-                    <span>是否激活</span>
+                    <Switch v-model:checked="stage.isRequried" />
+                    <span>是否启用</span>
                 </div>
 
                 <!-- 场次 -->
@@ -152,6 +81,8 @@ function submitForm() {
 
                         <Input placeholder="场次标题" v-model="session.title" class="mt-2" />
                         <Input placeholder="地点" v-model="session.location" class="mt-2" />
+                        <Input type="datetime-local" placeholder="场次开始时间" v-model="session.startTime" class="mt-2" />
+                        <Input type="datetime-local" placeholder="场次结束时间" v-model="session.endTime" class="mt-2" />
 
                         <!-- 时间段 -->
                         <div class="mt-3">
@@ -165,16 +96,111 @@ function submitForm() {
                                     <Button variant="destructive" size="sm" type="button"
                                         @click="removeTimeSlot(sIndex, seIndex, tIndex)">删除</Button>
                                 </div>
-                                <Input type="datetime-local" placeholder="起始时间" v-model="slot.startTime" class="mt-2" />
                                 <Input type="number" placeholder="最大座位数" v-model="slot.maxSeats" class="mt-2" />
+                                <Input type="datetime-local" placeholder="起始时间" v-model="slot.startTime" class="mt-2" />
+                                <Input type="datetime-local" placeholder="结束时间" v-model="slot.endTime" class="mt-2" />
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
         <!-- 提交按钮 -->
         <Button type="submit" class="mt-6">提交</Button>
     </Form>
 </template>
+
+<script setup lang="ts">
+import { reactive } from 'vue'
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Switch } from '@/components/ui/switch'
+import { Button } from "@/components/ui/button"
+
+const formData = reactive<InterviewForm>({
+    title: '',
+    description: '',
+    startTime: '',
+    endTime: '',
+    isActive: false,
+    stages: []
+})
+
+interface InterviewForm {
+    title: string
+    description: string
+    startTime: string
+    endTime: string
+    isActive: boolean
+    stages: Stage[]
+}
+
+interface Stage {
+    title: string
+    description: string
+    startTime: string
+    endTime: string
+    isRequried: boolean
+    sessions: Session[]
+}
+
+interface Session {
+    title: string
+    startTime: string
+    endTime: string
+    location: string
+    timeSlots: TimeSlot[]
+}
+
+interface TimeSlot {
+    startTime: string
+    endTime: string
+    maxSeats: number
+}
+
+function addStage() {
+    formData.stages.push({
+        title: '',
+        description: '',
+        startTime: '',
+        endTime: '',
+        isRequried: false,
+        sessions: []
+    })
+}
+
+function removeStage(index: number) {
+    formData.stages.splice(index, 1)
+}
+
+function addSession(stageIndex: number) {
+    formData.stages[stageIndex].sessions.push({
+        title: '',
+        startTime: '',
+        endTime: '',
+        location: '',
+        timeSlots: []
+    })
+}
+
+function removeSession(stageIndex: number, sessionIndex: number) {
+    formData.stages[stageIndex].sessions.splice(sessionIndex, 1)
+}
+
+function addTimeSlot(stageIndex: number, sessionIndex: number) {
+    formData.stages[stageIndex].sessions[sessionIndex].timeSlots.push({
+        startTime: '',
+        endTime: '',
+        maxSeats: 0
+    })
+}
+
+function removeTimeSlot(stageIndex: number, sessionIndex: number, slotIndex: number) {
+    formData.stages[stageIndex].sessions[sessionIndex].timeSlots.splice(slotIndex, 1)
+}
+
+function submitForm() {
+    console.log('提交数据：', JSON.stringify(formData, null, 2))
+}
+</script>
