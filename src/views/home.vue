@@ -42,7 +42,7 @@
             </div>
             <!-- 功能卡片 -->
             <div class="flex flex-col items-center justify-center gap-8">
-                <functionCard title="人员管理" subtitle="PERSONNEL MANAGEMENT" sideLabel="PERSONNEL" :icon="UsersRound"
+                <functionCard title="人员管理" subtitle="PERSONNEL MANAGEMENT" sideLabel="PERSONNEL" :icon="ShieldUser"
                     backgroundColor="#656A8B" link="/person" />
                 <functionCard title="面试管理" subtitle="INTERVIEW MANAGEMENT" sideLabel="INTERVIEW" :icon="FileUser"
                     backgroundColor="#AF8E73" link="/interview" />
@@ -53,7 +53,7 @@
 
 <script setup lang="ts">
 import functionCard from '@/components/functionCard.vue'
-import { UsersRound, FileUser } from 'lucide-vue-next';
+import { ShieldUser, FileUser } from 'lucide-vue-next';
 import MarqueeText from '@/components/MarqueeText.vue'
 </script>
 

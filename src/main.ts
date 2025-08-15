@@ -56,9 +56,15 @@ import './index.css' // shadcn-ui
 import './main.css' // 全局样式
 import 'vue-sonner/style.css' // vue-sonner
 
+// 导入 Ant Design Vue 组件库
+
+
 const pinia = createPinia()
 const app = createApp(App)
 
 app.use(router)
 app.use(pinia)
+
 app.mount('#app')
+
+

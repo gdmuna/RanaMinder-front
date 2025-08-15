@@ -37,10 +37,6 @@ const interviews = [
     { id: 4, title: '2025年干部招新', time: new Date('2025-12-15T16:00:00') },
     { id: 5, title: '2026年干事招新', time: new Date('2026-09-16T15:00:00') },
     { id: 6, title: '2026年干部招新', time: new Date('2026-12-17T17:00:00') },
-    { id: 7, title: '2027年干事招新', time: new Date('2027-09-18T14:00:00') },
-    { id: 8, title: '2027年干部招新', time: new Date('2027-12-19T10:30:00') },
-    { id: 9, title: '2028年干事招新', time: new Date('2028-09-20T13:00:00') },
-    { id: 10, title: '2028年干部招新', time: new Date('2028-12-21T11:00:00') },
 ];
 // 颜色
 const colors = ['#0A90B4', '#A6C1EE', '#C4E0E5', '#FCB69F', '#71B280', '#DECBA4'];
