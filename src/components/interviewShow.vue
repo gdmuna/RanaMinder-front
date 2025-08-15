@@ -13,19 +13,56 @@
             <div class="w-full items-end flex -mb-[0.8rem]">
                 <!-- 按钮 -->
                 <div class="flex space-x-5 cursor-pointer">
-                    <div class="relative flex items-center justify-center rounded-lg px-[1.5rem] py-[0.3rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md" 
-                    :style="{ backgroundColor: 'var(--main-color)' }"
-                        @click="handleViewDetail">
-                        <div
-                            class="text-[1rem] font-extrabold dark:text-[#000000] tracking-wide relative z-10">
-                            查看
+                    <div class="relative flex items-center justify-center rounded-2xl p-[0.4rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md group"
+                        :style="{ backgroundColor: 'var(--main-color)' }" @click="handleViewDetail">
+                        <div class="text-[1rem] dark:text-[#000000] z-10">
+                            <Eye />
+                        </div>
+                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-[#272727] text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap">
+                            查看详情
                         </div>
                     </div>
-                    <div class="relative flex items-center justify-center rounded-lg px-[1.5rem] py-[0.3rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md"
-                    :style="{ backgroundColor: 'var(--main-color)' }">
-                        <div
-                            class="text-[1rem] font-extrabold dark:text-[#000000] tracking-wide relative z-10">
-                            修改
+                    <div class="relative flex items-center justify-center rounded-2xl p-[0.4rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md group"
+                        :style="{ backgroundColor: 'var(--main-color)' }">
+                        <div class="text-[1rem] dark:text-[#000000]">
+                            <Pencil />
+                        </div>
+                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-[#272727] text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap">
+                            编辑面试
+                        </div>
+                    </div>
+                    <div class="relative flex items-center justify-center rounded-2xl p-[0.4rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md group"
+                        :style="{ backgroundColor: 'var(--main-color)' }" @click="">
+                        <div class="text-[1rem] dark:text-[#000000]">
+                            <FileUser />
+                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-[#272727] text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap">
+                            申请表模板
+                        </div>
+                        </div>
+                    </div>
+                    <div class="relative flex items-center justify-center rounded-2xl py-[0.3rem] px-[0.4rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md group"
+                        :style="{ backgroundColor: 'var(--main-color)' }">
+                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-[#272727] text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap">
+                            删除面试
+                        </div>
+                        <div class="text-[1rem] dark:text-[#000000]">
+                            <AlertDialog>
+                                <AlertDialogTrigger>
+                                    <div class="mt-[0.3rem]"><Trash2 /></div>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>确定要删除这个面试吗？</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            这将永久删除面试数据，无法恢复。
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>取消</AlertDialogCancel>
+                                        <AlertDialogAction>删除</AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
                         </div>
                     </div>
                 </div>
@@ -44,6 +81,19 @@
 </template>
 
 <script setup lang="ts">
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+
+import { Eye, Pencil, FileUser,Trash2 } from 'lucide-vue-next';
 
 const props = defineProps<{
     id: number
@@ -60,12 +110,11 @@ function formatDate(date: Date) {
     return `${date.getFullYear()} - ${date.getMonth() + 1} - ${date.getDate()}`
 }
 
-const emit = defineEmits(['view-detail']);
+const emitDetail = defineEmits(['view-detail']);
 
 function handleViewDetail() {
-    emit('view-detail', props.id);
+    emitDetail('view-detail', props.id);
 }
-
 
 </script>
 
