@@ -568,35 +568,39 @@ function removeTimeSlot(stageIndex: number, sessionIndex: number, slotIndex: num
 }
 
 function resetForm() {
-    formData.title = ''
-    formData.description = ''
-    formData.startTime = ''
-    formData.endTime = ''
-    formData.isActive = false
-    formData.stages = [
-        {
+    veeResetForm({
+        values: {
             title: '',
             description: '',
             startTime: '',
             endTime: '',
-            isRequired: false,
-            sessions: [
+            isActive: false,
+            stages: [
                 {
                     title: '',
+                    description: '',
                     startTime: '',
                     endTime: '',
-                    location: '',
-                    timeSlots: [
+                    isRequired: false,
+                    sessions: [
                         {
+                            title: '',
                             startTime: '',
                             endTime: '',
-                            maxSeats: 1,
+                            location: '',
+                            timeSlots: [
+                                {
+                                    startTime: '',
+                                    endTime: '',
+                                    maxSeats: 1,
+                                }
+                            ]
                         }
                     ]
                 }
             ]
         }
-    ]
+    })
 }
 
 const formSchema = toTypedSchema(z.object({
@@ -631,7 +635,7 @@ const formSchema = toTypedSchema(z.object({
     ).min(1, '至少有一个环节')
 }))
 
-const { handleSubmit } = useForm({
+const { handleSubmit, resetForm: veeResetForm  } = useForm({
     validationSchema: formSchema,
 })
 

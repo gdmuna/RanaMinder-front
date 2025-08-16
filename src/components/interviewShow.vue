@@ -18,7 +18,8 @@
                         <div class="text-[1rem] dark:text-[#000000] z-10">
                             <Eye />
                         </div>
-                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-[#272727] text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap">
+                        <div
+                            class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-[#272727] text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap">
                             查看详情
                         </div>
                     </div>
@@ -27,7 +28,8 @@
                         <div class="text-[1rem] dark:text-[#000000]">
                             <Pencil />
                         </div>
-                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-[#272727] text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap">
+                        <div
+                            class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-[#272727] text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap">
                             编辑面试
                         </div>
                     </div>
@@ -35,20 +37,24 @@
                         :style="{ backgroundColor: 'var(--main-color)' }" @click="">
                         <div class="text-[1rem] dark:text-[#000000]">
                             <FileUser />
-                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-[#272727] text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap">
-                            申请表模板
-                        </div>
+                            <div
+                                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-[#272727] text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap">
+                                申请表模板
+                            </div>
                         </div>
                     </div>
                     <div class="relative flex items-center justify-center rounded-2xl py-[0.3rem] px-[0.4rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md group"
                         :style="{ backgroundColor: 'var(--main-color)' }">
-                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-[#272727] text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap">
+                        <div
+                            class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-[#272727] text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap">
                             删除面试
                         </div>
                         <div class="text-[1rem] dark:text-[#000000]">
                             <AlertDialog>
                                 <AlertDialogTrigger>
-                                    <div class="mt-[0.3rem]"><Trash2 /></div>
+                                    <div style="transform: translateY(2px);">
+                                        <Trash2 />
+                                    </div>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
                                     <AlertDialogHeader>
@@ -93,7 +99,7 @@ import {
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 
-import { Eye, Pencil, FileUser,Trash2 } from 'lucide-vue-next';
+import { Eye, Pencil, FileUser, Trash2 } from 'lucide-vue-next';
 
 const props = defineProps<{
     id: number
