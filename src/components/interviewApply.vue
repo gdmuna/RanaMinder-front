@@ -8,27 +8,44 @@
             </div>
             <div class="flex-1 h-16 dark:bg-[#A3A2A0]"></div>
             <!-- 顶部按钮 -->
-            <div class="dark:bg-[#A3A2A0] px-4 py-2 flex">
+            <div class="dark:bg-[#A3A2A0] px-4 py-2 flex items-center">
                 <Button
-                    class="dark:bg-[#0b3e1c] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer"
+                    class="flex gap-1 text-sm tracking-wide dark:bg-[#7CA08C] dark:text-[#000000] font-bold xl:px-[5rem] px-[4rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer"
                     @click="openDialog()">
+                    <CirclePlus class="inline w-5 h-5" />
                     添加
                 </Button>
             </div>
+            <Popover>
+                <PopoverTrigger>
+                    Open popover
+                </PopoverTrigger>
+                <PopoverContent>
+                    Some popover content
+                </PopoverContent>
+            </Popover>
         </div>
-        <!-- 中间内容（自动滚动） -->
+
+        <!-- 中间内容 -->
         <div
-            class="flex-1 overflow-auto will-change-transform rounded-none xl:p-6 px-5 dark:bg-[#E8E7E2] dark:text-[#000000] scrollbar-hide">
+            class="flex-1 overflow-auto will-change-transform rounded-none dark:bg-[#E8E7E2] dark:text-[#000000] scrollbar-hide">
             <!-- 已添加字段列表 -->
             <div class="">
-                <ul class="space-y-2">
-                    <li v-for="field in fields" :key="field.id"
-                        class="p-3 border rounded dark:text-[#000000] cursor-pointer hover:bg-gray-100"
+                <ul class="">
+                    <li v-for="(field, index) in fields" :key="field.id"
+                        class="px-4 py-2 rounded dark:text-[#000000] cursor-pointer hover:bg-gray-100 flex items-center"
                         @click="openDialog(field)">
-                        {{ field.label }}({{ field.type }})
-                        <span v-if="field.type === 'select'">
-                            - 选项: {{ field.options.join(", ") }}
+                        <span
+                            class="w-20 mr-8 font-[优设标题黑] tracking-wide drop-shadow-lg text-transparent bg-clip-text text-[2.5rem]"
+                            :style="{
+                                background: gradients[index % gradients.length],
+                                WebkitBackgroundClip: 'text',
+                                backgroundClip: 'text',
+                                color: 'transparent'
+                            }">
+                            {{ (index + 1).toString().padStart(2, '0') }}
                         </span>
+                        <span class="dark:text-[#000000] tracking-wide font-bold ">{{ field.label }}</span>
                     </li>
                 </ul>
             </div>
@@ -52,6 +69,14 @@
                         <div class="mb-3">
                             <label class="block mb-1">字段名</label>
                             <input v-model="tempField.label" type="text" class="border rounded w-full px-2 py-1"
+                                required />
+                        </div>
+
+
+                        <!-- 字段存储名 -->
+                        <div class="mb-3">
+                            <label class="block mb-1">字段存储名</label>
+                            <input v-model="tempField.fieldName" type="text" class="border rounded w-full px-2 py-1"
                                 required />
                         </div>
 
@@ -100,7 +125,8 @@
         <div class="h-18 flex px-[1.5rem] py-[0.5rem]">
             <div class="flex justify-start">
                 <Button type="submit"
-                    class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
+                    class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer"
+                    @click="submitFields">
                     保存
                 </Button>
             </div>
@@ -108,8 +134,8 @@
             <div class="flex justify-end">
                 <Button
                     class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer"
-                    @click="">
-                    取消
+                    @click="reset">
+                    重置
                 </Button>
             </div>
         </div>
@@ -119,20 +145,29 @@
 <script setup lang="ts">
 import { ref, watch } from "vue"
 import { Minimize2 } from 'lucide-vue-next';
+import { CirclePlus } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button'
 import {
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/ui/popover'
+import {
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { toast } from 'vue-sonner'
+import { h, markRaw } from "vue"
 
 interface FormField {
     id: string
     label: string
+    fieldName: string
     type: string
     required: boolean
     options: string[]
@@ -144,9 +179,10 @@ const editingField = ref<FormField | null>(null) // 当前正在编辑的字段
 const tempField = ref<FormField>({
     id: "",
     label: "",
+    fieldName: "",
     type: "text",
     required: false,
-    options: [],  // ✅ 默认空数组
+    options: [],
 })
 
 // 打开弹层
@@ -161,9 +197,10 @@ function openDialog(field?: FormField) {
         tempField.value = {
             id: crypto.randomUUID(),
             label: "",
+            fieldName: "",
             type: "text",
             required: false,
-            options: [],  // ✅ 确保每次都是空数组
+            options: [],
         }
     }
     showDialog.value = true
@@ -199,9 +236,47 @@ function closeDialog() {
     showDialog.value = false
 }
 
+function reset() {
+    fields.value = []
+    tempField.value = {
+        id: "",
+        label: "",
+        fieldName: "",
+        type: "text",
+        required: false,
+        options: [],
+    }
+    editingField.value = null
+    showDialog.value = false
+}
+
 watch(() => tempField.value.type, (t) => {
     if (t !== "select") tempField.value.options = []
 })
+
+function submitFields() {
+    toast(
+        markRaw(
+            h("pre", { class: "mt-2 w-[340px] rounded-md bg-slate-950 p-4" },
+                h("code", { class: "text-white" }, JSON.stringify(fields.value, null, 2))
+            )
+        ),
+        {
+            description: "已提交字段内容",
+            duration: 4000,
+        }
+    )
+}
+
+const gradients = [
+    'linear-gradient(270deg, #71B280 0%, #0A90B4 100%)',
+    'linear-gradient(270deg, #FBC2EB 0%, #A6C1EE 100%)',
+    'linear-gradient(270deg, #4CA1AF 0%, #C4E0E5 100%)',
+    'linear-gradient(270deg, #FCB69F 0%, #FFECD2 100%)',
+    'linear-gradient(270deg, #71B280 0%, #FBC2EB 100%)',
+    'linear-gradient(270deg, #DECBA4 0%, #BDC3C7 100%)',
+];
+
 </script>
 
 <style scoped>
@@ -215,5 +290,14 @@ watch(() => tempField.value.type, (t) => {
 .scrollbar-hide::-webkit-scrollbar {
     display: none;
     /* Chrome/Safari/Opera */
+}
+
+.bg-clip-text {
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.text-transparent {
+    color: transparent;
 }
 </style>
