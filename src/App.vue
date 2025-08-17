@@ -1,5 +1,4 @@
 <template>
-    <a-config-provider :locale="zhCN">
     <div class="w-full flex flex-col dark:text-[#FEFCE4] min-h-screen">
         <!-- 页眉 -->
         <Header />
@@ -11,7 +10,6 @@
             <router-view />
         </main>
     </div>
-    </a-config-provider>
 </template>
 
 <script setup lang="ts">
@@ -32,8 +30,6 @@ import { useSystemStore } from '@/stores/system'
 import { storeToRefs } from 'pinia'
 
 import { nextTick } from 'vue'
-
-import zhCN from 'ant-design-vue/es/locale/zh_CN'
 
 const scroll_progress = ref<HTMLElement | null>(null)
 

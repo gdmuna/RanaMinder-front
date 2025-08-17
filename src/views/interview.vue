@@ -4,7 +4,8 @@
             <InterviewShow :id="item.id" :title="item.title" :time="item.time" :style="{
                 '--main-color': colors[index % colors.length],
                 '--main-gradient': gradients[index % gradients.length]
-            }" @view-detail="goToInfo" />
+            }" @view-detail="goToInfo" @apply="goToApply" />
+
         </div>
         <!-- 新增面试 -->
         <NewInterview @click="showCreate = true" />
@@ -18,6 +19,16 @@
                 </div>
             </Transition>
         </teleport>
+        <!-- 编辑申请表弹窗 -->
+        <teleport to="body">
+            <Transition name="fade">
+                <div v-if="showApply"
+                    class="fixed inset-0 dark:bg-black/50 backdrop-blur-xs z-10 flex items-center md:justify-center flex-col justify-end "
+                    @click.self="closeApply">
+                    <InterviewApply :deliverClose="closeApply" />
+                </div>
+            </Transition>
+        </teleport>
     </div>
 </template>
 
@@ -28,6 +39,7 @@ import InterviewShow from '@/components/interviewShow.vue';
 import NewInterview from '@/components/newInterview.vue';
 import { useRouter } from 'vue-router';
 import InterviewCreate from '@/components/interviewCreate.vue';
+import InterviewApply from '@/components/interviewApply.vue';
 
 // 伪数据
 const interviews = [
@@ -63,6 +75,24 @@ function closeCreate() {
 }
 
 watch(showCreate, (Val) => {
+    if (Val) {
+        document.body.style.overflow = 'hidden'
+    } else {
+        document.body.style.overflow = ''
+    }
+})
+
+function goToApply(id: number) {
+    console.log('申请表模板 id:', id);
+    showApply.value = true;
+}
+const showApply = ref(false)
+
+function closeApply() {
+    showApply.value = false
+}
+
+watch(showApply, (Val) => {
     if (Val) {
         document.body.style.overflow = 'hidden'
     } else {
