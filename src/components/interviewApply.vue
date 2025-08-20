@@ -72,6 +72,12 @@
                                 required />
                         </div>
 
+                        <!-- 字段描述 -->
+                        <div class="mb-3">
+                            <label class="block mb-1">字段描述</label>
+                            <input v-model="tempField.description" type="text"
+                                class="border rounded w-full px-2 py-1" />
+                        </div>
 
                         <!-- 字段存储名 -->
                         <div class="mb-3">
@@ -84,27 +90,60 @@
                         <div class="mb-3">
                             <label class="block mb-1">字段类型</label>
                             <select v-model="tempField.type" class="border rounded w-full px-2 py-1" required>
-                                <option value="text">文本</option>
-                                <option value="number">数字</option>
-                                <option value="select">选择框</option>
-                                <option value="date">日期</option>
+                                <option value="input">输入框</option>
+                                <option value="radioGroup">单选组</option>
+                                <option value="select">下拉选择</option>
+                                <option value="upload">文件上传</option>
+                                <option value="checkbox">多选组</option>
+                                <option value="textarea">多行文本</option>
                             </select>
                         </div>
 
-                        <!-- 选择器选项 -->
-                        <div v-if="tempField.type === 'select'" class="mb-3">
-                            <label class="block mb-1">选择框选项</label>
-                            <div v-for="(opt, idx) in tempField.options" :key="idx" class="flex gap-2 mb-2">
-                                <input v-model="tempField.options[idx]" type="text"
-                                    class="border rounded flex-1 px-2 py-1" placeholder="请输入选项值" required />
+                        <!-- value.type -->
+                        <div class="mb-3">
+                            <label class="block mb-1">值类型(type)</label>
+                            <select v-model="tempField.value.type" class="border rounded w-full px-2 py-1" required>
+                                <option value="string">string</option>
+                                <option value="number">number</option>
+                                <option value="boolean">boolean</option>
+                                <option value="array">array</option>
+                                <option value="file">file</option>
+                            </select>
+                        </div>
+
+                        <!-- 最大/最小长度 -->
+                        <div class="mb-3" v-if="'maxLength' in tempField.value || 'minLength' in tempField.value">
+                            <label class="block mb-1">最小长度</label>
+                            <input v-model="tempField.value.minLength" type="number" min="0"
+                                class="border rounded w-full px-2 py-1" />
+                            <label class="block mb-1 mt-2">最大长度</label>
+                            <input v-model="tempField.value.maxLength" type="number" min="1"
+                                class="border rounded w-full px-2 py-1" />
+                        </div>
+
+                        <!-- 选项配置（radioGroup/select/checkbox） -->
+                        <div v-if="['radioGroup', 'select', 'checkbox'].includes(tempField.type)" class="mb-3">
+                            <label class="block mb-1">选项列表</label>
+                            <div v-for="(opt, idx) in tempField.value.options" :key="idx" class="flex gap-2 mb-2">
+                                <input v-model="opt.label" type="text" class="border rounded px-2 py-1"
+                                    placeholder="选项显示文本" required />
+                                <input v-model="opt.value" type="text" class="border rounded px-2 py-1"
+                                    placeholder="选项值" required />
                                 <button type="button" class="bg-red-500 text-white px-2 rounded"
-                                    @click="removeOption(idx)">
-                                    删除
-                                </button>
+                                    @click="removeOption(idx)">删除</button>
                             </div>
-                            <button type="button" class="bg-blue-500 text-white px-3 py-1 rounded" @click="addOption">
-                                添加选项
-                            </button>
+                            <button type="button" class="bg-blue-500 text-white px-3 py-1 rounded"
+                                @click="addOption">添加选项</button>
+                        </div>
+
+                        <!-- 文件类型配置 -->
+                        <div v-if="tempField.type === 'upload'" class="mb-3">
+                            <label class="block mb-1">允许文件类型</label>
+                            <input v-model="tempField.value.accept" type="text" class="border rounded w-full px-2 py-1"
+                                placeholder="如 image/png,image/jpeg" />
+                            <label class="block mb-1 mt-2">最大文件大小（字节）</label>
+                            <input v-model="tempField.value.maxSize" type="number" min="1"
+                                class="border rounded w-full px-2 py-1" />
                         </div>
 
                         <!-- 是否必填 -->
@@ -114,9 +153,7 @@
                         </div>
 
                         <!-- 保存按钮 -->
-                        <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">
-                            保存
-                        </button>
+                        <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">保存</button>
                     </form>
                 </div>
             </div>
@@ -164,53 +201,286 @@ import { Input } from '@/components/ui/input'
 import { toast } from 'vue-sonner'
 import { h, markRaw } from "vue"
 
+/**
+ * 面试表单字段配置项
+ * 用于动态生成表单，每个字段描述了表单项的类型、校验规则、选项、样式等。
+ * 参考 template.json 配置。
+ */
 interface FormField {
+    /**
+     * 字段唯一标识符
+     * @example "studentNumber"
+     */
     id: string
+    /**
+     * 字段显示名称
+     * @example "学号"
+     */
     label: string
+    /**
+     * 字段描述（可选），用于辅助说明
+     * @example "范例：汉族"
+     */
+    description?: string
+    /**
+     * 字段名（唯一标识，提交时的 key）
+     * @example "studentNumber"
+     */
     fieldName: string
-    type: string
+    /**
+     * 是否为必填项
+     * @example true
+     */
     required: boolean
-    options: string[]
+    /**
+     * 字段类型
+     * - input: 普通输入框
+     * - radioGroup: 单选组
+     * - select: 下拉选择
+     * - upload: 文件上传
+     * - checkbox: 多选框组
+     * - textarea: 多行文本
+     * @example "input"
+     */
+    type: 'input' | 'radioGroup' | 'select' | 'upload' | 'checkbox' | 'textarea'
+    /**
+     * 字段值及校验规则
+     */
+    value: {
+        /**
+         * 值类型
+         * - string: 字符串
+         * - number: 数字
+         * - boolean: 布尔
+         * - array: 数组（多选）
+         * - file: 文件
+         * @example "string"
+         */
+        type: 'string' | 'number' | 'boolean' | 'array' | 'file'
+        /**
+         * 最小长度（字符串/数组/数字位数）
+         */
+        minLength?: number
+        /**
+         * 最大长度（字符串/数组/数字位数）
+         */
+        maxLength?: number
+        /**
+         * 最小值（仅 number 类型）
+         * @example 0
+         */
+        minCount?: number
+        /**
+         * 最大值（仅 number 类型）
+         * @example 100
+         */
+        maxCount?: number
+        /**
+         * 文件最大字节数（仅 file 类型）
+         * @example 10485760 // 10MB
+         */
+        maxSize?: number
+        /**
+         * 允许的文件类型（仅 file 类型）
+         * @example ["image/png", "image/jpeg"]
+         */
+        accept?: string[]
+        /**
+         * 数组项类型及默认值（仅 array 类型）
+         */
+        arrayItem?: {
+            /**
+             * 数组项类型
+             */
+            type: 'string' | 'number' | 'boolean'
+            /**
+             * 数组项最小长度
+             */
+            minLength?: number
+            /**
+             * 数组项最大长度
+             */
+            maxLength?: number
+            /**
+             * 数组项默认值
+             */
+            default?: string | number | boolean
+        }
+        /**
+         * 选项列表（radioGroup/select/checkbox）
+         * 每个选项包含 label（显示文本）和 value（实际值）
+         */
+        options?: Array<{
+            /**
+             * 选项显示文本
+             */
+            label: string
+            /**
+             * 选项实际值
+             */
+            value: string | number | boolean
+        }>
+        /**
+         * 默认值
+         * - input/textarea: string/number/boolean
+         * - checkbox: 数组
+         */
+        default?: string | number | boolean | Array<string | number | boolean>
+    },
+    /**
+     * 样式配置（如 inputType）
+     */
+    style?: {
+        /**
+         * 输入框类型
+         */
+        inputType?: 'text' | 'email' | 'number' | 'password'
+    }
 }
 
 const fields = ref<FormField[]>([]) // 已添加字段
 const showDialog = ref(false)       // 控制弹层显示
 const editingField = ref<FormField | null>(null) // 当前正在编辑的字段
-const tempField = ref<FormField>({
-    id: "",
-    label: "",
-    fieldName: "",
-    type: "text",
-    required: false,
-    options: [],
-})
 
-// 打开弹层
+const tempField = ref<FormField>(getDefaultField())
+
 function openDialog(field?: FormField) {
     if (field) {
-        // 编辑模式
+        tempField.value = { ...field }
         editingField.value = field
-        tempField.value = { ...field, options: [...field.options] }
     } else {
-        // 新增模式
+        tempField.value = getDefaultField()
         editingField.value = null
-        tempField.value = {
-            id: crypto.randomUUID(),
-            label: "",
-            fieldName: "",
-            type: "text",
-            required: false,
-            options: [],
-        }
     }
     showDialog.value = true
+}
+
+const typeOptions = [
+    { value: "input", label: "输入框" },
+    { value: "select", label: "选择框" },
+    { value: "multiSelect", label: "多选框" },
+]
+
+function getDefaultField(type: string = "input"): FormField {
+    if (type === "input") {
+        return {
+            id: "",
+            label: "",
+            description: "",
+            fieldName: "",
+            required: false,
+            type: "input",
+            value: {
+                type: "string",
+                minLength: undefined,
+                maxLength: undefined,
+                default: "",
+            },
+            style: {
+                inputType: "text"
+            }
+        }
+    } else if (type === "radioGroup") {
+        return {
+            id: "",
+            label: "",
+            description: "",
+            fieldName: "",
+            required: false,
+            type: "radioGroup",
+            value: {
+                type: "string",
+                options: [],
+                default: "",
+            }
+        }
+    } else if (type === "select") {
+        return {
+            id: "",
+            label: "",
+            description: "",
+            fieldName: "",
+            required: false,
+            type: "select",
+            value: {
+                type: "string",
+                options: [],
+                default: "",
+                maxLength: undefined,
+            }
+        }
+    } else if (type === "upload") {
+        return {
+            id: "",
+            label: "",
+            description: "",
+            fieldName: "",
+            required: false,
+            type: "upload",
+            value: {
+                type: "file",
+                maxSize: undefined,
+                accept: [],
+                default: ""
+            }
+        }
+    } else if (type === "checkbox") {
+        return {
+            id: "",
+            label: "",
+            description: "",
+            fieldName: "",
+            required: false,
+            type: "checkbox",
+            value: {
+                type: "array",
+                options: [],
+                minCount: undefined,
+                maxCount: undefined,
+                default: []
+            }
+        }
+    } else if (type === "textarea") {
+        return {
+            id: "",
+            label: "",
+            description: "",
+            fieldName: "",
+            required: false,
+            type: "textarea",
+            value: {
+                type: "string",
+                minLength: undefined,
+                maxLength: undefined,
+                default: ""
+            }
+        }
+    }
+    // 默认input
+    return {
+        id: "",
+        label: "",
+        description: "",
+        fieldName: "",
+        required: false,
+        type: "input",
+        value: {
+            type: "string",
+            minLength: undefined,
+            maxLength: undefined,
+            default: "",
+        },
+        style: {
+            inputType: "text"
+        }
+    }
 }
 
 // 保存字段
 function saveField() {
     if (editingField.value) {
         // 修改已有字段
-        const index = fields.value.findIndex(f => f.id === editingField.value!.id)
+        const index = fields.value.findIndex(f => f.fieldName === editingField.value!.fieldName)
         if (index !== -1) {
             fields.value[index] = { ...tempField.value }
         }
@@ -223,35 +493,41 @@ function saveField() {
 
 // 添加选项
 function addOption() {
-    tempField.value.options.push("")
+    if (Array.isArray(tempField.value.value.options)) {
+        tempField.value.value.options.push({ label: "", value: "" })
+    } else {
+        tempField.value.value.options = [{ label: "", value: "" }]
+    }
 }
 
 // 删除选项
 function removeOption(idx: number) {
-    tempField.value.options.splice(idx, 1)
+    if (Array.isArray(tempField.value.value.options)) {
+        tempField.value.value.options.splice(idx, 1)
+    }
 }
 
 // 关闭弹层
 function closeDialog() {
     showDialog.value = false
+    editingField.value = null
 }
 
+// 重置
 function reset() {
     fields.value = []
-    tempField.value = {
-        id: "",
-        label: "",
-        fieldName: "",
-        type: "text",
-        required: false,
-        options: [],
-    }
+    tempField.value = getDefaultField()
     editingField.value = null
     showDialog.value = false
 }
 
+// 监听类型变化，清空选项
 watch(() => tempField.value.type, (t) => {
-    if (t !== "select") tempField.value.options = []
+    if (!['radioGroup', 'select', 'checkbox'].includes(t)) {
+        if (tempField.value.value && Array.isArray(tempField.value.value.options)) {
+            tempField.value.value.options = []
+        }
+    }
 })
 
 function submitFields() {
