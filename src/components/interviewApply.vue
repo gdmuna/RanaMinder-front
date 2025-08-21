@@ -3,7 +3,7 @@
         class="flex flex-col h-[80%] md:w-auto min-w-[36%] w-full rounded-xl overflow-hidden select-none dark:bg-[#E8E7E2]">
         <!-- 顶部装饰 -->
         <div class="w-full h-16 flex">
-            <div class="dark:bg-[#A3A2A0] text-[#000000] px-6 py-5 cursor-pointer flex items-center" @click="">
+            <div class="dark:bg-[#A3A2A0] text-[#000000] px-6 py-5 cursor-pointer flex items-center" @click="deliverClose">
                 <Minimize2 />
             </div>
             <div class="flex-1 h-16 dark:bg-[#A3A2A0]"></div>
@@ -155,9 +155,10 @@
                             <label class="block mb-1 mt-2">数组项最大长度</label>
                             <input v-model.number="tempField.value.arrayItem.maxLength" type="number"
                                 class="border rounded w-full px-2 py-1" />
-                            <label class="block mb-1 mt-2">数组项默认值</label>
+                            <!-- 数组项默认值，直接返回空数组，待优化 -->
+                            <!-- <label class="block mb-1 mt-2">数组项默认值</label>
                             <input v-model="tempField.value.arrayItem.default" type="text"
-                                class="border rounded w-full px-2 py-1" />
+                                class="border rounded w-full px-2 py-1" /> -->
                         </div>
 
                         <!-- 选项配置，仅 radioGroup/select/checkbox 类型 -->
@@ -179,14 +180,14 @@
                         <div v-if="tempField.type === 'upload'" class="mb-3">
                             <label class="block mb-1">允许文件类型</label>
                             <input v-model="tempField.value.accept" type="text" class="border rounded w-full px-2 py-1"
-                                placeholder="如 image/png,image/jpeg" />
-                            <label class="block mb-1 mt-2">最大文件大小（字节）</label>
-                            <input v-model.number="tempField.value.maxSize" type="number" min="1"
+                                placeholder="如 image/png,image/jpeg" @blur="splitAccept" />
+                            <label class="block mb-1 mt-2">最大文件大小(MB)</label>
+                            <input v-model.number="tempField.value.maxSize" type="number"
                                 class="border rounded w-full px-2 py-1" />
                         </div>
 
-                        <!-- 值的显示样式 -->
-                        <div class="mb-3" v-if="tempField.style">
+                        <!-- 输入框的显示样式 -->
+                        <div class="mb-3" v-if="['input', 'textarea'].includes(tempField.type) && tempField.style">
                             <label class="block mb-1">值输入框显示样式</label>
                             <select v-model="tempField.style.inputType" class="border rounded w-full px-2 py-1">
                                 <option value="text">文本输入框</option>
@@ -198,26 +199,19 @@
 
                         <!-- 默认值 -->
                         <div class="mb-3">
-                            <label v-if="tempField.value.type" class="block mb-1">默认值</label>
-                            <!-- input/textarea 类型：string/number/boolean -->
-                            <div v-if="['input', 'textarea'].includes(tempField.type)">
-                                <input v-if="tempField.value.type === 'string'" v-model="tempField.value.default"
-                                    type="text" class="border rounded w-full px-2 py-1" />
-                                <input v-else-if="tempField.value.type === 'number'"
-                                    v-model.number="tempField.value.default" type="number"
-                                    class="border rounded w-full px-2 py-1" />
-                                <select v-else-if="tempField.value.type === 'boolean'" v-model="tempField.value.default"
-                                    class="border rounded w-full px-2 py-1">
-                                    <option :value="true">true</option>
-                                    <option :value="false">false</option>
-                                </select>
-                            </div>
-                            <!-- checkbox 类型：数组 -->
-                            <div v-else-if="tempField.type === 'checkbox'">
-                                <input v-model="tempField.value.default" type="text"
-                                    class="border rounded w-full px-2 py-1" placeholder="用英文逗号分隔，如: A,B,C" />
-                                <!-- 可在保存时将字符串转为数组 -->
-                            </div>
+                            <label
+                                v-if="tempField.value.type && tempField.type !== 'upload' && tempField.value.type !== 'array'"
+                                class="block mb-1">默认值</label>
+                            <input v-if="tempField.value.type === 'string'" v-model="tempField.value.default"
+                                type="text" class="border rounded w-full px-2 py-1" />
+                            <input v-else-if="tempField.value.type === 'number'"
+                                v-model.number="tempField.value.default" type="number"
+                                class="border rounded w-full px-2 py-1" />
+                            <select v-else-if="tempField.value.type === 'boolean'" v-model="tempField.value.default"
+                                class="border rounded w-full px-2 py-1">
+                                <option :value="true">true</option>
+                                <option :value="false">false</option>
+                            </select>
                         </div>
 
                         <!-- 是否必填 -->
@@ -269,6 +263,46 @@ import {
 import { Input } from '@/components/ui/input'
 import { toast } from 'vue-sonner'
 import { h, markRaw } from "vue"
+
+// 已添加字段
+const fields = ref<InterviewFormJSON[]>([])
+// 控制弹层显示
+const showDialog = ref(false)
+// 当前正在编辑的字段
+const editingField = ref<InterviewFormJSON | null>(null)
+// 临时字段，用于弹窗编辑
+const tempField = ref<InterviewFormJSON>(getDefaultField())
+
+// 定义组件导出Props
+const props = defineProps<{
+    id: number;
+    deliverClose: () => void;
+}>()
+
+
+// 监听类型变化
+watch(() => tempField.value.value.type, (valueType) => {
+    // 自动初始化 arrayItem
+    if (valueType === 'array') {
+        if (!tempField.value.value.arrayItem) {
+            tempField.value.value.arrayItem = {
+                type: "",
+                minLength: undefined,
+                maxLength: undefined,
+                default: undefined,
+            };
+            // 数组默认值, 直接传空数组， 待优化
+            tempField.value.value.default = [];
+            (tempField.value.value.arrayItem as any).default = []
+        }
+    }
+    // 清空选项
+    if (!['radioGroup', 'select', 'checkbox'].includes(tempField.value.type)) {
+        if (tempField.value.value && Array.isArray(tempField.value.value.options)) {
+            tempField.value.value.options = []
+        }
+    }
+})
 
 /**
  * 面试表单字段配置项
@@ -407,12 +441,10 @@ interface InterviewFormJSON {
     }
 }
 
-const fields = ref<InterviewFormJSON[]>([]) // 已添加字段
-const showDialog = ref(false)       // 控制弹层显示
-const editingField = ref<InterviewFormJSON | null>(null) // 当前正在编辑的字段
-
-const tempField = ref<InterviewFormJSON>(getDefaultField())
-
+/**
+ * 打开添加/编辑字段弹层
+ * @param field 编辑时传入已有字段配置，新增时传入 undefined
+ */
 function openDialog(field?: InterviewFormJSON) {
     if (field) {
         tempField.value = { ...field }
@@ -424,7 +456,11 @@ function openDialog(field?: InterviewFormJSON) {
     showDialog.value = true
 }
 
-function getDefaultField () {
+/**
+ * 获取一个默认的字段配置对象
+ * 用于初始化弹窗或重置字段
+ */
+function getDefaultField() {
     return {
         id: crypto.randomUUID(),
         label: "",
@@ -433,144 +469,12 @@ function getDefaultField () {
         type: "",
         value: {
             type: "",
-        }
+        },
+        style: {
+            inputType: undefined
+        },
     } as InterviewFormJSON
 }
-
-// function getDefaultField(type: string = "input"): InterviewFormJSON {
-//     if (type === "input") {
-//         return {
-//             id: crypto.randomUUID(),
-//             label: "",
-//             description: undefined,
-//             fieldName: "",
-//             required: false,
-//             type: "input",
-//             value: {
-//                 type: "",
-//                 minLength: undefined,
-//                 maxLength: undefined,
-//                 default: undefined,
-//             },
-//             style: {
-//                 inputType: undefined
-//             }
-//         }
-//     } else if (type === "radioGroup") {
-//         return {
-//             id: crypto.randomUUID(),
-//             label: "",
-//             description: undefined,
-//             fieldName: "",
-//             required: false,
-//             type: "radioGroup",
-//             value: {
-//                 type: "",
-//                 options: [],
-//                 default: undefined,
-//             },
-//             style: {
-//                 inputType: undefined
-//             }
-//         }
-//     } else if (type === "select") {
-//         return {
-//             id: crypto.randomUUID(),
-//             label: "",
-//             description: "",
-//             fieldName: "",
-//             required: false,
-//             type: "select",
-//             value: {
-//                 type: "",
-//                 options: [],
-//                 default: undefined,
-//                 minLength: undefined,
-//                 maxLength: undefined,
-//             },
-//             style: {
-//                 inputType: undefined
-//             }
-//         }
-//     } else if (type === "upload") {
-//         return {
-//             id: crypto.randomUUID(),
-//             label: "",
-//             description: "",
-//             fieldName: "",
-//             required: false,
-//             type: "upload",
-//             value: {
-//                 type: "file",
-//                 maxSize: undefined,
-//                 accept: [],
-//                 default: undefined
-//             },
-//             style: {
-//                 inputType: undefined
-//             }
-//         }
-//     } else if (type === "checkbox") {
-//         return {
-//             id: crypto.randomUUID(),
-//             label: "",
-//             description: "",
-//             fieldName: "",
-//             required: false,
-//             type: "checkbox",
-//             value: {
-//                 type: "",
-//                 minLength: undefined,
-//                 maxLength: undefined,
-//                 minCount: undefined,
-//                 maxCount: undefined,
-//                 maxSize: undefined,
-//                 accept: [],
-//                 arrayItem: {
-//                     type: "",
-//                     minLength: undefined,
-//                     maxLength: undefined,
-//                     default: undefined,
-//                 },
-//                 options: [],
-//                 default: []
-//             },
-//             style: {
-//                 inputType: undefined
-//             }
-//         }
-//     } else if (type === "textarea") {
-//         return {
-//             id: crypto.randomUUID(),
-//             label: "",
-//             description: "",
-//             fieldName: "",
-//             required: false,
-//             type: "textarea",
-//             value: {
-//                 type: "",
-//             }
-//         }
-//     }
-//     // 默认input
-//     return {
-//         id: crypto.randomUUID(),
-//         label: "",
-//         description: "",
-//         fieldName: "",
-//         required: false,
-//         type: "input",
-//         value: {
-//             type: "",
-//             minLength: undefined,
-//             maxLength: undefined,
-//             default: undefined,
-//         },
-//         style: {
-//             inputType: undefined
-//         }
-//     }
-// }
 
 // 保存字段
 function saveField() {
@@ -617,28 +521,29 @@ function reset() {
     showDialog.value = false
 }
 
-// 监听类型变化
-watch(() => tempField.value.value.type, (valueType) => {
-    // 自动初始化 arrayItem
-    if (valueType === 'array') {
-        if (!tempField.value.value.arrayItem) {
-            tempField.value.value.arrayItem = {
-                type: "",
-                minLength: undefined,
-                maxLength: undefined,
-                default: ""
-            }
+// 处理 accept 格式
+function splitAccept() {
+    if (
+        tempField.value.type === 'upload'
+    ) {
+        const acceptVal = tempField.value.value.accept as unknown as string
+        if (typeof acceptVal === 'string') {
+            tempField.value.value.accept = acceptVal
+                .split(',')
+                .map(s => s.trim())
+                .filter(Boolean)
         }
     }
-    // 清空选项
-    if (!['radioGroup', 'select', 'checkbox'].includes(tempField.value.type)) {
-        if (tempField.value.value && Array.isArray(tempField.value.value.options)) {
-            tempField.value.value.options = []
-        }
-    }
-})
+}
 
+// 提交
 function submitFields() {
+    // 转换 maxSize 单位（MB → 字节）
+    fields.value.forEach(field => {
+        if (field.type === 'upload' && typeof field.value.maxSize === 'number') {
+            field.value.maxSize = field.value.maxSize * 1024 * 1024
+        }
+    })
     toast(
         markRaw(
             h("pre", { class: "mt-2 w-[340px] rounded-md bg-slate-950 p-4" },
@@ -649,6 +554,7 @@ function submitFields() {
     console.log("提交的字段配置：", fields.value);
 }
 
+// 文字渐变色
 const gradients = [
     'linear-gradient(270deg, #71B280 0%, #0A90B4 100%)',
     'linear-gradient(270deg, #FBC2EB 0%, #A6C1EE 100%)',

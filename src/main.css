@@ -1,3 +1,11 @@
+@font-face {
+    font-family: 'DouyinSans';
+    src: url('./assets/fonts/DouyinSansBold.woff2') format('woff2');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
 html {
     box-sizing: border-box;
     margin: 0;
@@ -17,6 +25,8 @@ body::-webkit-scrollbar {
     /* Chrome/Safari/Webkit */
 }
 
-body, html {
+body,
+html {
     font-family: sans-serif, "Microsoft YaHei", Arial;
+
 }

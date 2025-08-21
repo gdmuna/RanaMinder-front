@@ -25,7 +25,8 @@
                 <div v-if="showApply"
                     class="fixed inset-0 dark:bg-black/50 backdrop-blur-xs z-10 flex items-center md:justify-center flex-col justify-end "
                     @click.self="closeApply">
-                    <InterviewApply :deliverClose="closeApply" />
+                    <InterviewApply v-if="currentInterviewId !== null" :id="currentInterviewId"
+                        :deliverClose="closeApply" />
                 </div>
             </Transition>
         </teleport>
@@ -40,6 +41,15 @@ import NewInterview from '@/components/newInterview.vue';
 import { useRouter } from 'vue-router';
 import InterviewCreate from '@/components/interviewCreate.vue';
 import InterviewApply from '@/components/interviewApply.vue';
+
+// 路由
+const router = useRouter();
+// 新增面试弹窗
+const showCreate = ref(false)
+// 申请表弹窗
+const showApply = ref(false)
+// 申请表id
+const currentInterviewId = ref<number | null>(null)
 
 // 伪数据
 const interviews = [
@@ -62,18 +72,6 @@ const gradients = [
     'linear-gradient(270deg, #DECBA4 0%, #BDC3C7 100%)',
 ];
 
-const router = useRouter();
-
-function goToInfo(id: number) {
-    router.push({ name: 'interviewInformation', params: { id } });
-}
-
-const showCreate = ref(false)
-
-function closeCreate() {
-    showCreate.value = false
-}
-
 watch(showCreate, (Val) => {
     if (Val) {
         document.body.style.overflow = 'hidden'
@@ -82,23 +80,25 @@ watch(showCreate, (Val) => {
     }
 })
 
+function goToInfo(id: number) {
+    router.push({ name: 'interviewInformation', params: { id } });
+}
+
 function goToApply(id: number) {
     console.log('申请表模板 id:', id);
+    currentInterviewId.value = id; // 保存当前面试id
     showApply.value = true;
 }
-const showApply = ref(false)
+
+function closeCreate() {
+    showCreate.value = false
+}
 
 function closeApply() {
     showApply.value = false
+    currentInterviewId.value = null // 关闭弹窗时清空id
 }
 
-watch(showApply, (Val) => {
-    if (Val) {
-        document.body.style.overflow = 'hidden'
-    } else {
-        document.body.style.overflow = ''
-    }
-})
 </script>
 
 <style scoped>
