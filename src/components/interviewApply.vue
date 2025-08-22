@@ -197,7 +197,7 @@
 
                     <!-- 默认值 -->
                     <div class="mb-[1.5rem]"
-                        v-if="tempField.value.type && tempField.type !== 'upload' && tempField.value.type !== 'array'">
+                        v-if="tempField.value.type && tempField.type !== 'upload' && tempField.value.type !== 'array' && tempField.value.type !== 'file'">
                         <label
                             class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#83c067] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[4.3rem]">默认值</label>
                         <Input v-if="tempField.value.type === 'string'" v-model="(tempField.value as any).default"
@@ -478,6 +478,38 @@ watch(() => tempField.value.value.type, (valueType) => {
         if (tempField.value.value && Array.isArray(tempField.value.value.options)) {
             tempField.value.value.options = []
         }
+    }
+})
+
+watch(() => tempField.value.type, (type) => {
+    // 清理选项
+    if (!['radioGroup', 'select', 'checkbox'].includes(type)) {
+        tempField.value.value.options = undefined
+    }
+    // 清理上传相关
+    if (type !== 'upload') {
+        tempField.value.value.accept = undefined
+        tempField.value.value.maxSize = undefined
+    }
+    // 清理输入框样式
+    if (!['input', 'textarea'].includes(type)) {
+        tempField.value.style = undefined
+        tempField.value.value.default = undefined
+    }
+})
+
+watch(() => tempField.value.value.type, (valueType) => {
+    // 数组类型初始化
+    if (valueType === 'array') {
+        tempField.value.value.arrayItem = { type: '', minLength: undefined, maxLength: undefined, default: undefined }
+        tempField.value.value.default = []
+    } else {
+        tempField.value.value.arrayItem = undefined
+        tempField.value.value.default = undefined
+    }
+    // 非 string/number/boolean 时清理默认值
+    if (!['string', 'number', 'boolean', 'array', 'file'].includes(valueType)) {
+        tempField.value.value.default = undefined
     }
 })
 
