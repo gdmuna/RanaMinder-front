@@ -41,7 +41,7 @@
                 <!-- 有字段时的列表 -->
                 <ul v-else class="w-full">
                     <li v-for="(field, index) in fields" :key="field.id"
-                        class="px-4 py-2 rounded dark:text-[#000000] cursor-pointer hover:bg-gray-100 flex items-center"
+                        class="px-4 py-2 rounded dark:text-[#000000] cursor-pointer hover:bg-[#f5f5f5cb] flex items-center"
                         @click="openDialog(field)">
                         <span
                             class="w-20 mr-8 font-[优设标题黑] tracking-wide drop-shadow-lg text-transparent bg-clip-text text-[2.5rem]"
@@ -54,6 +54,7 @@
                             {{ (index + 1).toString().padStart(2, '0') }}
                         </span>
                         <span class="dark:text-[#000000] tracking-wide font-bold ">{{ field.label }}</span>
+                            <CircleX @click.stop="removeField(index)" class="ml-auto mr-[0.8rem] w-[1.5rem] h-[1.5rem] font-bold text-[#af0d0d] cursor-pointer transition-transform duration-200 hover:scale-120 active:scale-95" />
                     </li>
                 </ul>
             </div>
@@ -373,14 +374,6 @@
 import { ref, watch } from "vue"
 import { Minimize2, Smile, CirclePlus, CircleX, Undo2 } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button'
-import {
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import {
     Select,
@@ -748,8 +741,8 @@ function reset() {
 }
 
 // 删除某个字段
-function removeField(fieldName: string) {
-    fields.value = fields.value.filter(f => f.fieldName !== fieldName)
+function removeField(index: number) {
+    fields.value.splice(index, 1)
 }
 
 // 处理 accept 格式
