@@ -12,7 +12,8 @@
                 </div>
                 <!-- 导航菜单 -->
                 <nav class="flex items-center ml-6 md:space-x-4 space-x-1 whitespace-nowrap">
-                    <Button variant="link" class="cursor-pointer p-2 text-lg dark:text-[#FEFCE4]" @click="routerGoTo('/home')">首页</Button>
+                    <Button variant="link" class="cursor-pointer p-2 text-lg dark:text-[#FEFCE4]"
+                        @click="routerGoTo('/home')">首页</Button>
                     <img :src="boundary" alt="">
                     <Button variant="link" class="cursor-pointer p-2 text-lg dark:text-[#FEFCE4]"
                         @click="routerGoTo('/person')">人员管理</Button>
@@ -21,8 +22,11 @@
                         @click="routerGoTo('/interview')">面试管理</Button>
                 </nav>
             </div>
+
             <!-- 页眉右侧内容 -->
-            <div class="md:ml-6 ml-2 flex items-center">
+            <div class="md:ml-6 ml-2 flex items-center gap-3">
+                <!-- 搜索 -->
+                <Search />
                 <div class="flex items-center space-x-2">
                     <Button class="cursor-pointer border-2 dark:border-[#FEFCE4] dark:bg-[#0E100F] dark:text-[#FEFCE4]">
                         <LogIn class="size-6" />
@@ -35,6 +39,7 @@
 </template>
 
 <script setup lang="ts">
+import Search from '@/components/search.vue'
 // 导入 Vue 相关库和组件
 import { onMounted, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'

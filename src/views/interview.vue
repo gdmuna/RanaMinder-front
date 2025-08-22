@@ -9,6 +9,7 @@
         </div>
         <!-- 新增面试 -->
         <NewInterview @click="showCreate = true" />
+        
         <!-- 新增面试弹窗 -->
         <teleport to="body">
             <Transition name="fade">
