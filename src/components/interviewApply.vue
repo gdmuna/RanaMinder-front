@@ -75,8 +75,7 @@
                             <label class="">字段显示名称</label>
                         </div>
                         <Input v-model="tempField.label" type="text"
-                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10"
-                            required />
+                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
                     </div>
 
                     <!-- 字段存储名 -->
@@ -87,8 +86,7 @@
                             <label class="">字段存储名称（英文）</label>
                         </div>
                         <Input v-model="tempField.fieldName" type="text"
-                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10"
-                            required />
+                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
                     </div>
 
                     <!-- 字段描述/备注 -->
@@ -114,7 +112,7 @@
                             <span class="text-red-500 translate-y-[0.21rem]">*</span>
                             <label class="">字段应用类型</label>
                         </div>
-                        <Select v-model="tempField.type" required>
+                        <Select v-model="tempField.type">
                             <SelectTrigger class="w-full dark:bg-[#D4D3CF] dark:text-[#000000] border-none">
                                 <SelectValue placeholder="请选择" />
                             </SelectTrigger>
@@ -142,13 +140,13 @@
                     </div>
 
                     <!-- 值类型 -->
-                    <div class="mb-[1.5rem]" v-if="tempField.type !== 'upload'">
+                    <div class="mb-[1.5rem]">
                         <div
                             class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#e6c492] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6rem]">
                             <span class="text-red-500 translate-y-[0.21rem]">*</span>
                             <label class="">值的类型</label>
                         </div>
-                        <Select v-model="tempField.value.type" required>
+                        <Select v-model="tempField.value.type">
                             <SelectTrigger class="w-full dark:bg-[#D4D3CF] dark:text-[#000000] border-none">
                                 <SelectValue placeholder="请选择" />
                             </SelectTrigger>
@@ -164,6 +162,9 @@
                                 </SelectItem>
                                 <SelectItem value="boolean" class="focus:bg-[#777777]">
                                     布尔值 boolean
+                                </SelectItem>
+                                <SelectItem value="file" class="focus:bg-[#777777]">
+                                    文件 file
                                 </SelectItem>
                             </SelectContent>
                         </Select>
@@ -260,7 +261,7 @@
                             <span class="text-red-500 translate-y-[0.21rem]">*</span>
                             <label class="">数组项类型</label>
                         </div>
-                        <Select v-model="tempField.value.arrayItem.type" required>
+                        <Select v-model="tempField.value.arrayItem.type">
                             <SelectTrigger class="w-full dark:bg-[#D4D3CF] dark:text-[#000000] border-none">
                                 <SelectValue placeholder="请选择" />
                             </SelectTrigger>
@@ -309,10 +310,10 @@
                             class="flex gap-2 mb-2 items-center">
                             <Input v-model="opt.label" type="text"
                                 class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10"
-                                placeholder="选项显示文本" required />
+                                placeholder="选项显示文本" />
                             <Input v-model="(opt as any).value" type="text"
                                 class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10"
-                                placeholder="选项值（中文）" required />
+                                placeholder="选项值（中文）" />
                             <button type="button"
                                 class="rounded-xl flex gap-1 text-sm dark:bg-[#a77fc2] dark:text-[#000000] p-[0.29rem] font-bold transition-transform duration-250 hover:scale-105 active:scale-95 cursor-pointer"
                                 @click="removeOption(idx)">
@@ -391,7 +392,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Switch } from '@/components/ui/switch'
-
+import { z } from 'zod'
 import { toast } from 'vue-sonner'
 import { h, markRaw } from "vue"
 
@@ -410,6 +411,51 @@ const props = defineProps<{
     deliverClose: () => void;
 }>()
 
+const InterviewFormJSONSchema = z.object({
+    id: z.string().min(1, '字段唯一标识符不能为空'),
+    label: z.string().min(1, '字段显示名称不能为空'),
+    description: z.string().optional(),
+    fieldName: z.string().min(1, '字段存储名称不能为空'),
+    required: z.boolean(),
+    type: z.enum(['input', 'radioGroup', 'select', 'upload', 'checkbox', 'textarea']),
+    value: z.object({
+        type: z.enum(['string', 'number', 'boolean', 'array', 'file']),
+        minLength: z.number().int().min(0).optional(),
+        maxLength: z.number().int().min(0).optional(),
+        minCount: z.number().optional(),
+        maxCount: z.number().optional(),
+        maxSize: z.number().optional(),
+        accept: z.array(z.string()).optional(),
+        arrayItem: z.object({
+            type: z.enum(['string', 'number', 'boolean']),
+            minLength: z.number().int().min(0).optional(),
+            maxLength: z.number().int().min(0).optional(),
+            default: z.union([
+                z.string(),
+                z.number(),
+                z.boolean(),
+                z.array(z.union([z.string(), z.number(), z.boolean()]))
+            ]).optional(),
+        }).optional(),
+        options: z.array(z.object({
+            label: z.string().min(1, '选项显示文本不能为空'),
+            value: z.union([
+                z.string(),
+                z.number(),
+                z.boolean()
+            ])
+        })).optional(),
+        default: z.union([
+            z.string(),
+            z.number(),
+            z.boolean(),
+            z.array(z.union([z.string(), z.number(), z.boolean()]))
+        ]).optional(),
+    }),
+    style: z.object({
+        inputType: z.enum(['text', 'email', 'number', 'password']).optional()
+    }).optional(),
+})
 
 // 监听类型变化
 watch(() => tempField.value.value.type, (valueType) => {
@@ -609,14 +655,31 @@ function getDefaultField() {
 
 // 保存字段
 function saveField() {
+    const result = InterviewFormJSONSchema.safeParse(tempField.value)
+    if (!result.success) {
+        // 拼接详细中文报错
+        const errorMsg = result.error.errors.map(e => {
+            // e.path 是字段路径数组
+            const path = e.path.length ? e.path.join('.') : '字段'
+            return `${path}：${e.message}`
+        }).join('\n')
+        toast(
+            markRaw(
+                h("pre", { class: "mt-2 w-[340px] rounded-md bg-red-100 p-4 text-red-700" },
+                    h("code", {}, errorMsg)
+                )
+            )
+        )
+        console.error('zod校验错误详情：', JSON.stringify(result.error, null, 2))
+        return
+    }
+    // 3. 校验通过，保存字段
     if (editingField.value) {
-        // 修改已有字段
         const index = fields.value.findIndex(f => f.fieldName === editingField.value!.fieldName)
         if (index !== -1) {
             fields.value[index] = { ...tempField.value }
         }
     } else {
-        // 新增字段
         fields.value.push({ ...tempField.value })
     }
     closeDialog()
