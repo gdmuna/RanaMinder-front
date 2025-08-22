@@ -70,7 +70,9 @@
 
             <FormField name="isActive" type="checkbox" v-slot="{ componentField }">
                 <FormItem>
-                    <FormLabel>启动面试</FormLabel>
+                    <FormLabel
+                        class="text-sm font-bold tracking-wide bg-[#E6A5A0] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
+                        启动面试</FormLabel>
                     <FormControl>
                         <Switch v-bind="componentField" :value="undefined" class="data-[state=checked]:bg-[#50C878]" />
                     </FormControl>
@@ -82,7 +84,7 @@
             <div>
                 <div class="flex justify-between items-center">
                     <span
-                        class="text-sm font-bold tracking-wide bg-[#C2DFD1] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">面试环节</span>
+                        class="text-sm font-bold tracking-wide bg-[#b0d1c1] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">面试环节</span>
                     <div
                         class="flex  gap-1 text-sm font-bold tracking-wide bg-[#8FB6D1] rounded-lg px-[0.7rem] py-[0.3rem] w-auto text-[#f0eeee] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
                         <CirclePlus class="w-5 h-5" />
@@ -94,7 +96,7 @@
                     class="border border-[#817f75a2] p-4 mt-4 rounded-lg space-y-4">
                     <div class="flex justify-between items-center">
                         <h1
-                            class="text-sm font-bold tracking-wide bg-[#F9D9A9] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[4rem]">
+                            class="text-sm font-bold tracking-wide bg-[#e6c492] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[4rem]">
                             环节 {{ sIndex + 1 }}</h1>
                         <div v-if="sIndex !== 0"
                             class="flex  gap-1 text-sm font-bold tracking-wide bg-[#A06B6B] rounded-lg px-[0.7rem] py-[0.3rem] w-auto text-[#f0eeee] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
@@ -635,7 +637,7 @@ const formSchema = toTypedSchema(z.object({
     ).min(1, '至少有一个环节')
 }))
 
-const { handleSubmit, resetForm: veeResetForm  } = useForm({
+const { handleSubmit, resetForm: veeResetForm } = useForm({
     validationSchema: formSchema,
 })
 

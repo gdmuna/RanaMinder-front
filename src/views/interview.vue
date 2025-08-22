@@ -72,7 +72,7 @@ const gradients = [
     'linear-gradient(270deg, #DECBA4 0%, #BDC3C7 100%)',
 ];
 
-watch(showCreate, (Val) => {
+watch(showApply, (Val) => {
     if (Val) {
         document.body.style.overflow = 'hidden'
     } else {
