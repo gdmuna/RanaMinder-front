@@ -5,12 +5,12 @@
         <div class="w-full h-16 flex">
             <!-- 最小化按钮：仅在未打开弹窗时显示 -->
             <div v-show="!showDialog"
-                class="dark:bg-[#A3A2A0] text-[#000000] px-6 py-5 cursor-pointer flex items-center"
+                class="dark:bg-[#A3A2A0] text-[#000000] px-6 py-5 cursor-pointer flex items-center transition-transform duration-250 hover:scale-115 active:scale-95"
                 @click="deliverClose">
                 <Minimize2 />
             </div>
             <!-- 返回按钮：仅在弹窗打开时显示 -->
-            <div v-show="showDialog" class="dark:bg-[#A3A2A0] text-[#000000] px-6 py-5 cursor-pointer flex items-center"
+            <div v-show="showDialog" class="dark:bg-[#A3A2A0] text-[#000000] px-6 py-5 cursor-pointer flex items-center transition-transform duration-250 hover:scale-115 active:scale-95"
                 @click="closeDialog">
                 <Undo2 />
             </div>
@@ -18,7 +18,7 @@
             <!-- 顶部按钮 -->
             <div class="dark:bg-[#A3A2A0] px-4 py-2 flex items-center">
                 <Button v-show="!showDialog"
-                    class="flex gap-1 text-sm tracking-wide dark:bg-[#7CA08C] dark:text-[#000000] font-bold xl:px-[5rem] px-[4rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer"
+                    class="flex gap-1 text-sm tracking-wide dark:bg-[#7CA08C] dark:text-[#000000] font-bold xl:px-[5rem] px-[4rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-sm cursor-pointer"
                     @click="openDialog()">
                     <CirclePlus class="inline w-5 h-5" />
                     添加
