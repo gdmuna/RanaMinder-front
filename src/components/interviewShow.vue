@@ -81,7 +81,9 @@
         </div>
         <!-- 可爱鱼猫图 -->
         <div class="absolute bottom-0 right-0 md:block hidden">
-            <img src="@/assets/modem1.svg" alt="" class="max-w-[20rem] max-h-[20rem]">
+            <!-- 卡片图片交替显示 -->
+            <img :src="isOdd ? '/src/assets/modem1.svg' : '/src/assets/modem2.png'" alt="modem"
+                class="max-w-[20rem] max-h-[20rem]">
         </div>
     </div>
 </template>
@@ -107,6 +109,8 @@ const props = defineProps<{
     time: Date
 }>()
 
+const isOdd = props.id % 2 === 1
+
 const {
     title = '这是一个面试活动',
     time = new Date(),
@@ -116,7 +120,7 @@ function formatDate(date: Date) {
     return `${date.getFullYear()} - ${date.getMonth() + 1} - ${date.getDate()}`
 }
 
-const emit = defineEmits(['view-detail','apply']);
+const emit = defineEmits(['view-detail', 'apply']);
 
 
 function handleViewDetail() {

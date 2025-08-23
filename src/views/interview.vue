@@ -1,15 +1,15 @@
 <template>
     <div class="flex flex-col items-center mt-[5rem] mb-[2rem]">
         <div v-for="(item, index) in interviews" :key="item.id" class="mb-8">
-            <InterviewShow :id="item.id" :title="item.title" :time="item.time" :style="{
+            <InterviewShow :id="index + 1" :title="item.title" :time="item.time" :style="{
                 '--main-color': colors[index % colors.length],
                 '--main-gradient': gradients[index % gradients.length]
             }" @view-detail="goToInfo" @apply="goToApply" />
-
         </div>
+
         <!-- 新增面试 -->
         <NewInterview @click="showCreate = true" />
-        
+
         <!-- 新增面试弹窗 -->
         <teleport to="body">
             <Transition name="fade">
@@ -36,11 +36,10 @@
 
 <script setup lang="ts">
 // 逻辑代码
-import { ref, watch } from 'vue';
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
 import InterviewShow from '@/components/interviewShow.vue';
 import NewInterview from '@/components/newInterview.vue';
 import { useRouter } from 'vue-router';
-import InterviewCreate from '@/components/interviewCreate.vue';
 import InterviewApply from '@/components/interviewApply.vue';
 
 // 路由
@@ -80,6 +79,16 @@ watch(showApply, (Val) => {
         document.body.style.overflow = ''
     }
 })
+
+  
+// watch(
+//     () => route.path,
+//     (newPath) => {
+//         // 只在 /interview/:id 页面显示返回按钮
+//         showBack.value = /^\\/interview\\/\\d+$/.test(newPath);
+//     },
+//     { immediate: true }
+// );
 
 function goToInfo(id: number) {
     router.push({ name: 'interviewInformation', params: { id } });

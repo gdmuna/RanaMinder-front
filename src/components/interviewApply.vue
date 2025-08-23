@@ -5,14 +5,14 @@
         <div class="w-full h-16 flex">
             <!-- 最小化按钮：仅在未打开弹窗时显示 -->
             <div v-show="!showDialog"
-                class="dark:bg-[#A3A2A0] text-[#000000] px-6 py-5 cursor-pointer flex items-center transition-transform duration-250 hover:scale-115 active:scale-95"
+                class="dark:bg-[#A3A2A0] text-[#000000] px-6 py-5 cursor-pointer flex items-center "
                 @click="deliverClose">
-                <Minimize2 />
+                <Minimize2 class="transition-transform duration-250 hover:scale-115 active:scale-95"/>
             </div>
             <!-- 返回按钮：仅在弹窗打开时显示 -->
-            <div v-show="showDialog" class="dark:bg-[#A3A2A0] text-[#000000] px-6 py-5 cursor-pointer flex items-center transition-transform duration-250 hover:scale-115 active:scale-95"
+            <div v-show="showDialog" class="dark:bg-[#A3A2A0] text-[#000000] px-6 py-5 cursor-pointer flex items-center"
                 @click="closeDialog">
-                <Undo2 />
+                <Undo2 class="transition-transform duration-250 hover:scale-115 active:scale-95"/>
             </div>
             <div class="flex-1 h-16 dark:bg-[#A3A2A0]"></div>
             <!-- 顶部按钮 -->

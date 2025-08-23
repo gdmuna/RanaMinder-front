@@ -15,7 +15,6 @@ const routes = [
     name: 'interviewInformation', 
     component: interviewInformation 
   },
-  { path: '/test', component: test },
 ]
 
 const router = createRouter({
