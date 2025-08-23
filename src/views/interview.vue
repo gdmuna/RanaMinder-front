@@ -39,6 +39,7 @@
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
 import InterviewShow from '@/components/interviewShow.vue';
 import NewInterview from '@/components/newInterview.vue';
+import InterviewCreate from '@/components/interviewCreate.vue';
 import { useRouter } from 'vue-router';
 import InterviewApply from '@/components/interviewApply.vue';
 
@@ -79,16 +80,6 @@ watch(showApply, (Val) => {
         document.body.style.overflow = ''
     }
 })
-
-  
-// watch(
-//     () => route.path,
-//     (newPath) => {
-//         // 只在 /interview/:id 页面显示返回按钮
-//         showBack.value = /^\\/interview\\/\\d+$/.test(newPath);
-//     },
-//     { immediate: true }
-// );
 
 function goToInfo(id: number) {
     router.push({ name: 'interviewInformation', params: { id } });

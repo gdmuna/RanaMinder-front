@@ -658,13 +658,16 @@ function openDialog(field?: InterviewFormJSON) {
     showDialog.value = true
 }
 
-/**
- * 获取一个默认的字段配置对象
- * 用于初始化弹窗或重置字段
- */
+function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
 function getDefaultField() {
     return {
-        id: crypto.randomUUID(),
+        id: generateUUID(),
         label: "",
         fieldName: "",
         required: false,

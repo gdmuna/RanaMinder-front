@@ -82,8 +82,7 @@
         <!-- 可爱鱼猫图 -->
         <div class="absolute bottom-0 right-0 md:block hidden">
             <!-- 卡片图片交替显示 -->
-            <img :src="isOdd ? '/src/assets/modem1.svg' : '/src/assets/modem2.png'" alt="modem"
-                class="max-w-[20rem] max-h-[20rem]">
+            <img :src="isOdd ? modem1 : modem2" alt="modem" class="max-w-[20rem] max-h-[20rem]">
         </div>
     </div>
 </template>
@@ -102,6 +101,9 @@ import {
 } from '@/components/ui/alert-dialog'
 
 import { Eye, Pencil, FileUser, Trash2 } from 'lucide-vue-next';
+
+import modem1 from '@/assets/modem1.svg'
+import modem2 from '@/assets/modem2.png'
 
 const props = defineProps<{
     id: number
