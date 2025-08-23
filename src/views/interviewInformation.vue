@@ -227,4 +227,8 @@ const personList = [
     opacity: 1;
     transform: translateY(0);
 }
+
+.overflow-hidden {
+    overflow: hidden;
+}
 </style>
