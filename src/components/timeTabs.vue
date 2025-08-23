@@ -1,46 +1,3 @@
-<script setup lang="ts">
-import { watch, ref, defineEmits } from "vue"
-
-import { Button } from "@/components/ui/button"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from "@/components/ui/tabs"
-
-const props = defineProps<{ open: boolean }>()
-const emit = defineEmits(['update:open'])
-
-function closeTabs() {
-    emit('update:open', false)
-}
-
-watch(
-    () => props.open,
-    (val) => {
-        if (val) {
-            document.body.style.overflow = "hidden"
-            document.documentElement.style.overflow = "hidden"
-        } else {
-            document.body.style.overflow = ""
-            document.documentElement.style.overflow = ""
-        }
-    }
-)
-
-</script>
-
 <template>
     <teleport to="body">
         <Transition name="fade">
@@ -107,3 +64,46 @@ watch(
         </Transition>
     </teleport>
 </template>
+
+<script setup lang="ts">
+import { watch, ref, defineEmits } from "vue"
+
+import { Button } from "@/components/ui/button"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+    Tabs,
+    TabsContent,
+    TabsList,
+    TabsTrigger,
+} from "@/components/ui/tabs"
+
+const props = defineProps<{ open: boolean }>()
+const emit = defineEmits(['update:open'])
+
+function closeTabs() {
+    emit('update:open', false)
+}
+
+watch(
+    () => props.open,
+    (val) => {
+        if (val) {
+            document.body.style.overflow = "hidden"
+            document.documentElement.style.overflow = "hidden"
+        } else {
+            document.body.style.overflow = ""
+            document.documentElement.style.overflow = ""
+        }
+    }
+)
+
+</script>
