@@ -23,21 +23,12 @@
                     class="mb-[0.9rem] sm:mb-0 sm:mr-[0.3rem] dark:bg-[#18181A] dark:text-[#FEFCE4] font-bold ">
                     <DropdownMenuLabel><span class="select-none font-bold">分配面试时间</span></DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem @mousedown.prevent @click="openTimeTabs"
-                        class="cursor-pointer mt-[0.5rem]">
-                        <FileClock class="w-5 h-5 translate-y-[0.06rem] dark:text-[#FEFCE4]" />
-                        <span>一面</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem @mousedown.prevent @click=""
-                        class="cursor-pointer mt-[0.5rem]">
-                        <FileClock class="w-5 h-5 translate-y-[0.06rem] dark:text-[#FEFCE4]" />
-                        <span>二面</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem @mousedown.prevent @click=""
-                        class="cursor-pointer mt-[0.5rem]">
-                        <FileClock class="w-5 h-5 translate-y-[0.06rem] dark:text-[#FEFCE4]" />
-                        <span>三面</span>
-                    </DropdownMenuItem>
+                    <template v-for="(round, idx) in interviewRounds" :key="idx">
+                        <DropdownMenuItem @mousedown.prevent @click="round.onClick" class="cursor-pointer mt-[0.5rem]">
+                            <FileClock class="w-5 h-5 translate-y-[0.06rem] dark:text-[#FEFCE4]" />
+                            <span>{{ round.name }}</span>
+                        </DropdownMenuItem>
+                    </template>
                 </DropdownMenuContent>
             </DropdownMenu>
 
@@ -274,7 +265,12 @@ const logoAnimate = {
     }
 }
 
-
+// 假数据
+const interviewRounds = [
+    { name: '一面', onClick: () => openTimeTabs() },
+    { name: '溜面', onClick: () => openTimeTabs() },
+    { name: '三面', onClick: () => openTimeTabs() },
+]
 
 </script>
 

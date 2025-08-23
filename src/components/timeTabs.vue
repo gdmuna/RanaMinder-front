@@ -4,58 +4,29 @@
             <div v-if="props.open"
                 class="fixed inset-0 dark:bg-black/50 backdrop-blur-xs z-10 flex items-center justify-center flex-col"
                 @click.self="closeTabs">
-                <Tabs default-value="account" class="w-[400px]">
-                    <TabsList class="grid w-full grid-cols-2">
-                        <TabsTrigger value="account">
-                            Account
-                        </TabsTrigger>
-                        <TabsTrigger value="password">
-                            Password
+                <Tabs default-value="period1" class="w-[22rem] h-[20rem]">
+                    <TabsList class="grid w-full grid-cols-3">
+                        <TabsTrigger v-for="tab in tabData" :key="tab.value" :value="tab.value"
+                            class="data-[state=active]:text-white cursor-pointer">
+                            {{ tab.label }}
                         </TabsTrigger>
                     </TabsList>
-                    <TabsContent value="account">
+                    <TabsContent v-for="tab in tabData" :key="tab.value" :value="tab.value">
                         <Card>
                             <CardHeader>
-                                <CardTitle>Account</CardTitle>
-                                <CardDescription>
-                                    Make changes to your account here. Click save when you're done.
+                                <CardTitle>{{ tab.label }}</CardTitle>
+                                <CardDescription class="mt-[0.3rem]">
+                                    这里可以设置 {{ tab.label }} 的相关信息。
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent class="space-y-2">
-                                <div class="space-y-1">
-                                    <Label for="name">Name</Label>
-                                    <Input id="name" default-value="Pedro Duarte" />
-                                </div>
-                                <div class="space-y-1">
-                                    <Label for="username">Username</Label>
-                                    <Input id="username" default-value="@peduarte" />
-                                </div>
+                            <CardContent class="flex flex-col items-start gap-3">
+                                <Button v-for="(item, idx) in tab.content" :key="idx" variant="link"
+                                    class="cursor-pointer p-2 text-lg">
+                                    {{ item }}
+                                </Button>
                             </CardContent>
-                            <CardFooter>
-                                <Button>Save changes</Button>
-                            </CardFooter>
-                        </Card>
-                    </TabsContent>
-                    <TabsContent value="password">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Password</CardTitle>
-                                <CardDescription>
-                                    Change your password here. After saving, you'll be logged out.
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent class="space-y-2">
-                                <div class="space-y-1">
-                                    <Label for="current">Current password</Label>
-                                    <Input id="current" type="password" />
-                                </div>
-                                <div class="space-y-1">
-                                    <Label for="new">New password</Label>
-                                    <Input id="new" type="password" />
-                                </div>
-                            </CardContent>
-                            <CardFooter>
-                                <Button>Save password</Button>
+                            <CardFooter class="flex justify-end">
+                                <Button class="transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer" @click="closeTabs">取消</Button>
                             </CardFooter>
                         </Card>
                     </TabsContent>
@@ -105,5 +76,36 @@ watch(
         }
     }
 )
+
+// 假数据
+const tabData = [
+    {
+        value: "period1",
+        label: "时间段1",
+        content: [
+            "19:00 - 19:30",
+            "20:00 - 20:30",
+            "21:00 - 21:30",
+        ]
+    },
+    {
+        value: "period2",
+        label: "时间段2",
+        content: [
+            "18:00 - 18:30",
+            "22:00 - 22:30"
+        ]
+    },
+    {
+        value: "period3",
+        label: "时间段3",
+        content: [
+            "20:00 - 20:30",
+            "21:00 - 21:30",
+            "22:00 - 22:30",
+            "19:00 - 19:30",
+        ]
+    }
+]
 
 </script>
