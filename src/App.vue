@@ -32,6 +32,8 @@ import { storeToRefs } from 'pinia'
 
 import { nextTick } from 'vue'
 
+import Lenis from 'lenis'
+
 const scroll_progress = ref<HTMLElement | null>(null)
 
 const systemStore = useSystemStore()
@@ -65,38 +67,33 @@ onBeforeMount(() => {
 
 const router = useRouter()
 
-onMounted(async () => {
-    // 初始化 GSAP ScrollSmoother
-    smoother.value = ScrollSmoother.create({
-        wrapper: '#app',
-        content: '#content',
-        smooth: 0.75,
-        // smoothTouch: 0,
-        onUpdate: (self: any) => {
-            const progress = self.progress
-            scroll_progress.value!.style.clipPath = `inset(0 0 ${100 - progress * 100}% 0)`;
-        },
-    })
-    // 路由跳转后重置滚动进度
-    // router.beforeEach(() => {
-    //     // 立即滚动到顶部
-    //     smoother.scrollTo(0, false)
-    //     // if (from.path !== '/') {
-    //     //     previousIsDark.value = isDark.value
-    //     // }
-    //     // if (from.path === '/' && previousIsDark.value === false) {
-    //     //     forceToggleTheme(`${previousIsDark.value}`)
-    //     // }
-    //     nextTick(() => {
-    //         return true
-    //     })
-    // })
-    // if (!isXlDesktop.value) {
-    //     toast.info('建议在大屏设备上使用本网站以获得最佳体验喵~', { duration: 5000 });
-    // }
-    // await initUserInfo()
-})
+// 初始化 Lenis
+onMounted(() => {
+    const lenis = new Lenis({
+        autoRaf: true,
+        duration: 1,
+        easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smoothWheel: true,
+        infinite: false,
+    });
 
+    // lenis.on('scroll', (e) => {
+    //     console.log(e);
+    // });
+
+    // 滚动进度条逻辑
+    function updateScrollProgress() {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const percent = scrollHeight > 0 ? scrollTop / scrollHeight : 0;
+        if (scroll_progress.value) {
+            scroll_progress.value.style.clipPath = `inset(0 0 ${100 - percent * 100}% 0)`;
+        }
+    }
+
+    window.addEventListener('scroll', updateScrollProgress);
+    nextTick(updateScrollProgress);
+});
 
 </script>
 

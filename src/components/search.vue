@@ -1,3 +1,42 @@
+<template>
+    <Combobox v-model="modelValue" v-model:open="open" :ignore-filter="true">
+        <ComboboxAnchor as-child>
+            <TagsInput v-model="modelValue" class="lg:px-2 px-1 lg:gap-2 gap-1 mx-4 lg:mx-0 w-auto h-[2.25rem] bg-custom-dark border-[1.3px]">
+                <div class="flex gap-2 flex-wrap items-center">
+                    <TagsInputItem v-for="item in modelValue" :key="item" :value="item">
+                        <TagsInputItemText class="text-[#FEFCE4] font-bold text-xs" />
+                        <TagsInputItemDelete class="text-[#FEFCE4] cursor-pointer" />
+                    </TagsInputItem>
+                </div>
+                <ComboboxInput v-model="searchTerm" as-child>
+                    <TagsInputInput placeholder="点击搜索 ..." class="lg:min-w-[120px] min-w-[75px] p-0 border-none focus-visible:ring-0"
+                        @keydown.enter.prevent />
+                </ComboboxInput>
+            </TagsInput>
+
+            <ComboboxList class="w-[--reka-popper-anchor-width] bg-[#181818] border-[1.3px]">
+                <ComboboxEmpty class="px-8 py-2 font-bold text-[#FEFCE4] flex translate-y-1">暂无选项</ComboboxEmpty>
+                <ComboboxGroup class="text-[#FEFCE4] font-bold">
+                    <ComboboxItem v-for="framework in filteredFrameworks" :key="framework.value"
+                        class="data-[highlighted]:text-[#FEFCE4]" :value="framework.label" @select.prevent="(ev) => {
+
+                            if (typeof ev.detail.value === 'string') {
+                                searchTerm = ''
+                                modelValue.push(ev.detail.value)
+                            }
+
+                            if (filteredFrameworks.length === 0) {
+                                open = false
+                            }
+                        }">
+                        {{ framework.label }}
+                    </ComboboxItem>
+                </ComboboxGroup>
+            </ComboboxList>
+        </ComboboxAnchor>
+    </Combobox>
+</template>
+
 <script setup lang="ts">
 import { useFilter } from "reka-ui"
 import { computed, ref } from "vue"
@@ -23,42 +62,8 @@ const filteredFrameworks = computed(() => {
 })
 </script>
 
-<template>
-    <Combobox v-model="modelValue" v-model:open="open" :ignore-filter="true">
-        <ComboboxAnchor as-child>
-            <TagsInput v-model="modelValue" class="px-2 gap-2 w-auto h-[2.25rem] bg-[#18181A] border-[1.3px]">
-                <div class="flex gap-2 flex-wrap items-center">
-                    <TagsInputItem v-for="item in modelValue" :key="item" :value="item">
-                        <TagsInputItemText class="text-[#FEFCE4] font-bold text-xs"/>
-                        <TagsInputItemDelete class="text-[#FEFCE4] cursor-pointer"/>
-                    </TagsInputItem>
-                </div>  
-                <ComboboxInput v-model="searchTerm" as-child>
-                    <TagsInputInput placeholder="点击搜索 ..."
-                        class="min-w-[120px] p-0 border-none focus-visible:ring-0"
-                        @keydown.enter.prevent />
-                </ComboboxInput>
-            </TagsInput>
-
-            <ComboboxList class="w-[--reka-popper-anchor-width] bg-[#18181A] border-[1.3px]">
-                <ComboboxEmpty class="px-8 py-2 font-bold text-[#FEFCE4] flex translate-y-1">暂无选项</ComboboxEmpty>
-                <ComboboxGroup class="text-[#FEFCE4] font-bold">
-                    <ComboboxItem v-for="framework in filteredFrameworks" :key="framework.value" class="data-[highlighted]:text-[#FEFCE4]"
-                        :value="framework.label" @select.prevent="(ev) => {
-
-                            if (typeof ev.detail.value === 'string') {
-                                searchTerm = ''
-                                modelValue.push(ev.detail.value)
-                            }
-
-                            if (filteredFrameworks.length === 0) {
-                                open = false
-                            }
-                        }">
-                        {{ framework.label }}
-                    </ComboboxItem>
-                </ComboboxGroup>
-            </ComboboxList>
-        </ComboboxAnchor>
-    </Combobox>
-</template>
+<style scoped>
+.bg-custom-dark {
+    background: rgba(47, 49, 47, 0.7);
+}
+</style>

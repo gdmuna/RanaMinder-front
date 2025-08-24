@@ -2,29 +2,25 @@
     <!-- 顶部导航栏容器 -->
     <div class="fixed top-0 left-0 w-full h-14 header-bg z-50 px-4 lg:flex lg:items-center select-none
     pointer-events-none lg:*:pointer-events-none *:pointer-events-auto">
-        <!-- 移动端顶部：左侧菜单按钮 + 登录按钮 -->
-        <div v-if="!isDesktop" class="size-full flex items-center justify-between">
+        <!-- 移动端顶部：左侧菜单按钮 + 搜索 + 登录按钮 -->
+        <div v-if="!isDesktop" class="size-full flex items-center justify-between will-change-transform overscroll-contain
+        overflow-x-auto scrollbar-hide flex-nowrap">
             <ChartNoAxesGantt class="shrink-0 size-8 cursor-pointer" @click="headerAnimate.toggle()" />
             <!-- 搜索 -->
-            <Search />
-            <div class="flex items-center space-x-4">
-                <!-- <primaryButton v-if="!isAuthenticated" class="cursor-pointer border-2 lg:w-auto w-full" @click="login">
-                    <div class="flex items-center space-x-2 text-[1rem]">
-                        <span>登录</span>
-                        <LogIn class="size-6" />
-                    </div>
-                </primaryButton> -->
-                <div class="flex items-center space-x-2 text-[1rem]">
-                    <span>登录</span>
-                    <LogIn class="size-6" />
-                </div>
+            <div class="shrink-0">
+                <Search v-if="route.path !== '/home' && route.path !== '/'" />
             </div>
+            <!-- <div class="flex items-center space-x-2 text-[1rem] flex-nowrap shrink-0">
+                <span>登录</span>
+                <LogIn class="size-6" />
+            </div> -->
+            <AvatarBar/>
         </div>
         <!-- 侧边栏/主导航区 -->
         <header ref="headerRef"
             class="flex lg:flex-row flex-col lg:h-full h-[100dvh] lg:w-full w-[min(24rem,70dvw)] -translate-x-full lg:-translate-x-0
         lg:items-center items-start lg:justify-between justify-start *:shrink-0 z-60 lg:p-0 p-3 space-y-4 lg:space-y-0 will-change-transform overscroll-contain
-        overflow-x-auto *:pointer-events-auto relative -top-14 lg:-top-0 -left-4 lg:-left-0 lg:bg-transparent bg-[#0E100F]">
+        overflow-x-auto scrollbar-hide *:pointer-events-auto relative -top-14 lg:-top-0 -left-4 lg:-left-0 lg:bg-transparent bg-[#0E100F]">
             <!-- 页眉左侧内容区域 -->
             <div class="flex lg:flex-row flex-col lg:h-full lg:items-center lg:w-auto w-full space-y-4 lg:space-y-0">
                 <!-- LOGO区（含动画切换） -->
@@ -92,8 +88,8 @@
                 <div v-if="isDesktop" class="flex lg:flex-row flex-col lg:items-center items-start lg:space-x-4 lg:w-auto w-full lg:p-0 p-3
                 lg:space-y-0 space-y-2 lg:dark:bg-transparent dark:bg-[#1f1e1e] rounded-lg">
                     <!-- 搜索 -->
-                    <Search />
-                    <img v-if="isDesktop" :src="boundary" alt="" class="ml-2 mr-4 shrink-0">
+                    <Search v-if="route.path !== '/home' && route.path !== '/'"/>
+                    <img v-if="isDesktop && route.path !== '/home' && route.path !== '/'" :src="boundary" alt="" class="ml-2 mr-4 shrink-0">
                     <!-- <primaryButton v-if="!isAuthenticated" class="cursor-pointer border-2 lg:w-auto w-full"
                         @click="login">
                         <div class="flex items-center space-x-2 text-[1rem]">
@@ -101,10 +97,11 @@
                             <LogIn class="size-6" />
                         </div>
                     </primaryButton> -->
-                    <div class="flex items-center space-x-2 text-[1rem]">
+                    <!-- <div class="flex items-center space-x-2 text-[1rem]">
                         <span>登录</span>
                         <LogIn class="size-6" />
-                    </div>
+                    </div> -->
+                    <AvatarBar/>
                 </div>
             </div>
         </header>
@@ -131,6 +128,7 @@ import { storeToRefs } from 'pinia'
 import { outlineText } from '@/components/ui/text'
 
 import Search from '@/components/search.vue'
+import AvatarBar from '@/components/avatarBar.vue'
 
 // 导入图标
 import {
@@ -146,7 +144,10 @@ import {
     Megaphone,
     Newspaper,
     Youtube,
-    Database
+    Database,
+    Home,
+    FileUser,
+    ShieldUser
 } from 'lucide-vue-next'
 
 import boundary from '@/assets/boundary.svg'
@@ -195,13 +196,13 @@ const routeMeta = ref([
         label: '人员管理',
         path: '/person',
         active: false,
-        icon: Megaphone
+        icon: ShieldUser
     },
     {
         label: '面试管理',
         path: '/interview',
         active: false,
-        icon: Newspaper
+        icon: FileUser
     }
 ])
 
@@ -381,5 +382,17 @@ watch(() => route.name, (newVal) => {
 .bg-enter-from,
 .bg-leave-to {
     opacity: 0;
+}
+
+.scrollbar-hide {
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE 10+ */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari/Opera */
 }
 </style>
