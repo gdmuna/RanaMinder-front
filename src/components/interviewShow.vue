@@ -81,7 +81,6 @@
         </div>
         <!-- 可爱鱼猫图 -->
         <div class="absolute bottom-0 right-0 md:block hidden">
-            <!-- 卡片图片交替显示 -->
             <img :src="isOdd ? modem1 : modem2" alt="modem" class="max-w-[20rem] max-h-[20rem]">
         </div>
     </div>
@@ -99,9 +98,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-
 import { Eye, Pencil, FileUser, Trash2 } from 'lucide-vue-next';
-
 import modem1 from '@/assets/modem1.svg'
 import modem2 from '@/assets/modem2.png'
 
@@ -111,19 +108,9 @@ const props = defineProps<{
     time: Date
 }>()
 
-const isOdd = props.id % 2 === 1
-
-const {
-    title = '这是一个面试活动',
-    time = new Date(),
-} = props;
-
-function formatDate(date: Date) {
-    return `${date.getFullYear()} - ${date.getMonth() + 1} - ${date.getDate()}`
-}
-
 const emit = defineEmits(['view-detail', 'apply']);
 
+const isOdd = props.id % 2 === 1
 
 function handleViewDetail() {
     emit('view-detail', props.id);
@@ -131,9 +118,11 @@ function handleViewDetail() {
 
 function handleApply() {
     emit('apply', props.id);
-
 }
 
+function formatDate(date: Date) {
+    return `${date.getFullYear()} - ${date.getMonth() + 1} - ${date.getDate()}`
+}
 </script>
 
 <style scoped>
@@ -146,14 +135,11 @@ function handleApply() {
 
 .hide-scrollbar {
     scrollbar-width: none;
-    /* Firefox */
     -ms-overflow-style: none;
-    /* IE 10+ */
 }
 
 .hide-scrollbar::-webkit-scrollbar {
     display: none;
-    /* Chrome/Safari/Opera */
 }
 
 .text-gradient {
