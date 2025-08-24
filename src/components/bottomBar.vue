@@ -1,6 +1,6 @@
 <template>
     <div
-        class="fixed sm:top-14 bottom-0 right-0 sm:h-full h-14 sm:w-auto w-full bg-white dark:bg-[#0E100F] shadow px-4 flex items-center">
+        class="fixed sm:top-14 bottom-0 right-0 sm:h-full h-14 sm:w-auto w-full bg-transparent shadow px-4 flex items-center">
         <header
             class="flex sm:flex-col flex-row sm:justify-normal justify-between sm:py-4 h-full flex-1 items-center *:shrink-0 sm:gap-y-[3.5rem] sm:mt-[1rem] sm:mx-0 mx-[0.5rem]">
 

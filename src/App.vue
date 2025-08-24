@@ -4,7 +4,8 @@
         <Header />
         <!-- 消息弹窗挂载点 -->
         <Toaster />
-        <div ref="scroll_progress" class="fixed z-40 top-14 left-0 w-2 h-[calc(100%-3.5rem)] page-scroll-progress" />
+        <!-- 滚动进度条 -->
+        <div ref="scroll_progress" class="fixed z-40 top-0 left-0 w-1 md:w-2 h-[100dvh] page-scroll-progress" />
         <!-- 主内容区 -->
         <main id="content" class="flex-1">
             <router-view />
@@ -39,6 +40,8 @@ const { isDark } = storeToRefs(systemStore)
 
 const previousIsDark = ref(isDark.value)
 
+const smoother = ref<ScrollSmoother | null>(null)
+
 // 动态设置根元素字体大小
 function setRootFontSize() {
     const html = document.documentElement;
@@ -62,25 +65,36 @@ onBeforeMount(() => {
 
 const router = useRouter()
 
-onMounted(() => {
+onMounted(async () => {
     // 初始化 GSAP ScrollSmoother
-    const smoother = ScrollSmoother.create({
+    smoother.value = ScrollSmoother.create({
         wrapper: '#app',
         content: '#content',
         smooth: 0.75,
-        // normalizeScroll: true,
         // smoothTouch: 0,
-        onUpdate: (self) => {
+        onUpdate: (self: any) => {
             const progress = self.progress
             scroll_progress.value!.style.clipPath = `inset(0 0 ${100 - progress * 100}% 0)`;
         },
     })
     // 路由跳转后重置滚动进度
-    router.afterEach(() => {
-        nextTick(() => {
-            smoother.scrollTo(0, false)
-        })
-    })
+    // router.beforeEach(() => {
+    //     // 立即滚动到顶部
+    //     smoother.scrollTo(0, false)
+    //     // if (from.path !== '/') {
+    //     //     previousIsDark.value = isDark.value
+    //     // }
+    //     // if (from.path === '/' && previousIsDark.value === false) {
+    //     //     forceToggleTheme(`${previousIsDark.value}`)
+    //     // }
+    //     nextTick(() => {
+    //         return true
+    //     })
+    // })
+    // if (!isXlDesktop.value) {
+    //     toast.info('建议在大屏设备上使用本网站以获得最佳体验喵~', { duration: 5000 });
+    // }
+    // await initUserInfo()
 })
 
 
@@ -89,7 +103,7 @@ onMounted(() => {
 
 <style scoped>
 .page-scroll-progress {
-    background: linear-gradient(0deg, #53B7DE, #0E100F);
+    background: linear-gradient(0deg, #D5C8B0, #0E100F);
     clip-path: inset(0 0 100% 0);
 }
 </style>
