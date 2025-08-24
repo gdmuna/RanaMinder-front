@@ -1,6 +1,6 @@
 <template>
     <div
-        class="fixed sm:top-14 bottom-0 right-0 sm:h-full h-14 sm:w-auto w-full bg-transparent shadow px-4 flex items-center">
+        class="fixed sm:top-14 bottom-0 right-0 sm:h-full h-14 sm:w-auto w-full header-bg shadow px-4 flex items-center">
         <header
             class="flex sm:flex-col flex-row sm:justify-normal justify-between sm:py-4 h-full flex-1 items-center *:shrink-0 sm:gap-y-[3.5rem] sm:mt-[1rem] sm:mx-0 mx-[0.5rem]">
 
@@ -154,13 +154,8 @@ const interviewRounds = [
 </script>
 
 <style scoped>
-.join-us-button {
-    background: linear-gradient(90deg, #27C93F, #53B7DE);
-    box-shadow: 0em 0.1em 0.5em rgba(39, 201, 63, 0.3);
-    transition: box-shadow 0.2s ease;
-}
-
-.join-us-button:hover {
-    box-shadow: 0 0.2em 1em rgba(39, 201, 63, 0.4);
+.header-bg {
+    background: linear-gradient(180.00deg, rgba(14, 16, 15, 0), rgba(14, 16, 15, 1) 100%);
+    backdrop-filter: blur(2px);
 }
 </style>
