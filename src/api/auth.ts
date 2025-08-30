@@ -9,7 +9,7 @@ export const authApi = {
     login() {
         window.location.href = `${baseUrl}/auth/login`;
     },
-    
+
     // 处理登录回调
     async loginCallback() {
         const searchParams = new URLSearchParams(window.location.search);
