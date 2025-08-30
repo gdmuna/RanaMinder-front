@@ -81,6 +81,9 @@ onMounted(() => {
     //     console.log(e);
     // });
 
+    // 挂载到 window，方便其他组件访问
+    (window as any).lenis = lenis
+
     // 滚动进度条逻辑
     function updateScrollProgress() {
         const scrollTop = window.scrollY || document.documentElement.scrollTop;

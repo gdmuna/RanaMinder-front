@@ -74,7 +74,7 @@
                 </div>
                 <!-- 时间 -->
                 <span
-                    class="text-[1rem] font-extrabold text-[#EEEEEE] tracking-widest ml-auto mr-[5rem] mb-[0.3rem] md:block hidden">
+                    class="text-[1rem] font-extrabold text-[#EEEEEE] tracking-widest ml-auto mr-[7rem] mb-[0.3rem] md:block hidden">
                     {{ formatDate(time) }}
                 </span>
             </div>

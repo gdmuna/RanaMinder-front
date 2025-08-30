@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { watch, ref, defineEmits } from "vue"
+import { watch, ref } from "vue"
 
 import { Button } from "@/components/ui/button"
 import {

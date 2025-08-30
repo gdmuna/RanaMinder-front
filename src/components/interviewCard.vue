@@ -58,7 +58,7 @@
 <script setup lang="ts">
 import Badge from '@/components/ui/badge/Badge.vue';
 import { SquarePlus, SquareMinus } from 'lucide-vue-next';
-import { defineEmits, ref } from 'vue';
+import { ref } from 'vue';
 
 // 定义组件导出Props
 const props = defineProps<{

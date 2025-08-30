@@ -1,370 +1,375 @@
 <template>
-    <div
-        class="flex flex-col h-[80%] md:w-auto min-w-[36%] w-full rounded-xl overflow-hidden select-none dark:bg-[#E8E7E2]">
-        <!-- 顶部装饰 -->
-        <div class="w-full h-16 flex">
-            <!-- 最小化按钮：仅在未打开弹窗时显示 -->
-            <div v-show="!showDialog"
-                class="dark:bg-[#A3A2A0] text-[#000000] px-6 py-5 cursor-pointer flex items-center "
-                @click="deliverClose">
-                <Minimize2 class="transition-transform duration-250 hover:scale-115 active:scale-95"/>
-            </div>
-            <!-- 返回按钮：仅在弹窗打开时显示 -->
-            <div v-show="showDialog" class="dark:bg-[#A3A2A0] text-[#000000] px-6 py-5 cursor-pointer flex items-center"
-                @click="closeDialog">
-                <Undo2 class="transition-transform duration-250 hover:scale-115 active:scale-95"/>
-            </div>
-            <div class="flex-1 h-16 dark:bg-[#A3A2A0]"></div>
-            <!-- 顶部按钮 -->
-            <div class="dark:bg-[#A3A2A0] px-4 py-2 flex items-center">
-                <Button v-show="!showDialog"
-                    class="flex gap-1 text-sm tracking-wide dark:bg-[#7CA08C] dark:text-[#000000] font-bold xl:px-[5rem] px-[4rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-sm cursor-pointer"
-                    @click="openDialog()">
-                    <CirclePlus class="inline w-5 h-5" />
-                    添加
-                </Button>
-            </div>
-        </div>
-
-        <!-- 中间内容 -->
+    <div data-lenis-prevent class="flex flex-col items-center md:justify-center justify-end min-h-screen w-full overflow-y-auto">
         <div
-            class="flex-1 overflow-auto will-change-transform rounded-none dark:bg-[#E8E7E2] dark:text-[#000000] scrollbar-hide">
-            <div v-show="!showDialog" class="flex w-full h-full">
-                <!-- 没有添加字段时的提示 -->
-                <div v-if="fields.length === 0" class="flex items-center justify-center w-full">
-                    <div class="dark:text-[#A3A2A0] transition-transform duration-400 hover:scale-102 active:scale-95 cursor-pointer flex items-center"
-                        @click.stop="openDialog()">
-                        <Smile class="inline w-[2.2rem] h-[2.2rem]" />
-                        <span class="ml-[1.5rem] font-bold text-[1.2rem] tracking-wider">点击添加申请表字段</span>
-                    </div>
+            class="flex flex-col h-[80%] md:w-auto min-w-[36%] w-full rounded-xl overflow-hidden select-none dark:bg-[#E8E7E2]">
+            <!-- 顶部装饰 -->
+            <div class="w-full h-16 flex">
+                <!-- 最小化按钮：仅在未打开弹窗时显示 -->
+                <div v-show="!showDialog"
+                    class="dark:bg-[#A3A2A0] text-[#000000] px-6 py-5 cursor-pointer flex items-center "
+                    @click="deliverClose">
+                    <Minimize2 class="transition-transform duration-250 hover:scale-115 active:scale-95" />
                 </div>
-                <!-- 有字段时的列表 -->
-                <ul v-else class="w-full">
-                    <li v-for="(field, index) in fields" :key="field.id"
-                        class="px-4 py-2 rounded dark:text-[#000000] cursor-pointer hover:bg-[#f5f5f5cb] flex items-center"
-                        @click="openDialog(field)">
-                        <span
-                            class="w-20 mr-8 font-[优设标题黑] tracking-wide drop-shadow-lg text-transparent bg-clip-text text-[2.5rem]"
-                            :style="{
-                                background: gradients[index % gradients.length],
-                                WebkitBackgroundClip: 'text',
-                                backgroundClip: 'text',
-                                color: 'transparent'
-                            }">
-                            {{ (index + 1).toString().padStart(2, '0') }}
-                        </span>
-                        <span class="dark:text-[#000000] tracking-wide font-bold ">{{ field.label }}</span>
-                            <CircleX @click.stop="removeField(index)" class="ml-auto mr-[0.8rem] w-[1.5rem] h-[1.5rem] font-bold text-[#af0d0d] cursor-pointer transition-transform duration-200 hover:scale-120 active:scale-95" />
-                    </li>
-                </ul>
+                <!-- 返回按钮：仅在弹窗打开时显示 -->
+                <div v-show="showDialog"
+                    class="dark:bg-[#A3A2A0] text-[#000000] px-6 py-5 cursor-pointer flex items-center"
+                    @click="closeDialog">
+                    <Undo2 class="transition-transform duration-250 hover:scale-115 active:scale-95" />
+                </div>
+                <div class="flex-1 h-16 dark:bg-[#A3A2A0]"></div>
+                <!-- 顶部按钮 -->
+                <div class="dark:bg-[#A3A2A0] px-4 py-2 flex items-center">
+                    <Button v-show="!showDialog"
+                        class="flex gap-1 text-sm tracking-wide dark:bg-[#7CA08C] dark:text-[#000000] font-bold xl:px-[5rem] px-[4rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-sm cursor-pointer"
+                        @click="openDialog()">
+                        <CirclePlus class="inline w-5 h-5" />
+                        添加
+                    </Button>
+                </div>
             </div>
 
-            <!-- 添加字段弹窗 -->
-            <div v-show="showDialog" class="py-[1rem] px-[2rem]">
-
-                <span class="text-xl font-bold">
-                    {{ editingField ? "编辑字段" : "添加字段" }}
-                </span>
-
-                <!-- 表单 -->
-                <form @submit.prevent="saveField" class="mt-[1.5rem]">
-                    <!-- 字段名 -->
-                    <div class="mb-[1.5rem] ">
-                        <div
-                            class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#8FAFC4] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[7.8rem]">
-                            <span class="text-red-500 translate-y-[0.21rem]">*</span>
-                            <label class="">字段显示名称</label>
+            <!-- 中间内容 -->
+            <div
+                class="flex-1 overflow-auto will-change-transform rounded-none dark:bg-[#E8E7E2] dark:text-[#000000] scrollbar-hide">
+                <div v-show="!showDialog" class="flex w-full h-full">
+                    <!-- 没有添加字段时的提示 -->
+                    <div v-if="fields.length === 0" class="flex items-center justify-center w-full">
+                        <div class="dark:text-[#A3A2A0] transition-transform duration-400 hover:scale-102 active:scale-95 cursor-pointer flex items-center"
+                            @click.stop="openDialog()">
+                            <Smile class="inline w-[2.2rem] h-[2.2rem]" />
+                            <span class="ml-[1.5rem] font-bold text-[1.2rem] tracking-wider">点击添加申请表字段</span>
                         </div>
-                        <Input v-model="tempField.label" type="text"
-                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
                     </div>
+                    <!-- 有字段时的列表 -->
+                    <ul v-else class="w-full">
+                        <li v-for="(field, index) in fields" :key="field.id"
+                            class="px-4 py-2 rounded dark:text-[#000000] cursor-pointer hover:bg-[#f5f5f5cb] flex items-center"
+                            @click="openDialog(field)">
+                            <span
+                                class="w-20 mr-8 font-[优设标题黑] tracking-wide drop-shadow-lg text-transparent bg-clip-text text-[2.5rem]"
+                                :style="{
+                                    background: gradients[index % gradients.length],
+                                    WebkitBackgroundClip: 'text',
+                                    backgroundClip: 'text',
+                                    color: 'transparent'
+                                }">
+                                {{ (index + 1).toString().padStart(2, '0') }}
+                            </span>
+                            <span class="dark:text-[#000000] tracking-wide font-bold ">{{ field.label }}</span>
+                            <CircleX @click.stop="removeField(index)"
+                                class="ml-auto mr-[0.8rem] w-[1.5rem] h-[1.5rem] font-bold text-[#af0d0d] cursor-pointer transition-transform duration-200 hover:scale-120 active:scale-95" />
+                        </li>
+                    </ul>
+                </div>
 
-                    <!-- 字段存储名 -->
-                    <div class="mb-[1.5rem]">
-                        <div
-                            class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#8EB38A] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[10.8rem]">
-                            <span class="text-red-500 translate-y-[0.21rem]">*</span>
-                            <label class="">字段存储名称（英文）</label>
+                <!-- 添加字段弹窗 -->
+                <div v-show="showDialog" class="py-[1rem] px-[2rem]">
+
+                    <span class="text-xl font-bold">
+                        {{ editingField ? "编辑字段" : "添加字段" }}
+                    </span>
+
+                    <!-- 表单 -->
+                    <form @submit.prevent="saveField" class="mt-[1.5rem]">
+                        <!-- 字段名 -->
+                        <div class="mb-[1.5rem] ">
+                            <div
+                                class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#8FAFC4] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[7.8rem]">
+                                <span class="text-red-500 translate-y-[0.21rem]">*</span>
+                                <label class="">字段显示名称</label>
+                            </div>
+                            <Input v-model="tempField.label" type="text"
+                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
                         </div>
-                        <Input v-model="tempField.fieldName" type="text"
-                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                    </div>
 
-                    <!-- 字段描述/备注 -->
-                    <div class="mb-[1.5rem]">
-                        <label
-                            class="mb-[0.5rem] flex items-center gap-2 text-sm font-bold tracking-wide bg-[#C490BD] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[3.3rem]">备注</label>
-                        <Input v-model="tempField.description" type="text"
-                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                    </div>
-
-                    <!-- 是否必填 -->
-                    <div class="mb-[1.5rem] flex flex-col items-start gap-[0.5rem]">
-                        <span
-                            class="text-sm font-bold tracking-wide bg-[#e2d55a] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6rem]">必填该字段</span>
-                        <Switch v-model="tempField.required" :value="undefined"
-                            class="data-[state=checked]:bg-[#50C878] ml-[0.1rem]" />
-                    </div>
-
-                    <!-- 字段类型 -->
-                    <div class="mb-[1.5rem]">
-                        <div
-                            class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#b0d1c1] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[7.8rem]">
-                            <span class="text-red-500 translate-y-[0.21rem]">*</span>
-                            <label class="">字段应用类型</label>
+                        <!-- 字段存储名 -->
+                        <div class="mb-[1.5rem]">
+                            <div
+                                class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#8EB38A] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[10.8rem]">
+                                <span class="text-red-500 translate-y-[0.21rem]">*</span>
+                                <label class="">字段存储名称（英文）</label>
+                            </div>
+                            <Input v-model="tempField.fieldName" type="text"
+                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
                         </div>
-                        <Select v-model="tempField.type">
-                            <SelectTrigger class="w-full dark:bg-[#D4D3CF] dark:text-[#000000] border-none">
-                                <SelectValue placeholder="请选择" />
-                            </SelectTrigger>
-                            <SelectContent class="dark:bg-[#D4D3CF] dark:text-[#000000] border-none ">
-                                <SelectItem value="input" class="focus:bg-[#777777]">
-                                    输入框 input
-                                </SelectItem>
-                                <SelectItem value="textarea" class="focus:bg-[#777777]">
-                                    多行文本 textarea
-                                </SelectItem>
-                                <SelectItem value="radioGroup" class="focus:bg-[#777777]">
-                                    单选组 radioGroup
-                                </SelectItem>
-                                <SelectItem value="checkbox" class="focus:bg-[#777777]">
-                                    多选组 checkbox
-                                </SelectItem>
-                                <SelectItem value="select" class="focus:bg-[#777777]">
-                                    下拉选择框 select
-                                </SelectItem>
-                                <SelectItem value="upload" class="focus:bg-[#777777]">
-                                    上传 upload
-                                </SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
 
-                    <!-- 值类型 -->
-                    <div class="mb-[1.5rem]">
-                        <div
-                            class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#e6c492] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6rem]">
-                            <span class="text-red-500 translate-y-[0.21rem]">*</span>
-                            <label class="">值的类型</label>
+                        <!-- 字段描述/备注 -->
+                        <div class="mb-[1.5rem]">
+                            <label
+                                class="mb-[0.5rem] flex items-center gap-2 text-sm font-bold tracking-wide bg-[#C490BD] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[3.3rem]">备注</label>
+                            <Input v-model="tempField.description" type="text"
+                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
                         </div>
-                        <Select v-model="tempField.value.type">
-                            <SelectTrigger class="w-full dark:bg-[#D4D3CF] dark:text-[#000000] border-none">
-                                <SelectValue placeholder="请选择" />
-                            </SelectTrigger>
-                            <SelectContent class="dark:bg-[#D4D3CF] dark:text-[#000000] border-none ">
-                                <SelectItem value="string" class="focus:bg-[#777777]">
-                                    字符串 string
-                                </SelectItem>
-                                <SelectItem value="number" class="focus:bg-[#777777]">
-                                    数字 number
-                                </SelectItem>
-                                <SelectItem value="array" class="focus:bg-[#777777]">
-                                    数组 array
-                                </SelectItem>
-                                <SelectItem value="boolean" class="focus:bg-[#777777]">
-                                    布尔值 boolean
-                                </SelectItem>
-                                <SelectItem value="file" class="focus:bg-[#777777]">
-                                    文件 file
-                                </SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
 
-                    <!-- 输入框的显示样式 -->
-                    <div class="mb-[1.5rem]" v-if="['input', 'textarea'].includes(tempField.type) && tempField.style">
-                        <label
-                            class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#8FAFC4] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[9.7rem]">值的输入框显示样式</label>
-                        <Select v-model="tempField.style.inputType">
-                            <SelectTrigger class="w-full dark:bg-[#D4D3CF] dark:text-[#000000] border-none">
-                                <SelectValue placeholder="请选择" />
-                            </SelectTrigger>
-                            <SelectContent class="dark:bg-[#D4D3CF] dark:text-[#000000] border-none ">
-                                <SelectItem value="text" class="focus:bg-[#777777]">
-                                    文本输入框
-                                </SelectItem>
-                                <SelectItem value="email" class="focus:bg-[#777777]">
-                                    邮箱输入框
-                                </SelectItem>
-                                <SelectItem value="number" class="focus:bg-[#777777]">
-                                    数字输入框
-                                </SelectItem>
-                                <SelectItem value="password" class="focus:bg-[#777777]">
-                                    密码输入框
-                                </SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <!-- 默认值 -->
-                    <div class="mb-[1.5rem]"
-                        v-if="tempField.value.type && tempField.type !== 'upload' && tempField.value.type !== 'array' && tempField.value.type !== 'file'">
-                        <label
-                            class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#83c067] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[4.3rem]">默认值</label>
-                        <Input v-if="tempField.value.type === 'string'" v-model="(tempField.value as any).default"
-                            type="text"
-                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                        <Input v-else-if="tempField.value.type === 'number'"
-                            v-model.number="(tempField.value as any).default" type="number"
-                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                        <Select v-else-if="tempField.value.type === 'boolean'"
-                            v-model="(tempField.value as any).default">
-                            <SelectTrigger class="w-full dark:bg-[#D4D3CF] dark:text-[#000000] border-none">
-                                <SelectValue placeholder="请选择" />
-                            </SelectTrigger>
-                            <SelectContent class="dark:bg-[#D4D3CF] dark:text-[#000000] border-none ">
-                                <SelectItem value="true" class="focus:bg-[#777777]">
-                                    true
-                                </SelectItem>
-                                <SelectItem value="false" class="focus:bg-[#777777]">
-                                    false
-                                </SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <!-- 值的最大值/最小值，仅数字类型,且字段类型为输入框/多行文本 -->
-                    <div class="mb-[1.5rem]"
-                        v-if="['number'].includes(tempField.value.type) && ['input', 'textarea'].includes(tempField.type)">
-                        <label
-                            class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#706cad] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6rem]">值的最大值</label>
-                        <Input v-model.number="tempField.value.maxCount" type="number" min="0"
-                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                    </div>
-                    <div class="mb-[1.5rem]"
-                        v-if="['number'].includes(tempField.value.type) && ['input', 'textarea'].includes(tempField.type)">
-                        <label
-                            class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#5ba8b6] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6rem]">值的最小值</label>
-                        <Input v-model.number="tempField.value.minCount" type="number" min="0"
-                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                    </div>
-
-                    <!-- 最大/最小长度，仅字符串/数组/数字，且字段类型为输入框/多行文本 -->
-                    <div class="mb-[1.5rem]"
-                        v-if="['string', 'array', 'number'].includes(tempField.value.type) && ['input', 'textarea'].includes(tempField.type)">
-                        <label
-                            class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#4ca373] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[10rem]">值的最大长度（字节）</label>
-                        <Input v-model.number="tempField.value.maxLength" type="number" min="0"
-                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                    </div>
-                    <div class="mb-[1.5rem]"
-                        v-if="['string', 'array', 'number'].includes(tempField.value.type) && ['input', 'textarea'].includes(tempField.type)">
-                        <label
-                            class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#d876a7] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[10rem]">值的最小长度（字节）</label>
-                        <Input v-model.number="tempField.value.minLength" type="number" min="0"
-                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                    </div>
-
-                    <!-- 数组项类型配置，仅 array 类型 -->
-                    <div class="mb-[1.5rem]" v-if="tempField.value.type === 'array' && tempField.value.arrayItem">
-                        <div
-                            class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#e6c492] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6.8rem]">
-                            <span class="text-red-500 translate-y-[0.21rem]">*</span>
-                            <label class="">数组项类型</label>
+                        <!-- 是否必填 -->
+                        <div class="mb-[1.5rem] flex flex-col items-start gap-[0.5rem]">
+                            <span
+                                class="text-sm font-bold tracking-wide bg-[#e2d55a] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6rem]">必填该字段</span>
+                            <Switch v-model="tempField.required" :value="undefined"
+                                class="data-[state=checked]:bg-[#50C878] ml-[0.1rem]" />
                         </div>
-                        <Select v-model="tempField.value.arrayItem.type">
-                            <SelectTrigger class="w-full dark:bg-[#D4D3CF] dark:text-[#000000] border-none">
-                                <SelectValue placeholder="请选择" />
-                            </SelectTrigger>
-                            <SelectContent class="dark:bg-[#D4D3CF] dark:text-[#000000] border-none ">
-                                <SelectItem value="string" class="focus:bg-[#777777]">
-                                    字符串 string
-                                </SelectItem>
-                                <SelectItem value="number" class="focus:bg-[#777777]">
-                                    数字 number
-                                </SelectItem>
-                                <SelectItem value="boolean" class="focus:bg-[#777777]">
-                                    布尔值 boolean
-                                </SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div class="mb-[1.5rem]" v-if="tempField.value.type === 'array' && tempField.value.arrayItem">
-                        <label
-                            class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#d17a64] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[7.8rem]">数组项最小长度</label>
-                        <Input v-model.number="tempField.value.arrayItem.minLength" type="number" min="0"
-                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                    </div>
-                    <div class="mb-[1.5rem]" v-if="tempField.value.type === 'array' && tempField.value.arrayItem">
-                        <label
-                            class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#b2d178] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[7.8rem]">数组项最大长度</label>
-                        <Input v-model.number="tempField.value.arrayItem.maxLength" type="number" min="0"
-                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                    </div>
-                    <!-- 数组项默认值，直接返回空数组，待优化 -->
-                    <!-- <label class="block mb-1 mt-2">数组项默认值</label>
+
+                        <!-- 字段类型 -->
+                        <div class="mb-[1.5rem]">
+                            <div
+                                class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#b0d1c1] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[7.8rem]">
+                                <span class="text-red-500 translate-y-[0.21rem]">*</span>
+                                <label class="">字段应用类型</label>
+                            </div>
+                            <Select v-model="tempField.type">
+                                <SelectTrigger class="w-full dark:bg-[#D4D3CF] dark:text-[#000000] border-none">
+                                    <SelectValue placeholder="请选择" />
+                                </SelectTrigger>
+                                <SelectContent class="dark:bg-[#D4D3CF] dark:text-[#000000] border-none ">
+                                    <SelectItem value="input" class="focus:bg-[#777777]">
+                                        输入框 input
+                                    </SelectItem>
+                                    <SelectItem value="textarea" class="focus:bg-[#777777]">
+                                        多行文本 textarea
+                                    </SelectItem>
+                                    <SelectItem value="radioGroup" class="focus:bg-[#777777]">
+                                        单选组 radioGroup
+                                    </SelectItem>
+                                    <SelectItem value="checkbox" class="focus:bg-[#777777]">
+                                        多选组 checkbox
+                                    </SelectItem>
+                                    <SelectItem value="select" class="focus:bg-[#777777]">
+                                        下拉选择框 select
+                                    </SelectItem>
+                                    <SelectItem value="upload" class="focus:bg-[#777777]">
+                                        上传 upload
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <!-- 值类型 -->
+                        <div class="mb-[1.5rem]">
+                            <div
+                                class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#e6c492] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6rem]">
+                                <span class="text-red-500 translate-y-[0.21rem]">*</span>
+                                <label class="">值的类型</label>
+                            </div>
+                            <Select v-model="tempField.value.type">
+                                <SelectTrigger class="w-full dark:bg-[#D4D3CF] dark:text-[#000000] border-none">
+                                    <SelectValue placeholder="请选择" />
+                                </SelectTrigger>
+                                <SelectContent class="dark:bg-[#D4D3CF] dark:text-[#000000] border-none ">
+                                    <SelectItem value="string" class="focus:bg-[#777777]">
+                                        字符串 string
+                                    </SelectItem>
+                                    <SelectItem value="number" class="focus:bg-[#777777]">
+                                        数字 number
+                                    </SelectItem>
+                                    <SelectItem value="array" class="focus:bg-[#777777]">
+                                        数组 array
+                                    </SelectItem>
+                                    <SelectItem value="boolean" class="focus:bg-[#777777]">
+                                        布尔值 boolean
+                                    </SelectItem>
+                                    <SelectItem value="file" class="focus:bg-[#777777]">
+                                        文件 file
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <!-- 输入框的显示样式 -->
+                        <div class="mb-[1.5rem]"
+                            v-if="['input', 'textarea'].includes(tempField.type) && tempField.style">
+                            <label
+                                class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#8FAFC4] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[9.7rem]">值的输入框显示样式</label>
+                            <Select v-model="tempField.style.inputType">
+                                <SelectTrigger class="w-full dark:bg-[#D4D3CF] dark:text-[#000000] border-none">
+                                    <SelectValue placeholder="请选择" />
+                                </SelectTrigger>
+                                <SelectContent class="dark:bg-[#D4D3CF] dark:text-[#000000] border-none ">
+                                    <SelectItem value="text" class="focus:bg-[#777777]">
+                                        文本输入框
+                                    </SelectItem>
+                                    <SelectItem value="email" class="focus:bg-[#777777]">
+                                        邮箱输入框
+                                    </SelectItem>
+                                    <SelectItem value="number" class="focus:bg-[#777777]">
+                                        数字输入框
+                                    </SelectItem>
+                                    <SelectItem value="password" class="focus:bg-[#777777]">
+                                        密码输入框
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <!-- 默认值 -->
+                        <div class="mb-[1.5rem]"
+                            v-if="tempField.value.type && tempField.type !== 'upload' && tempField.value.type !== 'array' && tempField.value.type !== 'file'">
+                            <label
+                                class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#83c067] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[4.3rem]">默认值</label>
+                            <Input v-if="tempField.value.type === 'string'" v-model="(tempField.value as any).default"
+                                type="text"
+                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                            <Input v-else-if="tempField.value.type === 'number'"
+                                v-model.number="(tempField.value as any).default" type="number"
+                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                            <Select v-else-if="tempField.value.type === 'boolean'"
+                                v-model="(tempField.value as any).default">
+                                <SelectTrigger class="w-full dark:bg-[#D4D3CF] dark:text-[#000000] border-none">
+                                    <SelectValue placeholder="请选择" />
+                                </SelectTrigger>
+                                <SelectContent class="dark:bg-[#D4D3CF] dark:text-[#000000] border-none ">
+                                    <SelectItem value="true" class="focus:bg-[#777777]">
+                                        true
+                                    </SelectItem>
+                                    <SelectItem value="false" class="focus:bg-[#777777]">
+                                        false
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <!-- 值的最大值/最小值，仅数字类型,且字段类型为输入框/多行文本 -->
+                        <div class="mb-[1.5rem]"
+                            v-if="['number'].includes(tempField.value.type) && ['input', 'textarea'].includes(tempField.type)">
+                            <label
+                                class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#706cad] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6rem]">值的最大值</label>
+                            <Input v-model.number="tempField.value.maxCount" type="number" min="0"
+                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                        </div>
+                        <div class="mb-[1.5rem]"
+                            v-if="['number'].includes(tempField.value.type) && ['input', 'textarea'].includes(tempField.type)">
+                            <label
+                                class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#5ba8b6] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6rem]">值的最小值</label>
+                            <Input v-model.number="tempField.value.minCount" type="number" min="0"
+                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                        </div>
+
+                        <!-- 最大/最小长度，仅字符串/数组/数字，且字段类型为输入框/多行文本 -->
+                        <div class="mb-[1.5rem]"
+                            v-if="['string', 'array', 'number'].includes(tempField.value.type) && ['input', 'textarea'].includes(tempField.type)">
+                            <label
+                                class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#4ca373] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[10rem]">值的最大长度（字节）</label>
+                            <Input v-model.number="tempField.value.maxLength" type="number" min="0"
+                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                        </div>
+                        <div class="mb-[1.5rem]"
+                            v-if="['string', 'array', 'number'].includes(tempField.value.type) && ['input', 'textarea'].includes(tempField.type)">
+                            <label
+                                class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#d876a7] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[10rem]">值的最小长度（字节）</label>
+                            <Input v-model.number="tempField.value.minLength" type="number" min="0"
+                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                        </div>
+
+                        <!-- 数组项类型配置，仅 array 类型 -->
+                        <div class="mb-[1.5rem]" v-if="tempField.value.type === 'array' && tempField.value.arrayItem">
+                            <div
+                                class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#e6c492] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6.8rem]">
+                                <span class="text-red-500 translate-y-[0.21rem]">*</span>
+                                <label class="">数组项类型</label>
+                            </div>
+                            <Select v-model="tempField.value.arrayItem.type">
+                                <SelectTrigger class="w-full dark:bg-[#D4D3CF] dark:text-[#000000] border-none">
+                                    <SelectValue placeholder="请选择" />
+                                </SelectTrigger>
+                                <SelectContent class="dark:bg-[#D4D3CF] dark:text-[#000000] border-none ">
+                                    <SelectItem value="string" class="focus:bg-[#777777]">
+                                        字符串 string
+                                    </SelectItem>
+                                    <SelectItem value="number" class="focus:bg-[#777777]">
+                                        数字 number
+                                    </SelectItem>
+                                    <SelectItem value="boolean" class="focus:bg-[#777777]">
+                                        布尔值 boolean
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div class="mb-[1.5rem]" v-if="tempField.value.type === 'array' && tempField.value.arrayItem">
+                            <label
+                                class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#d17a64] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[7.8rem]">数组项最小长度</label>
+                            <Input v-model.number="tempField.value.arrayItem.minLength" type="number" min="0"
+                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                        </div>
+                        <div class="mb-[1.5rem]" v-if="tempField.value.type === 'array' && tempField.value.arrayItem">
+                            <label
+                                class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#b2d178] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[7.8rem]">数组项最大长度</label>
+                            <Input v-model.number="tempField.value.arrayItem.maxLength" type="number" min="0"
+                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                        </div>
+                        <!-- 数组项默认值，直接返回空数组，待优化 -->
+                        <!-- <label class="block mb-1 mt-2">数组项默认值</label>
                             <input v-model="tempField.value.arrayItem.default" type="text"
                                 class="border rounded w-full px-2 py-1" /> -->
 
-                    <!-- 选项配置，仅 radioGroup/select/checkbox 类型 -->
-                    <div v-if="['radioGroup', 'select', 'checkbox'].includes(tempField.type)" class="mb-[1.5rem]">
-                        <div class="flex items-center justify-start gap-1">
+                        <!-- 选项配置，仅 radioGroup/select/checkbox 类型 -->
+                        <div v-if="['radioGroup', 'select', 'checkbox'].includes(tempField.type)" class="mb-[1.5rem]">
+                            <div class="flex items-center justify-start gap-1">
+                                <label
+                                    class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#a77fc2] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.2rem]">选项列表</label>
+                                <button type="button"
+                                    class="mb-[0.5rem] rounded-xl flex gap-1 text-sm dark:bg-[#a77fc2] dark:text-[#000000] p-[0.29rem] font-bold transition-transform duration-250 hover:scale-105 active:scale-95 cursor-pointer"
+                                    @click="addOption">
+                                    <CirclePlus class="inline w-5 h-5" />
+                                </button>
+                            </div>
+                            <div v-for="(opt, idx) in tempField.value.options" :key="idx"
+                                class="flex gap-2 mb-2 items-center">
+                                <Input v-model="opt.label" type="text"
+                                    class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10"
+                                    placeholder="选项显示文本" />
+                                <Input v-model="(opt as any).value" type="text"
+                                    class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10"
+                                    placeholder="选项值（中文）" />
+                                <button type="button"
+                                    class="rounded-xl flex gap-1 text-sm dark:bg-[#a77fc2] dark:text-[#000000] p-[0.29rem] font-bold transition-transform duration-250 hover:scale-105 active:scale-95 cursor-pointer"
+                                    @click="removeOption(idx)">
+                                    <CircleX class="inline w-5 h-5" />
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 允许文件类型，仅 upload 类型 -->
+                        <div v-if="tempField.type === 'upload'" class="mb-[1.5rem]">
                             <label
-                                class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#a77fc2] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.2rem]">选项列表</label>
-                            <button type="button"
-                                class="mb-[0.5rem] rounded-xl flex gap-1 text-sm dark:bg-[#a77fc2] dark:text-[#000000] p-[0.29rem] font-bold transition-transform duration-250 hover:scale-105 active:scale-95 cursor-pointer"
-                                @click="addOption">
-                                <CirclePlus class="inline w-5 h-5" />
-                            </button>
-                        </div>
-                        <div v-for="(opt, idx) in tempField.value.options" :key="idx"
-                            class="flex gap-2 mb-2 items-center">
-                            <Input v-model="opt.label" type="text"
+                                class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#7db15b] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6.9rem]">允许文件类型</label>
+                            <Input v-model="(tempField.value as any).accept" type="text"
                                 class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10"
-                                placeholder="选项显示文本" />
-                            <Input v-model="(opt as any).value" type="text"
-                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10"
-                                placeholder="选项值（中文）" />
-                            <button type="button"
-                                class="rounded-xl flex gap-1 text-sm dark:bg-[#a77fc2] dark:text-[#000000] p-[0.29rem] font-bold transition-transform duration-250 hover:scale-105 active:scale-95 cursor-pointer"
-                                @click="removeOption(idx)">
-                                <CircleX class="inline w-5 h-5" />
-                            </button>
+                                placeholder="使用英文逗号分隔，如 img/png, img/jpeg" @blur="splitAccept" />
                         </div>
-                    </div>
+                        <div v-if="tempField.type === 'upload'" class="mb-[1.5rem]">
+                            <label
+                                class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#7d8cc9] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[9.6rem]">最大文件大小（MB）</label>
+                            <Input v-model.number="tempField.value.maxSize" type="number" min="0"
+                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                        </div>
 
-                    <!-- 允许文件类型，仅 upload 类型 -->
-                    <div v-if="tempField.type === 'upload'" class="mb-[1.5rem]">
-                        <label
-                            class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#7db15b] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6.9rem]">允许文件类型</label>
-                        <Input v-model="(tempField.value as any).accept" type="text"
-                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10"
-                            placeholder="使用英文逗号分隔，如 img/png, img/jpeg" @blur="splitAccept" />
-                    </div>
-                    <div v-if="tempField.type === 'upload'" class="mb-[1.5rem]">
-                        <label
-                            class="mb-[0.5rem] flex items-center gap-1 text-sm font-bold tracking-wide bg-[#7d8cc9] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[9.6rem]">最大文件大小（MB）</label>
-                        <Input v-model.number="tempField.value.maxSize" type="number" min="0"
-                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                    </div>
+                        <!-- 保存按钮 -->
+                        <!-- <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">保存</button> -->
+                    </form>
 
-                    <!-- 保存按钮 -->
-                    <!-- <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">保存</button> -->
-                </form>
-
+                </div>
             </div>
-        </div>
-        <!-- 底部栏，固定在组件底部 -->
-        <div class="h-18 flex px-[1.5rem] py-[0.5rem]">
-            <div class="flex justify-start">
-                <Button type="submit"
-                    class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer"
-                    @click="showDialog ? saveField() : submitFields()">
-                    {{ showDialog ? '保存' : '提交' }}
-                </Button>
-            </div>
-            <div class="flex-1 md:min-w-[5rem] w-auto"></div>
-            <div class="flex justify-end">
-                <Button v-show="!showDialog"
-                    class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer"
-                    @click="reset">
-                    重置
-                </Button>
-                <Button v-show="showDialog"
-                    class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer"
-                    @click="closeDialog">
-                    取消
-                </Button>
+            <!-- 底部栏，固定在组件底部 -->
+            <div class="h-18 flex px-[1.5rem] py-[0.5rem]">
+                <div class="flex justify-start">
+                    <Button type="submit"
+                        class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer"
+                        @click="showDialog ? saveField() : submitFields()">
+                        {{ showDialog ? '保存' : '提交' }}
+                    </Button>
+                </div>
+                <div class="flex-1 md:min-w-[5rem] w-auto"></div>
+                <div class="flex justify-end">
+                    <Button v-show="!showDialog"
+                        class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer"
+                        @click="reset">
+                        重置
+                    </Button>
+                    <Button v-show="showDialog"
+                        class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer"
+                        @click="closeDialog">
+                        取消
+                    </Button>
+                </div>
             </div>
         </div>
     </div>
@@ -388,6 +393,16 @@ import { Switch } from '@/components/ui/switch'
 import { z } from 'zod'
 import { toast } from 'vue-sonner'
 import { h, markRaw } from "vue"
+
+import { onMounted, onUnmounted } from 'vue'
+
+onMounted(() => {
+    document.body.style.overflow = 'hidden'
+})
+
+onUnmounted(() => {
+    document.body.style.overflow = ''
+})
 
 // 已添加字段
 const fields = ref<InterviewFormJSON[]>([])
@@ -659,7 +674,7 @@ function openDialog(field?: InterviewFormJSON) {
 }
 
 function generateUUID() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
     });

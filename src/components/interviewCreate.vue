@@ -1,189 +1,194 @@
 <template>
-    <div class="rounded-t-lg dark:bg-[#A3A2A0] text-[#000000] md:w-[22rem] min-w-[35%] w-full">
-        <div class="w-full h-13 flex">
-            <div class="px-6 py-5 cursor-pointer flex items-center" @click="props.deliverClose && props.deliverClose()">
-                <Minimize2 :size="22" />
-            </div>
-            <div class="rounded-tr-lg w-full h-13"></div>
-        </div>
-    </div>
-    <div
-        class="will-change-transform overflow-y-auto scrollbar-hide rounded-b-lg xl:p-6 p-5 dark:bg-[#E8E7E2] dark:text-[#000000] select-none md:w-auto min-w-[35%] w-full max-h-[75%] h-auto">
-        <form @submit="onSubmit" class="space-y-8">
-            <!-- 面试基础信息 -->
-
-            <FormField name="title" v-slot="{ componentField }">
-                <FormItem>
-                    <FormLabel
-                        class="text-sm font-bold tracking-wide bg-[#8FAFC4] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
-                        面试标题
-                    </FormLabel>
-                    <FormControl>
-                        <Input v-bind="componentField"
-                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                    </FormControl>
-                    <FormMessage />
-                </FormItem>
-            </FormField>
-
-            <FormField name="description" v-slot="{ componentField }">
-                <FormItem>
-                    <FormLabel
-                        class="text-sm font-bold tracking-wide bg-[#D48587] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
-                        面试描述
-                    </FormLabel>
-                    <FormControl>
-                        <Textarea v-bind="componentField"
-                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                    </FormControl>
-                    <FormMessage />
-                </FormItem>
-            </FormField>
-
-            <FormField name="startTime" v-slot="{ componentField }">
-                <FormItem>
-                    <FormLabel
-                        class="text-sm font-bold tracking-wide bg-[#C490BD] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
-                        开始时间
-                    </FormLabel>
-                    <FormControl>
-                        <Input type="datetime-local" v-bind="componentField"
-                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                    </FormControl>
-                    <FormMessage />
-                </FormItem>
-            </FormField>
-
-            <FormField name="endTime" v-slot="{ componentField }">
-                <FormItem>
-                    <FormLabel
-                        class="text-sm font-bold tracking-wide bg-[#8EB38A] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
-                        结束时间
-                    </FormLabel>
-                    <FormControl>
-                        <Input type="datetime-local" v-bind="componentField"
-                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                    </FormControl>
-                    <FormMessage />
-                </FormItem>
-            </FormField>
-
-            <FormField name="isActive" type="checkbox" v-slot="{ componentField }">
-                <FormItem>
-                    <FormLabel
-                        class="text-sm font-bold tracking-wide bg-[#E6A5A0] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
-                        启动面试</FormLabel>
-                    <FormControl>
-                        <Switch v-bind="componentField" :value="undefined" class="data-[state=checked]:bg-[#50C878]" />
-                    </FormControl>
-                    <FormMessage />
-                </FormItem>
-            </FormField>
-
-            <!-- 面试环节 -->
-            <div>
-                <div class="flex justify-between items-center">
-                    <span
-                        class="text-sm font-bold tracking-wide bg-[#b0d1c1] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">面试环节</span>
-                    <div
-                        class="flex  gap-1 text-sm font-bold tracking-wide bg-[#8FB6D1] rounded-lg px-[0.7rem] py-[0.3rem] w-auto text-[#f0eeee] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
-                        <CirclePlus class="w-5 h-5" />
-                        <div @click="addStage">添加环节</div>
-                    </div>
+    <div data-lenis-prevent class="flex flex-col items-center md:justify-center justify-end min-h-screen w-full overflow-y-auto">
+        <div class="rounded-t-lg dark:bg-[#A3A2A0] text-[#000000] md:w-[22rem] min-w-[35%] w-full">
+            <div class="w-full h-13 flex">
+                <div class="px-6 py-5 cursor-pointer flex items-center"
+                    @click="props.deliverClose && props.deliverClose()">
+                    <Minimize2 :size="22" />
                 </div>
+                <div class="rounded-tr-lg w-full h-13"></div>
+            </div>
+        </div>
+        <div
+            class="will-change-transform overflow-y-auto scrollbar-hide rounded-b-lg xl:p-6 p-5 dark:bg-[#E8E7E2] dark:text-[#000000] select-none md:w-auto min-w-[35%] w-full max-h-[75%] h-auto">
+            <form @submit="onSubmit" class="space-y-8">
+                <!-- 面试基础信息 -->
 
-                <div v-for="(stage, sIndex) in formData.stages" :key="sIndex"
-                    class="border border-[#817f75a2] p-4 mt-4 rounded-lg space-y-4">
+                <FormField name="title" v-slot="{ componentField }">
+                    <FormItem>
+                        <FormLabel
+                            class="text-sm font-bold tracking-wide bg-[#8FAFC4] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
+                            面试标题
+                        </FormLabel>
+                        <FormControl>
+                            <Input v-bind="componentField"
+                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                </FormField>
+
+                <FormField name="description" v-slot="{ componentField }">
+                    <FormItem>
+                        <FormLabel
+                            class="text-sm font-bold tracking-wide bg-[#D48587] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
+                            面试描述
+                        </FormLabel>
+                        <FormControl>
+                            <Textarea v-bind="componentField"
+                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                </FormField>
+
+                <FormField name="startTime" v-slot="{ componentField }">
+                    <FormItem>
+                        <FormLabel
+                            class="text-sm font-bold tracking-wide bg-[#C490BD] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
+                            开始时间
+                        </FormLabel>
+                        <FormControl>
+                            <Input type="datetime-local" v-bind="componentField"
+                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                </FormField>
+
+                <FormField name="endTime" v-slot="{ componentField }">
+                    <FormItem>
+                        <FormLabel
+                            class="text-sm font-bold tracking-wide bg-[#8EB38A] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
+                            结束时间
+                        </FormLabel>
+                        <FormControl>
+                            <Input type="datetime-local" v-bind="componentField"
+                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                </FormField>
+
+                <FormField name="isActive" type="checkbox" v-slot="{ componentField }">
+                    <FormItem>
+                        <FormLabel
+                            class="text-sm font-bold tracking-wide bg-[#E6A5A0] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
+                            启动面试</FormLabel>
+                        <FormControl>
+                            <Switch v-bind="componentField" :value="undefined"
+                                class="data-[state=checked]:bg-[#50C878]" />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                </FormField>
+
+                <!-- 面试环节 -->
+                <div>
                     <div class="flex justify-between items-center">
-                        <h1
-                            class="text-sm font-bold tracking-wide bg-[#e6c492] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[4rem]">
-                            环节 {{ sIndex + 1 }}</h1>
-                        <div v-if="sIndex !== 0"
-                            class="flex  gap-1 text-sm font-bold tracking-wide bg-[#A06B6B] rounded-lg px-[0.7rem] py-[0.3rem] w-auto text-[#f0eeee] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
-                            <CircleX class="w-5 h-5" />
-                            <div @click="removeStage(sIndex)">
-                                删除环节
-                            </div>
+                        <span
+                            class="text-sm font-bold tracking-wide bg-[#b0d1c1] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">面试环节</span>
+                        <div
+                            class="flex  gap-1 text-sm font-bold tracking-wide bg-[#8FB6D1] rounded-lg px-[0.7rem] py-[0.3rem] w-auto text-[#f0eeee] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
+                            <CirclePlus class="w-5 h-5" />
+                            <div @click="addStage">添加环节</div>
                         </div>
                     </div>
 
-                    <div v-for="(stage, sIndex) in formData.stages" :key="sIndex" class="space-y-4">
-                        <!-- 环节标题 -->
-                        <FormField :name="`stages[${sIndex}].title`" v-slot="{ componentField }">
-                            <FormItem>
-                                <FormLabel
-                                    class="text-sm font-bold tracking-wide bg-[#B6E3C4] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
-                                    环节标题
-                                </FormLabel>
-                                <FormControl>
-                                    <Input v-bind="componentField"
-                                        class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        </FormField>
+                    <div v-for="(stage, sIndex) in formData.stages" :key="sIndex"
+                        class="border border-[#817f75a2] p-4 mt-4 rounded-lg space-y-4">
+                        <div class="flex justify-between items-center">
+                            <h1
+                                class="text-sm font-bold tracking-wide bg-[#e6c492] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[4rem]">
+                                环节 {{ sIndex + 1 }}</h1>
+                            <div v-if="sIndex !== 0"
+                                class="flex  gap-1 text-sm font-bold tracking-wide bg-[#A06B6B] rounded-lg px-[0.7rem] py-[0.3rem] w-auto text-[#f0eeee] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
+                                <CircleX class="w-5 h-5" />
+                                <div @click="removeStage(sIndex)">
+                                    删除环节
+                                </div>
+                            </div>
+                        </div>
 
-                        <!-- 环节描述 -->
-                        <FormField :name="`stages[${sIndex}].description`" v-slot="{ componentField }">
-                            <FormItem>
-                                <FormLabel
-                                    class="text-sm font-bold tracking-wide bg-[#EDC7DB] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
-                                    环节描述
-                                </FormLabel>
-                                <FormControl>
-                                    <Textarea v-bind="componentField"
-                                        class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        </FormField>
+                        <div v-for="(stage, sIndex) in formData.stages" :key="sIndex" class="space-y-4">
+                            <!-- 环节标题 -->
+                            <FormField :name="`stages[${sIndex}].title`" v-slot="{ componentField }">
+                                <FormItem>
+                                    <FormLabel
+                                        class="text-sm font-bold tracking-wide bg-[#B6E3C4] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
+                                        环节标题
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input v-bind="componentField"
+                                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            </FormField>
 
-                        <!-- 环节开始时间 -->
-                        <FormField :name="`stages[${sIndex}].startTime`" v-slot="{ componentField }">
-                            <FormItem>
-                                <FormLabel
-                                    class="text-sm font-bold tracking-wide bg-[#A5CEE9] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6.8rem]">
-                                    环节开始时间
-                                </FormLabel>
-                                <FormControl>
-                                    <Input type="datetime-local" v-bind="componentField"
-                                        class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        </FormField>
+                            <!-- 环节描述 -->
+                            <FormField :name="`stages[${sIndex}].description`" v-slot="{ componentField }">
+                                <FormItem>
+                                    <FormLabel
+                                        class="text-sm font-bold tracking-wide bg-[#EDC7DB] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
+                                        环节描述
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Textarea v-bind="componentField"
+                                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            </FormField>
 
-                        <!-- 环节结束时间 -->
-                        <FormField :name="`stages[${sIndex}].endTime`" v-slot="{ componentField }">
-                            <FormItem>
-                                <FormLabel
-                                    class="text-sm font-bold tracking-wide bg-[#F3E09C] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6.8rem]">
-                                    环节结束时间
-                                </FormLabel>
-                                <FormControl>
-                                    <Input type="datetime-local" v-bind="componentField"
-                                        class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        </FormField>
+                            <!-- 环节开始时间 -->
+                            <FormField :name="`stages[${sIndex}].startTime`" v-slot="{ componentField }">
+                                <FormItem>
+                                    <FormLabel
+                                        class="text-sm font-bold tracking-wide bg-[#A5CEE9] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6.8rem]">
+                                        环节开始时间
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input type="datetime-local" v-bind="componentField"
+                                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            </FormField>
 
-                        <!-- 进入环节 -->
-                        <FormField :name="`stages[${sIndex}].isRequired`" type="checkbox" v-slot="{ componentField }">
-                            <FormItem>
-                                <FormLabel
-                                    class="text-sm font-bold tracking-wide bg-[#E6CAA5] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
-                                    进入环节
-                                </FormLabel>
-                                <FormControl>
-                                    <Switch v-bind="componentField" class="data-[state=checked]:bg-[#50C878] mt-1" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        </FormField>
-                    </div>
+                            <!-- 环节结束时间 -->
+                            <FormField :name="`stages[${sIndex}].endTime`" v-slot="{ componentField }">
+                                <FormItem>
+                                    <FormLabel
+                                        class="text-sm font-bold tracking-wide bg-[#F3E09C] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6.8rem]">
+                                        环节结束时间
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input type="datetime-local" v-bind="componentField"
+                                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            </FormField>
 
-                    <!-- <h2
+                            <!-- 进入环节 -->
+                            <FormField :name="`stages[${sIndex}].isRequired`" type="checkbox"
+                                v-slot="{ componentField }">
+                                <FormItem>
+                                    <FormLabel
+                                        class="text-sm font-bold tracking-wide bg-[#E6CAA5] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
+                                        进入环节
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Switch v-bind="componentField"
+                                            class="data-[state=checked]:bg-[#50C878] mt-1" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            </FormField>
+                        </div>
+
+                        <!-- <h2
                         class="text-sm font-bold tracking-wide bg-[#B6E3C4] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
                         环节标题</h2>
                     <Input v-model="stage.title"
@@ -210,93 +215,93 @@
                         <Switch v-model:checked="stage.isRequired" class="data-[state=checked]:bg-[#50C878]" />
                     </div> -->
 
-                    <!-- 场次 -->
-                    <div class="mt-9">
-                        <div class="flex justify-between items-center">
-                            <h1
-                                class="text-sm font-bold tracking-wide bg-[#A79679] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[3.2rem]">
-                                场次</h1>
-                            <div
-                                class="flex gap-1 text-sm font-bold tracking-wide bg-[#8FB6D1] rounded-lg px-[0.7rem] py-[0.3rem] w-auto text-[#f0eeee] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
-                                <CirclePlus class="w-5 h-5" />
-                                <div @click="addSession(sIndex)">添加场次</div>
-                            </div>
-                        </div>
-
-                        <div v-for="(session, seIndex) in stage.sessions" :key="seIndex"
-                            class="border border-[#817f75a2] p-3 mt-3 rounded-lg  space-y-4">
+                        <!-- 场次 -->
+                        <div class="mt-9">
                             <div class="flex justify-between items-center">
                                 <h1
-                                    class="text-sm font-bold tracking-wide bg-[#C1DBAB] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[4rem]">
-                                    场次 {{ seIndex + 1 }}</h1>
-                                <div v-if="seIndex !== 0"
-                                    class="flex  gap-1 text-sm font-bold tracking-wide bg-[#A06B6B] rounded-lg px-[0.7rem] py-[0.3rem] w-auto text-[#f0eeee] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
-                                    <CircleX class="w-5 h-5" />
-                                    <div @click="removeSession(sIndex, seIndex)">删除场次</div>
+                                    class="text-sm font-bold tracking-wide bg-[#A79679] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[3.2rem]">
+                                    场次</h1>
+                                <div
+                                    class="flex gap-1 text-sm font-bold tracking-wide bg-[#8FB6D1] rounded-lg px-[0.7rem] py-[0.3rem] w-auto text-[#f0eeee] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
+                                    <CirclePlus class="w-5 h-5" />
+                                    <div @click="addSession(sIndex)">添加场次</div>
                                 </div>
                             </div>
 
-                            <FormField :name="`stages[${sIndex}].sessions[${seIndex}].title`"
-                                v-slot="{ componentField }">
-                                <FormItem>
-                                    <FormLabel
-                                        class="text-sm font-bold tracking-wide bg-[#BBB16A] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
-                                        场次标题
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input v-bind="componentField"
-                                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            </FormField>
+                            <div v-for="(session, seIndex) in stage.sessions" :key="seIndex"
+                                class="border border-[#817f75a2] p-3 mt-3 rounded-lg  space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <h1
+                                        class="text-sm font-bold tracking-wide bg-[#C1DBAB] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[4rem]">
+                                        场次 {{ seIndex + 1 }}</h1>
+                                    <div v-if="seIndex !== 0"
+                                        class="flex  gap-1 text-sm font-bold tracking-wide bg-[#A06B6B] rounded-lg px-[0.7rem] py-[0.3rem] w-auto text-[#f0eeee] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
+                                        <CircleX class="w-5 h-5" />
+                                        <div @click="removeSession(sIndex, seIndex)">删除场次</div>
+                                    </div>
+                                </div>
 
-                            <FormField :name="`stages[${sIndex}].sessions[${seIndex}].location`"
-                                v-slot="{ componentField }">
-                                <FormItem>
-                                    <FormLabel
-                                        class="text-sm font-bold tracking-wide bg-[#85c29b] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
-                                        场次地点
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input v-bind="componentField"
-                                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            </FormField>
+                                <FormField :name="`stages[${sIndex}].sessions[${seIndex}].title`"
+                                    v-slot="{ componentField }">
+                                    <FormItem>
+                                        <FormLabel
+                                            class="text-sm font-bold tracking-wide bg-[#BBB16A] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
+                                            场次标题
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input v-bind="componentField"
+                                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                </FormField>
 
-                            <FormField :name="`stages[${sIndex}].sessions[${seIndex}].startTime`"
-                                v-slot="{ componentField }">
-                                <FormItem>
-                                    <FormLabel
-                                        class="text-sm font-bold tracking-wide bg-[#DBAAB4] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6.8rem]">
-                                        场次开始时间
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input type="datetime-local" v-bind="componentField"
-                                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            </FormField>
+                                <FormField :name="`stages[${sIndex}].sessions[${seIndex}].location`"
+                                    v-slot="{ componentField }">
+                                    <FormItem>
+                                        <FormLabel
+                                            class="text-sm font-bold tracking-wide bg-[#85c29b] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
+                                            场次地点
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input v-bind="componentField"
+                                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                </FormField>
 
-                            <FormField :name="`stages[${sIndex}].sessions[${seIndex}].endTime`"
-                                v-slot="{ componentField }">
-                                <FormItem>
-                                    <FormLabel
-                                        class="text-sm font-bold tracking-wide bg-[#E4E1A0] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6.8rem]">
-                                        场次结束时间
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input type="datetime-local" v-bind="componentField"
-                                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            </FormField>
+                                <FormField :name="`stages[${sIndex}].sessions[${seIndex}].startTime`"
+                                    v-slot="{ componentField }">
+                                    <FormItem>
+                                        <FormLabel
+                                            class="text-sm font-bold tracking-wide bg-[#DBAAB4] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6.8rem]">
+                                            场次开始时间
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input type="datetime-local" v-bind="componentField"
+                                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                </FormField>
 
-                            <!-- <h2
+                                <FormField :name="`stages[${sIndex}].sessions[${seIndex}].endTime`"
+                                    v-slot="{ componentField }">
+                                    <FormItem>
+                                        <FormLabel
+                                            class="text-sm font-bold tracking-wide bg-[#E4E1A0] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6.8rem]">
+                                            场次结束时间
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input type="datetime-local" v-bind="componentField"
+                                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                </FormField>
+
+                                <!-- <h2
                                 class="text-sm font-bold tracking-wide bg-[#BBB16A] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
                                 场次标题</h2>
                             <Input v-model="session.title"
@@ -317,81 +322,81 @@
                             <Input type="datetime-local" v-model="session.endTime"
                                 class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" /> -->
 
-                            <!-- 时间段 -->
-                            <div class="mt-9">
-                                <div class="flex justify-between items-center">
-                                    <h1
-                                        class="text-sm font-bold tracking-wide bg-[#9FC5B3] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[4.1rem]">
-                                        时间段</h1>
-                                    <div
-                                        class="flex  gap-1 text-sm font-bold tracking-wide bg-[#8FB6D1] rounded-lg px-[0.7rem] py-[0.3rem] w-auto text-[#f0eeee] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
-                                        <CirclePlus class="w-5 h-5" />
-                                        <div @click="addTimeSlot(sIndex, seIndex)">添加时间段</div>
-                                    </div>
-                                </div>
-
-                                <div v-for="(slot, tIndex) in session.timeSlots" :key="tIndex"
-                                    class="border border-[#817f75a2] p-2 mt-2 rounded-lg space-y-4">
-                                    <div class="flex justify-between">
+                                <!-- 时间段 -->
+                                <div class="mt-9">
+                                    <div class="flex justify-between items-center">
                                         <h1
-                                            class="text-sm font-bold tracking-wide bg-[#D8A7C5] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5rem]">
-                                            时间段 {{ tIndex + 1 }}</h1>
-                                        <div v-if="tIndex !== 0"
-                                            class="flex  gap-1 text-sm font-bold tracking-wide bg-[#A06B6B] rounded-lg px-[0.7rem] py-[0.3rem] w-auto text-[#f0eeee] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
-                                            <CircleX class="w-5 h-5" />
-                                            <div @click="removeTimeSlot(sIndex, seIndex, tIndex)">删除时间段</div>
+                                            class="text-sm font-bold tracking-wide bg-[#9FC5B3] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[4.1rem]">
+                                            时间段</h1>
+                                        <div
+                                            class="flex  gap-1 text-sm font-bold tracking-wide bg-[#8FB6D1] rounded-lg px-[0.7rem] py-[0.3rem] w-auto text-[#f0eeee] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
+                                            <CirclePlus class="w-5 h-5" />
+                                            <div @click="addTimeSlot(sIndex, seIndex)">添加时间段</div>
                                         </div>
                                     </div>
 
-                                    <FormField
-                                        :name="`stages[${sIndex}].sessions[${seIndex}].timeSlots[${tIndex}].maxSeats`"
-                                        v-slot="{ componentField }">
-                                        <FormItem>
-                                            <FormLabel
-                                                class="text-sm font-bold tracking-wide bg-[#A0DFDA] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.9rem]">
-                                                最大座位数
-                                            </FormLabel>
-                                            <FormControl>
-                                                <Input type="number" v-bind="componentField"
-                                                    class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    </FormField>
+                                    <div v-for="(slot, tIndex) in session.timeSlots" :key="tIndex"
+                                        class="border border-[#817f75a2] p-2 mt-2 rounded-lg space-y-4">
+                                        <div class="flex justify-between">
+                                            <h1
+                                                class="text-sm font-bold tracking-wide bg-[#D8A7C5] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5rem]">
+                                                时间段 {{ tIndex + 1 }}</h1>
+                                            <div v-if="tIndex !== 0"
+                                                class="flex  gap-1 text-sm font-bold tracking-wide bg-[#A06B6B] rounded-lg px-[0.7rem] py-[0.3rem] w-auto text-[#f0eeee] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
+                                                <CircleX class="w-5 h-5" />
+                                                <div @click="removeTimeSlot(sIndex, seIndex, tIndex)">删除时间段</div>
+                                            </div>
+                                        </div>
 
-                                    <FormField
-                                        :name="`stages[${sIndex}].sessions[${seIndex}].timeSlots[${tIndex}].startTime`"
-                                        v-slot="{ componentField }">
-                                        <FormItem>
-                                            <FormLabel
-                                                class="text-sm font-bold tracking-wide bg-[#C1A7D8] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[7.7rem]">
-                                                时间段开始时间
-                                            </FormLabel>
-                                            <FormControl>
-                                                <Input type="datetime-local" v-bind="componentField"
-                                                    class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    </FormField>
+                                        <FormField
+                                            :name="`stages[${sIndex}].sessions[${seIndex}].timeSlots[${tIndex}].maxSeats`"
+                                            v-slot="{ componentField }">
+                                            <FormItem>
+                                                <FormLabel
+                                                    class="text-sm font-bold tracking-wide bg-[#A0DFDA] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.9rem]">
+                                                    最大座位数
+                                                </FormLabel>
+                                                <FormControl>
+                                                    <Input type="number" v-bind="componentField"
+                                                        class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        </FormField>
 
-                                    <FormField
-                                        :name="`stages[${sIndex}].sessions[${seIndex}].timeSlots[${tIndex}].endTime`"
-                                        v-slot="{ componentField }">
-                                        <FormItem>
-                                            <FormLabel
-                                                class="text-sm font-bold tracking-wide bg-[#E6A5A0] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[7.7rem]">
-                                                时间段结束时间
-                                            </FormLabel>
-                                            <FormControl>
-                                                <Input type="datetime-local" v-bind="componentField"
-                                                    class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    </FormField>
+                                        <FormField
+                                            :name="`stages[${sIndex}].sessions[${seIndex}].timeSlots[${tIndex}].startTime`"
+                                            v-slot="{ componentField }">
+                                            <FormItem>
+                                                <FormLabel
+                                                    class="text-sm font-bold tracking-wide bg-[#C1A7D8] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[7.7rem]">
+                                                    时间段开始时间
+                                                </FormLabel>
+                                                <FormControl>
+                                                    <Input type="datetime-local" v-bind="componentField"
+                                                        class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        </FormField>
 
-                                    <!-- <h2
+                                        <FormField
+                                            :name="`stages[${sIndex}].sessions[${seIndex}].timeSlots[${tIndex}].endTime`"
+                                            v-slot="{ componentField }">
+                                            <FormItem>
+                                                <FormLabel
+                                                    class="text-sm font-bold tracking-wide bg-[#E6A5A0] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[7.7rem]">
+                                                    时间段结束时间
+                                                </FormLabel>
+                                                <FormControl>
+                                                    <Input type="datetime-local" v-bind="componentField"
+                                                        class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        </FormField>
+
+                                        <!-- <h2
                                         class="text-sm font-bold tracking-wide bg-[#A0DFDA] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.9rem]">
                                         最大座位数</h2>
                                     <Input v-model="slot.maxSeats"
@@ -407,21 +412,22 @@
                                     <Input type="datetime-local" v-model="slot.endTime"
                                         class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" /> -->
 
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <!-- 按钮 -->
-            <div class="flex justify-between">
-                <Button type="submit"
-                    class="mt-5 dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">提交</Button>
-                <Button type="reset"
-                    class="mt-5 dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer"
-                    @click="resetForm">重置</Button>
-            </div>
-        </form>
+                <!-- 按钮 -->
+                <div class="flex justify-between">
+                    <Button type="submit"
+                        class="mt-5 dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">提交</Button>
+                    <Button type="reset"
+                        class="mt-5 dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer"
+                        @click="resetForm">重置</Button>
+                </div>
+            </form>
+        </div>
     </div>
 </template>
 
@@ -441,6 +447,16 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { h, markRaw } from 'vue'
 import * as z from 'zod'
 import { toast } from 'vue-sonner';
+
+import { onMounted, onUnmounted } from 'vue'
+
+onMounted(() => {
+    document.body.style.overflow = 'hidden'
+})
+
+onUnmounted(() => {
+    document.body.style.overflow = ''
+})
 
 const props = defineProps<{ deliverClose?: () => void }>()
 

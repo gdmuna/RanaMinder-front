@@ -1,7 +1,7 @@
 <template>
     <!-- 顶部导航栏容器 -->
-    <div class="fixed top-0 left-0 w-full h-14 header-bg z-50 px-4 lg:flex lg:items-center select-none
-    pointer-events-none lg:*:pointer-events-none *:pointer-events-auto">
+    <div class="fixed top-0 left-0 w-full h-14 z-50  lg:flex lg:items-center select-none px-4
+    pointer-events-none lg:*:pointer-events-none *:pointer-events-auto header-bg">
         <!-- 移动端顶部：左侧菜单按钮 + 搜索 + 登录按钮 -->
         <div v-if="!isDesktop" class="size-full flex items-center justify-between will-change-transform overscroll-contain
         overflow-x-auto scrollbar-hide flex-nowrap">
@@ -25,8 +25,7 @@
             <div class="flex lg:flex-row flex-col lg:h-full lg:items-center lg:w-auto w-full space-y-4 lg:space-y-0">
                 <!-- LOGO区（含动画切换） -->
                 <div class="flex items-center lg:h-full lg:p-0 p-3 rounded-lg lg:dark:bg-transparent dark:bg-[#1f1e1e]">
-                    <div class="relative overflow-hidden cursor-pointer shrink-0 text-lg font-bold"
-                        @click="router.push('/'), headerAnimate.toggle()">
+                    <div class="relative overflow-hidden shrink-0 text-lg font-bold">
                         <div ref="logo1" class="space-x-2 flex items-center will-change-transform">
                             <img src="/src/assets/gdmuna-logo_gradient.svg" alt=""
                                 class="lg:size-10 size-12 will-change-transform">
@@ -97,11 +96,11 @@
                             <LogIn class="size-6" />
                         </div>
                     </primaryButton> -->
-                    <!-- <div class="flex items-center space-x-2 text-[1rem]">
+                    <div class="flex items-center space-x-2 text-[1rem]" @click="login">
                         <span>登录</span>
                         <LogIn class="size-6" />
-                    </div> -->
-                    <AvatarBar/>
+                    </div>
+                    <!-- <AvatarBar/> -->
                 </div>
             </div>
         </header>
@@ -122,8 +121,8 @@ import { useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { useSystemStore } from '@/stores/system'
-// import { useAuthStore } from '@/stores/auth'
-// import { useUserStore } from '@/stores/user'
+import { useAuthStore } from '@/stores/auth'
+import { useUserStore } from '@/stores/user'
 import { storeToRefs } from 'pinia'
 import { outlineText } from '@/components/ui/text'
 
@@ -188,7 +187,7 @@ const disableSwitchTheme = computed(() => {
 const routeMeta = ref([
     {
         label: '首页',
-        path: '/home',
+        path: '/',
         active: false,
         icon: House
     },
@@ -206,12 +205,12 @@ const routeMeta = ref([
     }
 ])
 
-// const authStore = useAuthStore()
-// const { isAuthenticated } = storeToRefs(authStore)
-// const { login } = authStore
+const authStore = useAuthStore()
+const { isAuthenticated } = storeToRefs(authStore)
+const { login } = authStore
 
-// const userStore = useUserStore()
-// const { userInfo } = storeToRefs(userStore)
+const userStore = useUserStore()
+const { userInfo } = storeToRefs(userStore)
 
 const logo1 = ref<HTMLImageElement | null>(null)
 const logo2 = ref<HTMLImageElement | null>(null)
@@ -271,8 +270,6 @@ const logoAnimate = {
         gsap.set(logo2.value, { y: '100%' });
     }
 }
-
-// “加入我们”相关动画及变量已移除
 
 const headerRef = ref<HTMLElement | null>(null)
 const isEnter = ref(false)

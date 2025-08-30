@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 // 导入 GSAP 与相关插件
 import { gsap } from "gsap";
 import { CustomEase } from "gsap/CustomEase";
@@ -18,6 +19,7 @@ import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { ScrollSmoother } from "gsap/ScrollSmoother";
 import { SplitText } from "gsap/SplitText";
 import { TextPlugin } from "gsap/TextPlugin";
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
 // 注册 GSAP 插件
 gsap.registerPlugin(
@@ -56,13 +58,11 @@ import './index.css' // shadcn-ui
 import './main.css' // 全局样式
 import 'vue-sonner/style.css' // vue-sonner
 
-// 导入 Ant Design Vue 组件库
-
-
 const pinia = createPinia()
 const app = createApp(App)
 
 app.use(router)
+pinia.use(piniaPluginPersistedstate)
 app.use(pinia)
 
 app.mount('#app')

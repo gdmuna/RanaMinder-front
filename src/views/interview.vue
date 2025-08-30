@@ -14,8 +14,8 @@
         <teleport to="body">
             <Transition name="fade">
                 <div v-if="showCreate"
-                    class="fixed inset-0 dark:bg-black/50 backdrop-blur-xs z-10 flex items-center md:justify-center flex-col justify-end "
-                    @click.self="closeCreate">
+                    class="fixed inset-0 dark:bg-black/50 backdrop-blur-xs z-10 flex items-center md:justify-center flex-col justify-end"
+                    @click.stop.self="closeCreate">
                     <InterviewCreate :deliverClose="closeCreate" />
                 </div>
             </Transition>
@@ -25,7 +25,7 @@
             <Transition name="fade">
                 <div v-if="showApply"
                     class="fixed inset-0 dark:bg-black/50 backdrop-blur-xs z-10 flex items-center md:justify-center flex-col justify-end "
-                    @click.self="closeApply">
+                    @click.stop.self="closeApply">
                     <InterviewApply v-if="currentInterviewId !== null" :id="currentInterviewId"
                         :deliverClose="closeApply" />
                 </div>
@@ -53,14 +53,74 @@ const showApply = ref(false)
 const currentInterviewId = ref<number | null>(null)
 
 // 伪数据
-const interviews = [
-    { id: 1, title: '2024年干事招新面试干事招新面试', time: new Date('2024-09-12T14:00:00') },
-    { id: 2, title: '2024年干部招新', time: new Date('2024-12-13T10:30:00') },
-    { id: 3, title: '2025年干事招新', time: new Date('2025-09-14T09:00:00') },
-    { id: 4, title: '2025年干部招新', time: new Date('2025-12-15T16:00:00') },
-    { id: 5, title: '2026年干事招新', time: new Date('2026-09-16T15:00:00') },
-    { id: 6, title: '2026年干部招新', time: new Date('2026-12-17T17:00:00') },
-];
+// const interviews = [
+//     { id: 1, title: '2024年干事招新面试干事招新面试', time: new Date('2024-09-12T14:00:00') },
+//     { id: 2, title: '2024年干部招新', time: new Date('2024-12-13T10:30:00') },
+//     { id: 3, title: '2025年干事招新', time: new Date('2025-09-14T09:00:00') },
+//     { id: 4, title: '2025年干部招新', time: new Date('2025-12-15T16:00:00') },
+//     { id: 5, title: '2026年干事招新', time: new Date('2026-09-16T15:00:00') },
+//     { id: 6, title: '2026年干部招新', time: new Date('2026-12-17T17:00:00') },
+// ];
+
+const interviews = ref<any[]>([]);
+const currentPage = ref(1);
+const pageSize = ref(2);
+const totalPages = ref(1);
+const loading = ref(false);
+
+async function fetchInterviews(page = 1) {
+    if (loading.value) return;
+    loading.value = true;
+    try {
+        const response = await alovaInstance.Get('/campaign/user', {
+            params: {
+                currentPage: page,
+                pageSize: pageSize.value,
+            }
+        });
+        const res = response as any;
+        // 首次加载覆盖，后续加载追加
+        if (page === 1) {
+            interviews.value = [];
+        }
+        console.log("获取面试列表新分页",res.data.campaigns);
+        interviews.value.push(...res.data.campaigns.map((item: any) => ({
+            id: item.id,
+            title: item.title,
+            time: new Date(item.start_date),
+        })));
+        totalPages.value = res.data.pagination.totalPages;
+        currentPage.value = res.data.pagination.currentPage;
+    } catch (error) {
+        console.error('获取面试列表失败:', error);
+    }
+    loading.value = false;
+}
+
+onMounted(() => {
+    fetchInterviews(1);
+    window.addEventListener('scroll', handleScroll);
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener('scroll', handleScroll);
+});
+
+// 滚动触发加载下一页
+function handleScroll() {
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const windowHeight = window.innerHeight;
+    const docHeight = document.documentElement.scrollHeight;
+    // 滚动到页面80%时触发
+    if (
+        scrollTop + windowHeight >= docHeight * 0.8 &&
+        currentPage.value < totalPages.value &&
+        !loading.value
+    ) {
+        fetchInterviews(currentPage.value + 1);
+    }
+}
+
 // 颜色
 const colors = ['#0A90B4', '#A6C1EE', '#C4E0E5', '#FCB69F', '#71B280', '#DECBA4'];
 // 渐变色
@@ -72,14 +132,6 @@ const gradients = [
     'linear-gradient(270deg, #71B280 0%, #FBC2EB 100%)',
     'linear-gradient(270deg, #DECBA4 0%, #BDC3C7 100%)',
 ];
-
-watch(showApply, (Val) => {
-    if (Val) {
-        document.body.style.overflow = 'hidden'
-    } else {
-        document.body.style.overflow = ''
-    }
-})
 
 function goToInfo(id: number) {
     router.push({ name: 'interviewInformation', params: { id } });
@@ -99,6 +151,16 @@ function closeApply() {
     showApply.value = false
     currentInterviewId.value = null // 关闭弹窗时清空id
 }
+
+// 导入 alova 网络请求库
+import { createAlova } from 'alova';
+import adapterFetch from 'alova/fetch';
+
+const alovaInstance = createAlova({
+    baseURL: 'http://localhost:3001/api',
+    requestAdapter: adapterFetch(),
+    responded: response => response.json()
+});
 
 </script>
 
