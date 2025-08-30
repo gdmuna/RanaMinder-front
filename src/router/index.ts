@@ -101,7 +101,7 @@ router.beforeEach((to, _from, next) => {
     authStore.login()
     return next(false)
   } else if (to.meta.guest && authStore.isAuthenticated) {
-    return next({ name: 'home' })
+    return next({ name: '/' })
   }
 
   // 检查是否需要权限
