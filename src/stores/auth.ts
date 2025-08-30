@@ -31,7 +31,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     // 处理登录回调
     async function loginCallback() {
-    const { err, res } = await authApi.loginCallback();
+        const { err, res } = await authApi.loginCallback();
         if (res) {
             const userStore = useUserStore();
             const data = res.data
@@ -40,7 +40,6 @@ export const useAuthStore = defineStore('auth', () => {
             setToken(token)
             userStore.generateCasdoorUserInfo(token.access_token)
             userStore.handleUserInfo(data.userInfo)
-            console.log('groups', userStore.userInfo.groups);
             initUserPermission()
         } else {
             toast.error(err.data.message || '登录失败')
@@ -82,7 +81,7 @@ export const useAuthStore = defineStore('auth', () => {
             return Promise.reject('登录态已过期，请重新登录')
         }
     }
-    
+
     // 登出
     function logout() {
         setToken()
@@ -218,7 +217,7 @@ export const useAuthStore = defineStore('auth', () => {
         const metas = userStore.userInfo.groups
             .map(key => groupMeta[key])
             .filter(Boolean);
-                    console.log('metas', metas);
+        console.log('metas', metas);
         if (metas.length === 0) return null;
         return metas.reduce((prev, curr) => {
             if (type === 'min') {

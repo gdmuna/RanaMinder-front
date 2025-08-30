@@ -65,6 +65,7 @@ export const useSystemStore = defineStore('system', () => {
     }
     
     function setPrevPath(path: string | null) {
+        console.log('setPrevPath1', path);
         localStorage.setItem('prevPath', path || '/')
         prevPath.value = path
     }
