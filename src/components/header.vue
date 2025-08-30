@@ -10,11 +10,13 @@
             <div class="shrink-0">
                 <Search v-if="route.path !== '/home' && route.path !== '/'" />
             </div>
-            <!-- <div class="flex items-center space-x-2 text-[1rem] flex-nowrap shrink-0">
-                <span>登录</span>
-                <LogIn class="size-6" />
-            </div> -->
-            <AvatarBar/>
+            <primaryButton v-if="!isAuthenticated" class="cursor-pointer border-2 mr-10" @click="authStore.login">
+                <div class="flex items-center space-x-2 text-[1rem]">
+                    <span>登录</span>
+                    <LogIn class="size-6" />
+                </div>
+            </primaryButton>
+            <AvatarBar v-else />
         </div>
         <!-- 侧边栏/主导航区 -->
         <header ref="headerRef"
@@ -87,20 +89,16 @@
                 <div v-if="isDesktop" class="flex lg:flex-row flex-col lg:items-center items-start lg:space-x-4 lg:w-auto w-full lg:p-0 p-3
                 lg:space-y-0 space-y-2 lg:dark:bg-transparent dark:bg-[#1f1e1e] rounded-lg">
                     <!-- 搜索 -->
-                    <Search v-if="route.path !== '/home' && route.path !== '/'"/>
-                    <img v-if="isDesktop && route.path !== '/home' && route.path !== '/'" :src="boundary" alt="" class="ml-2 mr-4 shrink-0">
-                    <!-- <primaryButton v-if="!isAuthenticated" class="cursor-pointer border-2 lg:w-auto w-full"
-                        @click="login">
+                    <Search v-if="route.path !== '/home' && route.path !== '/'" />
+                    <img v-if="isDesktop && route.path !== '/home' && route.path !== '/'" :src="boundary" alt=""
+                        class="ml-2 mr-4 shrink-0">
+                    <primaryButton v-if="!isAuthenticated" class="cursor-pointer border-2" @click="authStore.login">
                         <div class="flex items-center space-x-2 text-[1rem]">
                             <span>登录</span>
                             <LogIn class="size-6" />
                         </div>
-                    </primaryButton> -->
-                    <div class="flex items-center space-x-2 text-[1rem]" @click="login">
-                        <span>登录</span>
-                        <LogIn class="size-6" />
-                    </div>
-                    <!-- <AvatarBar/> -->
+                    </primaryButton>
+                    <AvatarBar v-else />
                 </div>
             </div>
         </header>
@@ -118,7 +116,7 @@
 import { onMounted, ref, computed, watch, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { Button } from '@/components/ui/button'
+import { Button, primaryButton } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { useSystemStore } from '@/stores/system'
 import { useAuthStore } from '@/stores/auth'

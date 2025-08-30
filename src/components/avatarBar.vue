@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useAuthStore } from '@/stores/auth'
+const authStore = useAuthStore()
 import {
     Cloud,
     CreditCard,
@@ -50,10 +52,10 @@ import {
                 <span>返回主系统</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem class="cursor-pointer">
-                <LogOut class="mr-2 h-4 w-4" />
-                <span>退出登录</span>
-            </DropdownMenuItem>
+                <DropdownMenuItem class="cursor-pointer" @click="authStore.logout">
+                    <LogOut class="mr-2 h-4 w-4" />
+                    <span>退出登录</span>
+                </DropdownMenuItem>
         </DropdownMenuContent>
     </DropdownMenu>
 </template>

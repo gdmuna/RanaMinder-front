@@ -89,7 +89,7 @@ export const useAuthStore = defineStore('auth', () => {
         const userStore = useUserStore();
         userStore.cleanUserInfo()
         const systemStore = useSystemStore();
-        systemStore.routerGoto('/home')
+        systemStore.routerGoto('/')
         toast.info('已登出')
     }
 
