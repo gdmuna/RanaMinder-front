@@ -65,7 +65,7 @@
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
                                         <AlertDialogCancel>取消</AlertDialogCancel>
-                                        <AlertDialogAction>删除</AlertDialogAction>
+                                        <AlertDialogAction @click="handleDelete">删除</AlertDialogAction>
                                     </AlertDialogFooter>
                                 </AlertDialogContent>
                             </AlertDialog>
@@ -101,6 +101,7 @@ import {
 import { Eye, Pencil, FileUser, Trash2 } from 'lucide-vue-next';
 import modem1 from '@/assets/modem1.svg'
 import modem2 from '@/assets/modem2.png'
+import { useInterviewStore } from '@/stores/interview'
 
 const props = defineProps<{
     id: number
@@ -108,9 +109,21 @@ const props = defineProps<{
     time: Date
 }>()
 
-const emit = defineEmits(['view-detail', 'apply']);
+const emit = defineEmits(['view-detail', 'apply', 'deleted']);
 
 const isOdd = props.id % 2 === 1
+
+const interviewStore = useInterviewStore();
+
+async function handleDelete() {
+    try {
+        await interviewStore.deleteCampaign(props.id);
+        emit('deleted', props.id);
+        window.location.reload();
+    } catch (e) {
+        // 错误处理已在 store 内 toast
+    }
+}
 
 function handleViewDetail() {
     emit('view-detail', props.id);

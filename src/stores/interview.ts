@@ -34,6 +34,7 @@ export const useInterviewStore = defineStore('interview', () => {
     const pageSize = ref(10);
     const totalPages = ref(1);
 
+    // 获取面试列表
     async function getCampaignList(page = 1, force: boolean = false) {
         interviewDataStatus.value = 'loading'
         const { err, res } = await interviewApi.getCampaignList({ currentPage: page, pageSize: pageSize.value }, force)
@@ -66,6 +67,7 @@ export const useInterviewStore = defineStore('interview', () => {
         }
     }
 
+    // 创建面试活动
     async function createCampaign(data: { title: string; description: string; startDate: Date; endDate: Date; isActive: boolean }) {
         interviewDataStatus.value = 'loading'
         // 时间格式化函数
@@ -92,10 +94,11 @@ export const useInterviewStore = defineStore('interview', () => {
         }
     }
 
+    // 创建面试环节
     async function createStage(data: { campaign_id: number; title: string; description: string; sort_order: number; is_required: boolean }) {
         interviewDataStatus.value = 'loading'
         const { err, res } = await interviewApi.createStage(data)
-        console.log('创建环节',data);
+        console.log('创建环节', data);
         if (res) {
             toast.success('创建环节成功')
             interviewDataStatus.value = 'loaded'
@@ -107,6 +110,7 @@ export const useInterviewStore = defineStore('interview', () => {
         }
     }
 
+    // 创建会话
     async function createSession(data: { stage_id: number; title: string; start_time: string; end_time: string; location: string }) {
         interviewDataStatus.value = 'loading'
         const { err, res } = await interviewApi.createSession(data)
@@ -121,19 +125,35 @@ export const useInterviewStore = defineStore('interview', () => {
         }
     }
 
-async function createTimeSlot(data: { seesion_id: number; start_time: string; end_time: string; max_seats: number }) {
-    interviewDataStatus.value = 'loading'
-    const { err, res } = await interviewApi.createTimeSlot(data)
-    if (res) {
-        toast.success('创建时间段成功')
-        interviewDataStatus.value = 'loaded'
-        return res
-    } else {
-        toast.error(err?.data?.message || '创建时间段失败')
-        interviewDataStatus.value = 'error'
-        throw err
+    // 创建时间段
+    async function createTimeSlot(data: { session_id: number; start_time: string; end_time: string; max_seats: number }) {
+        interviewDataStatus.value = 'loading'
+        const { err, res } = await interviewApi.createTimeSlot(data)
+        if (res) {
+            toast.success('创建时间段成功')
+            interviewDataStatus.value = 'loaded'
+            return res
+        } else {
+            toast.error(err?.data?.message || '创建时间段失败')
+            interviewDataStatus.value = 'error'
+            throw err
+        }
     }
-}
+
+    // 删除面试活动
+    async function deleteCampaign(id: number, force: boolean = false) {
+        interviewDataStatus.value = 'loading'
+        const { err, res } = await interviewApi.deleteCampaign(id, force)
+        if (res) {
+            toast.success('删除面试成功')
+            interviewDataStatus.value = 'loaded'
+            return res
+        } else {
+            toast.error(err?.data?.message || '删除面试失败')
+            interviewDataStatus.value = 'error'
+            throw err
+        }
+    }
 
     return {
         campaigns,
@@ -145,6 +165,7 @@ async function createTimeSlot(data: { seesion_id: number; start_time: string; en
         createCampaign,
         createStage,
         createSession,
-        createTimeSlot
+        createTimeSlot,
+        deleteCampaign
     }
 })

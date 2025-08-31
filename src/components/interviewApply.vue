@@ -1,5 +1,6 @@
 <template>
-    <div data-lenis-prevent class="flex flex-col items-center md:justify-center justify-end min-h-screen w-full overflow-y-auto">
+    <div data-lenis-prevent
+        class="flex flex-col items-center md:justify-center justify-end min-h-screen w-full overflow-y-auto">
         <div
             class="flex flex-col h-[80%] md:w-auto min-w-[36%] w-full rounded-xl overflow-hidden select-none dark:bg-[#E8E7E2]">
             <!-- 顶部装饰 -->
@@ -350,24 +351,24 @@
             </div>
             <!-- 底部栏，固定在组件底部 -->
             <div class="h-18 flex px-[1.5rem] py-[0.5rem]">
-                <div class="flex justify-start">
-                    <Button type="submit"
-                        class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer"
-                        @click="showDialog ? saveField() : submitFields()">
-                        {{ showDialog ? '保存' : '提交' }}
-                    </Button>
-                </div>
-                <div class="flex-1 md:min-w-[5rem] w-auto"></div>
                 <div class="flex justify-end">
+                    <Button v-show="showDialog"
+                        class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer"
+                        @click="closeDialog">
+                        取消
+                    </Button>
                     <Button v-show="!showDialog"
                         class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer"
                         @click="reset">
                         重置
                     </Button>
-                    <Button v-show="showDialog"
+                </div>
+                <div class="flex-1 md:min-w-[5rem] w-auto"></div>
+                <div class="flex justify-start">
+                    <Button type="submit"
                         class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer"
-                        @click="closeDialog">
-                        取消
+                        @click="showDialog ? saveField() : submitFields()">
+                        {{ showDialog ? '保存' : '提交' }}
                     </Button>
                 </div>
             </div>

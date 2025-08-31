@@ -421,11 +421,11 @@
                 </div>
                 <!-- 按钮 -->
                 <div class="flex justify-between">
-                    <Button type="submit"
-                        class="mt-5 dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">提交</Button>
                     <Button type="reset"
                         class="mt-5 dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer"
                         @click="resetForm">重置</Button>
+                    <Button type="submit"
+                        class="mt-5 dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">提交</Button>
                 </div>
             </form>
         </div>
@@ -694,7 +694,7 @@ const onSubmit = handleSubmit(async (values) => {
                         const timeSlot = session.timeSlots[tsIndex];
                         try {
                             const timeSlotRes = await interviewStore.createTimeSlot({
-                                seesion_id: sessionId,
+                                session_id: sessionId,
                                 start_time: timeSlot.startTime,
                                 end_time: timeSlot.endTime,
                                 max_seats: timeSlot.maxSeats
@@ -712,13 +712,7 @@ const onSubmit = handleSubmit(async (values) => {
             console.error('创建环节失败:', err)
         }
     }
-    toast(
-        markRaw(
-            h("pre", { class: "mt-2 w-[340px] rounded-md bg-slate-950 p-4" },
-                h("code", { class: "text-white" }, JSON.stringify(values, null, 2))
-            )
-        )
-    )
+    window.location.reload();
 })
 
 </script>
