@@ -1,4 +1,10 @@
-import type { BaseRes, BasePagination } from "./api";
+import type { BaseRes } from "./api";
+
+export interface GenericReq<T> {
+    message: string
+    code: string
+    data: T
+}
 
 export interface Campaign {
     id: number;

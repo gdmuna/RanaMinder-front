@@ -4,7 +4,7 @@
             <InterviewShow :id="item.id" :title="item.title" :time="item.startDate" :style="{
                 '--main-color': colors[index % colors.length],
                 '--main-gradient': gradients[index % gradients.length]
-            }" @view-detail="goToInfo" @apply="goToApply" />
+            }" @view-detail="goToInfo" @apply="goToApply" @edit="handleEdit" />
         </div>
 
         <!-- 新增面试 -->
@@ -31,6 +31,16 @@
                 </div>
             </Transition>
         </teleport>
+        <!-- 编辑面试弹窗 -->
+        <teleport to="body">
+            <Transition name="fade">
+                <div v-if="showEdit"
+                    class="fixed inset-0 dark:bg-black/50 backdrop-blur-xs z-10 flex items-center md:justify-center flex-col justify-end"
+                    @click.stop.self="closeEdit">
+                    <InterviewCreate :deliverClose="closeEdit" :isEdit="true" :editData="editData" />
+                </div>
+            </Transition>
+        </teleport>
     </div>
 </template>
 
@@ -42,11 +52,157 @@ import NewInterview from '@/components/newInterview.vue';
 import InterviewCreate from '@/components/interviewCreate.vue';
 import { useRouter } from 'vue-router';
 import InterviewApply from '@/components/interviewApply.vue';
+import type { Campaign } from '@/types/interview'
 
 import { useInterviewStore } from '@/stores/interview';
 const interviewStore = useInterviewStore();
 
 const loading = ref(false);
+const showEdit = ref(false)
+
+const editData = ref<Campaign | null>(null)
+
+async function handleEdit(id: number) {
+    try {
+        console.log('开始处理编辑操作，ID:', id);
+        
+        // 1. 获取面试基本信息（本地缓存）
+        const campaign = interviewStore.campaigns.find(item => item.id === id)
+        if (!campaign) {
+            console.error('找不到对应的面试数据，ID:', id);
+            return;
+        }
+        
+        console.log('找到面试基本信息:', campaign);
+
+        // 2. 查询环节
+        let stages: any[] = [];
+        try {
+            const stageRes = await interviewStore.getStage(id);
+            stages = stageRes?.stages || [];
+            console.log('获取到环节数据:', stages);
+        } catch (err) {
+            console.error('获取环节数据失败:', err);
+            // 即使获取环节失败，也继续执行
+        }
+
+        // 如果没有获取到环节数据，创建一个默认环节
+        if (!stages || stages.length === 0) {
+            console.log('没有获取到环节数据，创建默认环节');
+            stages = [{
+                id: -1, // 使用临时ID
+                title: '默认环节',
+                description: '请填写环节描述',
+                is_required: false,
+                sessions: []
+            }];
+        }
+
+        // 3. 查询每个环节的场次和时间段
+        for (const stage of stages) {
+            console.log('正在处理环节:', stage.title, 'ID:', stage.id);
+            try {
+                if (stage.id > 0) { // 只有有效ID才查询场次
+                    const sessionRes = await interviewStore.getSession(stage.id);
+                    (stage as any).sessions = sessionRes?.sessions || [];
+                    console.log('获取到场次数据:', stage.sessions);
+                } else {
+                    (stage as any).sessions = [];
+                }
+                
+                // 如果没有场次数据，创建默认场次
+                if (!stage.sessions || stage.sessions.length === 0) {
+                    (stage as any).sessions = [{
+                        id: -1,
+                        title: '默认场次',
+                        start_time: formatDateString(new Date()),
+                        end_time: formatDateString(new Date(Date.now() + 3600000)), // 一小时后
+                        location: '请填写场次地点',
+                        timeSlots: []
+                    }];
+                }
+                
+                for (const session of (stage as any).sessions) {
+                    console.log('正在处理场次:', session.title, 'ID:', session.id);
+                    try {
+                        if (session.id > 0) { // 只有有效ID才查询时间段
+                            const timeSlotRes = await interviewStore.getTimeSlot(session.id);
+                            (session as any).timeSlots = timeSlotRes?.timeSlots || [];
+                            console.log('获取到时间段数据:', session.timeSlots);
+                        } else {
+                            (session as any).timeSlots = [];
+                        }
+                        
+                        // 如果没有时间段数据，创建默认时间段
+                        if (!session.timeSlots || session.timeSlots.length === 0) {
+                            (session as any).timeSlots = [{
+                                id: -1,
+                                start_time: formatDateString(new Date()),
+                                end_time: formatDateString(new Date(Date.now() + 1800000)), // 半小时后
+                                max_seats: 10
+                            }];
+                        }
+                    } catch (err) {
+                        console.error('获取时间段数据失败:', err);
+                        // 设置默认时间段
+                        (session as any).timeSlots = [{
+                            id: -1,
+                            start_time: formatDateString(new Date()),
+                            end_time: formatDateString(new Date(Date.now() + 1800000)), // 半小时后
+                            max_seats: 10
+                        }];
+                    }
+                }
+            } catch (err) {
+                console.error('获取场次数据失败:', err);
+                // 设置默认场次
+                (stage as any).sessions = [{
+                    id: -1,
+                    title: '默认场次',
+                    start_time: formatDateString(new Date()),
+                    end_time: formatDateString(new Date(Date.now() + 3600000)), // 一小时后
+                    location: '请填写场次地点',
+                    timeSlots: [{
+                        id: -1,
+                        start_time: formatDateString(new Date()),
+                        end_time: formatDateString(new Date(Date.now() + 1800000)), // 半小时后
+                        max_seats: 10
+                    }]
+                }];
+            }
+        }
+
+        // 4. 组装 editData
+        editData.value = {
+            id: campaign.id,
+            title: campaign.title,
+            description: campaign.description,
+            startDate: campaign.startDate,
+            endDate: campaign.endDate,
+            isActive: campaign.isActive,
+            deleteAt: campaign.deleteAt,
+            createdAt: campaign.createdAt,
+            updatedAt: campaign.updatedAt,
+            stages
+        } as any;
+        
+        console.log('最终组装的编辑数据:', editData.value);
+        showEdit.value = true;
+    } catch (error) {
+        console.error('处理编辑操作失败:', error);
+    }
+}
+
+// 日期格式化辅助函数
+function formatDateString(date: Date): string {
+    const pad = (n: number) => n < 10 ? '0' + n : n;
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+}
+
+function closeEdit() {
+    showEdit.value = false
+    editData.value = null
+}
 
 async function fetchInterviews(page = 1) {
     if (loading.value) return;

@@ -155,6 +155,132 @@ export const useInterviewStore = defineStore('interview', () => {
         }
     }
 
+    // 查询环节
+    async function getStage(id: number, force: boolean = false) {
+        interviewDataStatus.value = 'loading'
+        const { err, res } = await interviewApi.getStage({ campaign_id: id }, force)
+        if (res) {
+            toast.success('查询环节成功')
+            interviewDataStatus.value = 'loaded'
+            return res
+        } else {
+            toast.error(err?.data?.message || '查询环节失败')
+            interviewDataStatus.value = 'error'
+            throw err
+        }
+    }
+
+    // 查询场次
+    async function getSession(id: number, force: boolean = false) {
+        interviewDataStatus.value = 'loading'
+        const { err, res } = await interviewApi.getSession({ stage_id: id }, force)
+        if (res) {
+            toast.success('查询场次成功')
+            interviewDataStatus.value = 'loaded'
+            return res
+        } else {
+            toast.error(err?.data?.message || '查询场次失败')
+            interviewDataStatus.value = 'error'
+            throw err
+        }
+    }
+
+    // 查询时间段
+    async function getTimeSlot(id: number, force: boolean = false) {
+        interviewDataStatus.value = 'loading'
+        const { err, res } = await interviewApi.getTimeSlot({ session_id: id }, force)
+        if (res) {
+            toast.success('查询时间段成功')
+            interviewDataStatus.value = 'loaded'
+            return res
+        } else {
+            toast.error(err?.data?.message || '查询时间段失败')
+            interviewDataStatus.value = 'error'
+            throw err
+        }
+    }
+
+    // 更新面试活动
+    async function updateCampaign(data: { id: number; title: string; description: string; startDate: Date; endDate: Date; isActive: boolean }) {
+        interviewDataStatus.value = 'loading'
+        
+        // 时间格式化函数
+        function formatDate(date: Date): string {
+            const pad = (n: number) => n < 10 ? '0' + n : n;
+            return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+        }
+        
+        const payload = {
+            title: data.title,
+            description: data.description,
+            is_active: data.isActive,
+            start_date: formatDate(data.startDate),
+            end_date: formatDate(data.endDate),
+        }
+        
+        const { err, res } = await interviewApi.updateCampaign(data.id, payload)
+        if (res) {
+            toast.success('更新面试成功')
+            interviewDataStatus.value = 'loaded'
+            return res
+        } else {
+            toast.error(err?.data?.message || '更新面试失败')
+            interviewDataStatus.value = 'error'
+            throw err
+        }
+    }
+
+    // 更新面试环节
+    async function updateStage(data: { id: number; title: string; description: string; sort_order: number; is_required: boolean }) {
+        interviewDataStatus.value = 'loading'
+        const { id, title, description, sort_order, is_required } = data;
+        const payload = { title, description, sort_order, is_required };
+        const { err, res } = await interviewApi.updateStage(id, payload);
+        if (res) {
+            toast.success('更新环节成功')
+            interviewDataStatus.value = 'loaded'
+            return res
+        } else {
+            toast.error(err?.data?.message || '更新环节失败')
+            interviewDataStatus.value = 'error'
+            throw err
+        }
+    }
+
+    // 更新面试场次 
+    async function updateSession(data: { id: number; title: string; start_time: string; end_time: string; location: string }) {
+        interviewDataStatus.value = 'loading'
+        const { id, title, start_time, end_time, location } = data;
+        const payload = { title, start_time, end_time, location };
+        const { err, res } = await interviewApi.updateSession(id, payload);
+        if (res) {
+            toast.success('更新场次成功')
+            interviewDataStatus.value = 'loaded'
+            return res
+        } else {
+            toast.error(err?.data?.message || '更新场次失败')
+            interviewDataStatus.value = 'error'
+            throw err
+        }
+    }
+
+    // 更新面试时间段
+    async function updateTimeSlot(data: { id: number; start_time: string; end_time: string; max_seats: number }) {
+        interviewDataStatus.value = 'loading'
+        const { id, start_time, end_time, max_seats } = data;
+        const payload = { start_time, end_time, max_seats };
+        const { err, res } = await interviewApi.updateTimeSlot(id, payload);
+        if (res) {
+            toast.success('更新时间段成功')
+            interviewDataStatus.value = 'loaded'
+            return res
+        } else {
+            toast.error(err?.data?.message || '更新时间段失败')
+            interviewDataStatus.value = 'error'
+            throw err
+        }
+    }
+
     return {
         campaigns,
         interviewDataStatus,
@@ -166,6 +292,13 @@ export const useInterviewStore = defineStore('interview', () => {
         createStage,
         createSession,
         createTimeSlot,
-        deleteCampaign
+        deleteCampaign,
+        getStage,
+        getSession,
+        getTimeSlot,
+        updateCampaign,
+        updateStage,
+        updateSession,
+        updateTimeSlot,
     }
 })

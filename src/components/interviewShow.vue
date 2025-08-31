@@ -24,7 +24,7 @@
                         </div>
                     </div>
                     <div class="relative flex items-center justify-center rounded-2xl p-[0.4rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md group"
-                        :style="{ backgroundColor: 'var(--main-color)' }">
+                        :style="{ backgroundColor: 'var(--main-color)' }" @click="$emit('edit', id)">
                         <div class="text-[1rem] dark:text-[#000000]">
                             <Pencil />
                         </div>
@@ -109,7 +109,7 @@ const props = defineProps<{
     time: Date
 }>()
 
-const emit = defineEmits(['view-detail', 'apply', 'deleted']);
+const emit = defineEmits(['view-detail', 'apply', 'deleted', 'edit']);
 
 const isOdd = props.id % 2 === 1
 

@@ -425,7 +425,8 @@
                         class="mt-5 dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer"
                         @click="resetForm">重置</Button>
                     <Button type="submit"
-                        class="mt-5 dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">提交</Button>
+                        class="mt-5 dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">{{
+                            props.isEdit ? '更新' : '提交' }}</Button>
                 </div>
             </form>
         </div>
@@ -454,15 +455,164 @@ import { onMounted, onUnmounted } from 'vue'
 import { useInterviewStore } from '@/stores/interview'
 const interviewStore = useInterviewStore()
 
-onMounted(() => {
-    document.body.style.overflow = 'hidden'
-})
 
 onUnmounted(() => {
     document.body.style.overflow = ''
 })
 
-const props = defineProps<{ deliverClose?: () => void }>()
+onMounted(() => {
+    document.body.style.overflow = 'hidden'
+
+    // 如果是编辑模式且有数据，初始化表单
+    if (props.isEdit && props.editData) {
+        initFormWithEditData(props.editData)
+    }
+})
+
+// 添加一个初始化表单的函数
+function initFormWithEditData(data: any) {
+    console.log('初始化表单数据:', data);
+    
+    // 创建一个新的表单数据对象
+    const newFormData = {
+        title: data.title || '',
+        description: data.description || '',
+        startTime: formatDateForInput(data.startDate || data.start_date || new Date()),
+        endTime: formatDateForInput(data.endDate || data.end_date || new Date()),
+        isActive: data.isActive || data.is_active || false,
+        stages: [] as Stage[]
+    };
+
+    // 环节数据填充
+    if (data.stages && data.stages.length > 0) {
+        console.log('填充环节数据，共', data.stages.length, '个环节');
+        
+        // 处理每个环节
+        data.stages.forEach((stage: any) => {
+            console.log('处理环节:', stage);
+            
+            const newStage: Stage = {
+                title: stage.title || '默认环节',
+                description: stage.description || '请添加环节描述',
+                isRequired: stage.isRequired || stage.is_required || false,
+                sessions: []
+            };
+            
+            // 处理场次数据
+            if (stage.sessions && stage.sessions.length > 0) {
+                stage.sessions.forEach((session: any) => {
+                    console.log('处理场次:', session);
+                    
+                    const newSession: Session = {
+                        title: session.title || '默认场次',
+                        startTime: formatDateForInput(session.startTime || session.start_time || new Date()),
+                        endTime: formatDateForInput(session.endTime || session.end_time || new Date()),
+                        location: session.location || '请添加场次地点',
+                        timeSlots: []
+                    };
+                    
+                    // 处理时间段数据
+                    if (session.timeSlots && session.timeSlots.length > 0) {
+                        session.timeSlots.forEach((slot: any) => {
+                            console.log('处理时间段:', slot);
+                            
+                            const newTimeSlot: TimeSlot = {
+                                startTime: formatDateForInput(slot.startTime || slot.start_time || new Date()),
+                                endTime: formatDateForInput(slot.endTime || slot.end_time || new Date()),
+                                maxSeats: Number(slot.maxSeats || slot.max_seats || 10)
+                            };
+                            newSession.timeSlots.push(newTimeSlot);
+                        });
+                    } else {
+                        // 至少添加一个默认时间段
+                        const now = new Date();
+                        const later = new Date(now.getTime() + 30 * 60000); // 30分钟后
+                        
+                        newSession.timeSlots.push({
+                            startTime: formatDateForInput(now),
+                            endTime: formatDateForInput(later),
+                            maxSeats: 10
+                        });
+                    }
+                    
+                    newStage.sessions.push(newSession);
+                });
+            } else {
+                // 至少添加一个默认场次
+                const now = new Date();
+                const later = new Date(now.getTime() + 60 * 60000); // 1小时后
+                
+                newStage.sessions.push({
+                    title: '默认场次',
+                    startTime: formatDateForInput(now),
+                    endTime: formatDateForInput(later),
+                    location: '请添加场次地点',
+                    timeSlots: [
+                        {
+                            startTime: formatDateForInput(now),
+                            endTime: formatDateForInput(new Date(now.getTime() + 30 * 60000)), // 30分钟后
+                            maxSeats: 10,
+                        }
+                    ]
+                });
+            }
+            
+            newFormData.stages.push(newStage);
+        });
+    } else {
+        // 如果没有环节，至少保留一个默认环节
+        const now = new Date();
+        
+        newFormData.stages = [
+            {
+                title: '默认环节',
+                description: '请添加环节描述',
+                isRequired: false,
+                sessions: [
+                    {
+                        title: '默认场次',
+                        startTime: formatDateForInput(now),
+                        endTime: formatDateForInput(new Date(now.getTime() + 60 * 60000)), // 1小时后
+                        location: '请添加场次地点',
+                        timeSlots: [
+                            {
+                                startTime: formatDateForInput(now),
+                                endTime: formatDateForInput(new Date(now.getTime() + 30 * 60000)), // 30分钟后
+                                maxSeats: 10,
+                            }
+                        ]
+                    }
+                ]
+            }
+        ];
+    }
+    
+    // 更新响应式数据
+    Object.assign(formData, newFormData);
+    
+    // 更新表单值（这是关键步骤）
+    setValues(newFormData);
+    
+    console.log('表单初始化完成:', formData);
+}
+
+// 添加日期格式化函数（用于将日期对象或ISO字符串转为input可用的格式）
+function formatDateForInput(dateString: string | Date): string {
+    if (!dateString) return ''
+
+    const date = typeof dateString === 'string' ? new Date(dateString) : dateString
+
+    // 格式化为 yyyy-MM-ddThh:mm 格式（适用于datetime-local输入框）
+    const pad = (n: number) => n < 10 ? '0' + n : n
+
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
+}
+
+const props = defineProps<{
+    deliverClose?: () => void,
+    isEdit?: boolean,
+    editData?: any
+}>()
 
 const formData = reactive<InterviewForm>({
     title: '',
@@ -647,73 +797,237 @@ const formSchema = toTypedSchema(z.object({
     ).min(1, '至少有一个环节')
 }))
 
-const { handleSubmit, resetForm: veeResetForm } = useForm({
+const { handleSubmit, resetForm: veeResetForm, setValues } = useForm({
     validationSchema: formSchema,
+    initialValues: formData
 })
 
 const onSubmit = handleSubmit(async (values) => {
-    // 创建面试
-    const campaignReq = await interviewStore.createCampaign({
-        title: values.title,
-        description: values.description,
-        startDate: new Date(values.startTime),
-        endDate: new Date(values.endTime),
-        isActive: !!values.isActive
-    })
-    // 创建环节
-    const campaignId = (campaignReq as any).data.campaigns.id
-    for (let sIndex = 0; sIndex < values.stages.length; sIndex++) {
-        const stage = values.stages[sIndex];
-        console.log('准备创建环节:', stage)
-        try {
-            const stageRes = await interviewStore.createStage({
-                campaign_id: campaignId,
-                title: stage.title,
-                description: stage.description,
-                sort_order: sIndex,
-                is_required: !!stage.isRequired
-            })
-            const stageId = (stageRes as any).data.stages.id
-            console.log('创建环节成功:', stageRes)
-            // 创建场次
-            for (let ssIndex = 0; ssIndex < stage.sessions.length; ssIndex++) {
-                const session = stage.sessions[ssIndex];
-                console.log('准备创建场次:', session)
-                try {
+    if (props.isEdit) {
+        // 编辑模式：调用更新接口
+        await updateInterview(values)
+    } else {
+        // 创建模式：调用创建接口
+        // 创建面试
+        const campaignReq = await interviewStore.createCampaign({
+            title: values.title,
+            description: values.description,
+            startDate: new Date(values.startTime),
+            endDate: new Date(values.endTime),
+            isActive: !!values.isActive
+        })
+        // 创建环节
+        const campaignId = (campaignReq as any).data.campaigns.id
+        for (let sIndex = 0; sIndex < values.stages.length; sIndex++) {
+            const stage = values.stages[sIndex];
+            console.log('准备创建环节:', stage)
+            try {
+                const stageRes = await interviewStore.createStage({
+                    campaign_id: campaignId,
+                    title: stage.title,
+                    description: stage.description,
+                    sort_order: sIndex,
+                    is_required: !!stage.isRequired
+                })
+                const stageId = (stageRes as any).data.stages.id
+                console.log('创建环节成功:', stageRes)
+                // 创建场次
+                for (let ssIndex = 0; ssIndex < stage.sessions.length; ssIndex++) {
+                    const session = stage.sessions[ssIndex];
+                    console.log('准备创建场次:', session)
+                    try {
+                        const sessionRes = await interviewStore.createSession({
+                            stage_id: stageId,
+                            title: session.title,
+                            start_time: session.startTime,
+                            end_time: session.endTime,
+                            location: session.location
+                        })
+                        const sessionId = (sessionRes as any).data.sessions.id
+                        console.log('创建场次成功:', sessionRes)
+                        // 创建时间段
+                        for (let tsIndex = 0; tsIndex < session.timeSlots.length; tsIndex++) {
+                            const timeSlot = session.timeSlots[tsIndex];
+                            try {
+                                const timeSlotRes = await interviewStore.createTimeSlot({
+                                    session_id: sessionId,
+                                    start_time: timeSlot.startTime,
+                                    end_time: timeSlot.endTime,
+                                    max_seats: timeSlot.maxSeats
+                                })
+                                console.log('创建时间段成功:', timeSlotRes)
+                            } catch (err) {
+                                console.error('创建时间段失败:', err)
+                            }
+                        }
+                    } catch (err) {
+                        console.error('创建场次失败:', err)
+                    }
+                }
+            } catch (err) {
+                console.error('创建环节失败:', err)
+            }
+        }
+    }
+    // 关闭弹窗
+    if (props.deliverClose) {
+        props.deliverClose()
+    }
+    window.location.reload();
+})
+
+// 添加更新面试的函数
+async function updateInterview(values: any) {
+    try {
+        const campaignId = props.editData?.id
+        if (!campaignId) {
+            toast.error('找不到面试ID，无法更新')
+            return
+        }
+
+        console.log('开始更新面试信息', values)
+
+        // 1. 更新面试基本信息
+        await interviewStore.updateCampaign({
+            id: campaignId,
+            title: values.title,
+            description: values.description,
+            startDate: new Date(values.startTime),
+            endDate: new Date(values.endTime),
+            isActive: !!values.isActive
+        })
+
+        // 2. 处理环节更新
+        for (let sIndex = 0; sIndex < values.stages.length; sIndex++) {
+            const stage = values.stages[sIndex]
+            const stageId = props.editData?.stages?.[sIndex]?.id
+            
+            console.log(`处理第${sIndex+1}个环节:`, stage)
+            console.log('环节ID:', stageId)
+
+            // 检查是否为有效的环节ID（大于0表示是真实的服务器ID）
+            if (stageId && stageId > 0) {
+                // 更新已有环节
+                await interviewStore.updateStage({
+                    id: stageId,
+                    title: stage.title,
+                    description: stage.description,
+                    sort_order: sIndex,
+                    is_required: !!stage.isRequired
+                })
+
+                // 处理该环节下的场次
+                for (let seIndex = 0; seIndex < stage.sessions.length; seIndex++) {
+                    const session = stage.sessions[seIndex]
+                    const sessionId = props.editData?.stages?.[sIndex]?.sessions?.[seIndex]?.id
+                    
+                    console.log(`处理第${seIndex+1}个场次:`, session)
+                    console.log('场次ID:', sessionId)
+
+                    // 检查是否为有效的场次ID
+                    if (sessionId && sessionId > 0) {
+                        // 更新已有场次
+                        await interviewStore.updateSession({
+                            id: sessionId,
+                            title: session.title,
+                            start_time: session.startTime,
+                            end_time: session.endTime,
+                            location: session.location
+                        })
+
+                        // 处理该场次下的时间段
+                        for (let tIndex = 0; tIndex < session.timeSlots.length; tIndex++) {
+                            const timeSlot = session.timeSlots[tIndex]
+                            const timeSlotId = props.editData?.stages?.[sIndex]?.sessions?.[seIndex]?.timeSlots?.[tIndex]?.id
+                            
+                            console.log(`处理第${tIndex+1}个时间段:`, timeSlot)
+                            console.log('时间段ID:', timeSlotId)
+
+                            // 检查是否为有效的时间段ID
+                            if (timeSlotId && timeSlotId > 0) {
+                                // 更新已有时间段
+                                await interviewStore.updateTimeSlot({
+                                    id: timeSlotId,
+                                    start_time: timeSlot.startTime,
+                                    end_time: timeSlot.endTime,
+                                    max_seats: timeSlot.maxSeats
+                                })
+                            } else {
+                                // 添加新时间段
+                                await interviewStore.createTimeSlot({
+                                    session_id: sessionId,
+                                    start_time: timeSlot.startTime,
+                                    end_time: timeSlot.endTime,
+                                    max_seats: timeSlot.maxSeats
+                                })
+                            }
+                        }
+                    } else {
+                        // 添加新场次
+                        const sessionRes = await interviewStore.createSession({
+                            stage_id: stageId,
+                            title: session.title,
+                            start_time: session.startTime,
+                            end_time: session.endTime,
+                            location: session.location
+                        })
+                        
+                        const newSessionId = (sessionRes as any).data.sessions.id
+                        
+                        // 为新场次添加时间段
+                        for (const timeSlot of session.timeSlots) {
+                            await interviewStore.createTimeSlot({
+                                session_id: newSessionId,
+                                start_time: timeSlot.startTime,
+                                end_time: timeSlot.endTime,
+                                max_seats: timeSlot.maxSeats
+                            })
+                        }
+                    }
+                }
+            } else {
+                // 添加新环节
+                const stageRes = await interviewStore.createStage({
+                    campaign_id: campaignId,
+                    title: stage.title,
+                    description: stage.description,
+                    sort_order: sIndex,
+                    is_required: !!stage.isRequired
+                })
+                
+                const newStageId = (stageRes as any).data.stages.id
+                
+                // 为新环节添加场次
+                for (const session of stage.sessions) {
                     const sessionRes = await interviewStore.createSession({
-                        stage_id: stageId,
+                        stage_id: newStageId,
                         title: session.title,
                         start_time: session.startTime,
                         end_time: session.endTime,
                         location: session.location
                     })
-                    const sessionId = (sessionRes as any).data.sessions.id
-                    console.log('创建场次成功:', sessionRes)
-                    // 创建时间段
-                    for (let tsIndex = 0; tsIndex < session.timeSlots.length; tsIndex++) {
-                        const timeSlot = session.timeSlots[tsIndex];
-                        try {
-                            const timeSlotRes = await interviewStore.createTimeSlot({
-                                session_id: sessionId,
-                                start_time: timeSlot.startTime,
-                                end_time: timeSlot.endTime,
-                                max_seats: timeSlot.maxSeats
-                            })
-                            console.log('创建时间段成功:', timeSlotRes)
-                        } catch (err) {
-                            console.error('创建时间段失败:', err)
-                        }
+                    
+                    const newSessionId = (sessionRes as any).data.sessions.id
+                    
+                    // 为新场次添加时间段
+                    for (const timeSlot of session.timeSlots) {
+                        await interviewStore.createTimeSlot({
+                            session_id: newSessionId,
+                            start_time: timeSlot.startTime,
+                            end_time: timeSlot.endTime,
+                            max_seats: timeSlot.maxSeats
+                        })
                     }
-                } catch (err) {
-                    console.error('创建场次失败:', err)
                 }
             }
-        } catch (err) {
-            console.error('创建环节失败:', err)
         }
+
+        toast.success('更新面试成功')
+    } catch (err) {
+        console.error('更新面试失败:', err)
+        toast.error('更新面试失败')
     }
-    window.location.reload();
-})
+}
 
 </script>
 
