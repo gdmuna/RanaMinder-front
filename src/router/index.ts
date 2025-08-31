@@ -18,7 +18,8 @@ const routes = [
     name: 'home',
     meta: {
       title: '首页',
-      requireAuth: false
+      requireAuth: false,
+      scrollToTop: true
     }
   },
   {
@@ -28,7 +29,8 @@ const routes = [
     meta: {
       title: '人员管理',
       requireAuth: true,
-      minManageLevel: 1
+      minManageLevel: 1,
+      scrollToTop: true
     }
   },
   {
@@ -38,7 +40,8 @@ const routes = [
     meta: {
       title: '面试管理',
       requireAuth: true,
-      minManageLevel: 1
+      minManageLevel: 1,
+      scrollToTop: true
     }
   },
   {
@@ -48,7 +51,8 @@ const routes = [
     meta: {
       title: '面试详细',
       requireAuth: true,
-      minManageLevel: 1
+      minManageLevel: 1,
+      scrollToTop: true
     }
   },
   {
@@ -80,7 +84,7 @@ const router = createRouter({
   strict: true
 })
 
-router.beforeEach((to, _from, next) => {
+router.beforeEach((to, from, next) => {
   const systemStore = useSystemStore()
   const authStore = useAuthStore()
   const minManageLevel = to.meta.minManageLevel
@@ -89,12 +93,15 @@ router.beforeEach((to, _from, next) => {
   const title = document.title
   document.title = title + ' - ' + (to.meta.title || 'RanaMinder')
   // 只有在不是子路由跳转时，且目标路由配置了 scrollToTop 时，才滚动到顶部
-  // const isChildRoute = from.matched.length > 0 && to.path === from.matched[0].path
-  // const scrollToTop = to.meta.scrollToTop && !(from.meta.parentAction?.doNotScrollToTop && isChildRoute)
-  // if (scrollToTop) {
-  //   const smoother = ScrollSmoother.get();
-  //   smoother?.scrollTo(0, false)
-  // }
+  const isChildRoute = from.matched.length > 0 && to.path === from.matched[0].path
+  const scrollToTop = to.meta.scrollToTop && !(from.meta.parentAction?.doNotScrollToTop && isChildRoute)
+  if (scrollToTop) {
+    if (window.lenis) {
+      window.lenis.scrollTo(0, { duration: 1 })
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
 
   // 检查是否需要登录
   if (to.meta.requireAuth && !authStore.isAuthenticated) {
