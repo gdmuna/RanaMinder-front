@@ -95,13 +95,13 @@ export const useInterviewStore = defineStore('interview', () => {
     async function createStage(data: { campaign_id: number; title: string; description: string; sort_order: number; is_required: boolean }) {
         interviewDataStatus.value = 'loading'
         const { err, res } = await interviewApi.createStage(data)
-        console.log('创建阶段',data);
+        console.log('创建环节',data);
         if (res) {
-            toast.success('创建阶段成功')
+            toast.success('创建环节成功')
             interviewDataStatus.value = 'loaded'
             return res
         } else {
-            toast.error(err?.data?.message || '创建阶段失败')
+            toast.error(err?.data?.message || '创建环节失败')
             interviewDataStatus.value = 'error'
             throw err
         }
@@ -111,15 +111,29 @@ export const useInterviewStore = defineStore('interview', () => {
         interviewDataStatus.value = 'loading'
         const { err, res } = await interviewApi.createSession(data)
         if (res) {
-            toast.success('创建会话成功')
+            toast.success('创建场次成功')
             interviewDataStatus.value = 'loaded'
             return res
         } else {
-            toast.error(err?.data?.message || '创建会话失败')
+            toast.error(err?.data?.message || '创建场次失败')
             interviewDataStatus.value = 'error'
             throw err
         }
     }
+
+async function createTimeSlot(data: { seesion_id: number; start_time: string; end_time: string; max_seats: number }) {
+    interviewDataStatus.value = 'loading'
+    const { err, res } = await interviewApi.createTimeSlot(data)
+    if (res) {
+        toast.success('创建时间段成功')
+        interviewDataStatus.value = 'loaded'
+        return res
+    } else {
+        toast.error(err?.data?.message || '创建时间段失败')
+        interviewDataStatus.value = 'error'
+        throw err
+    }
+}
 
     return {
         campaigns,
@@ -130,6 +144,7 @@ export const useInterviewStore = defineStore('interview', () => {
         totalPages,
         createCampaign,
         createStage,
-        createSession
+        createSession,
+        createTimeSlot
     }
 })

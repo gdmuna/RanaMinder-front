@@ -666,28 +666,44 @@ const onSubmit = handleSubmit(async (values) => {
         const stage = values.stages[sIndex];
         console.log('准备创建环节:', stage)
         try {
-            const stageReq = await interviewStore.createStage({
+            const stageRes = await interviewStore.createStage({
                 campaign_id: campaignId,
                 title: stage.title,
                 description: stage.description,
                 sort_order: sIndex,
                 is_required: !!stage.isRequired
             })
-            const stageId = (stageReq as any).data.stages.id
-            console.log('创建环节成功:', stageReq)
+            const stageId = (stageRes as any).data.stages.id
+            console.log('创建环节成功:', stageRes)
             // 创建场次
             for (let ssIndex = 0; ssIndex < stage.sessions.length; ssIndex++) {
                 const session = stage.sessions[ssIndex];
                 console.log('准备创建场次:', session)
                 try {
-                    const res = await interviewStore.createSession({
+                    const sessionRes = await interviewStore.createSession({
                         stage_id: stageId,
                         title: session.title,
                         start_time: session.startTime,
                         end_time: session.endTime,
                         location: session.location
                     })
-                    console.log('创建场次成功:', res)
+                    const sessionId = (sessionRes as any).data.sessions.id
+                    console.log('创建场次成功:', sessionRes)
+                    // 创建时间段
+                    for (let tsIndex = 0; tsIndex < session.timeSlots.length; tsIndex++) {
+                        const timeSlot = session.timeSlots[tsIndex];
+                        try {
+                            const timeSlotRes = await interviewStore.createTimeSlot({
+                                seesion_id: sessionId,
+                                start_time: timeSlot.startTime,
+                                end_time: timeSlot.endTime,
+                                max_seats: timeSlot.maxSeats
+                            })
+                            console.log('创建时间段成功:', timeSlotRes)
+                        } catch (err) {
+                            console.error('创建时间段失败:', err)
+                        }
+                    }
                 } catch (err) {
                     console.error('创建场次失败:', err)
                 }

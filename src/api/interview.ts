@@ -53,8 +53,16 @@ export const interviewApi = {
         return await to<{ message: string; code: string; session: session }>(inst)
     },
 
-    async createTimeSlot(data: { sessionId: number; startTime: Date; endTime: Date; maxSeats: number }) {
-        const inst = ranaMinder.Post<{ message: string; code: string; timeSlot: timeSlot }>('/timeSlot', { data }).send()
+    async createTimeSlot(data: { seesion_id: number; start_time: string; end_time: string; max_seats: number }) {
+        // x-www-form-urlencoded 序列化
+        const formBody = Object.entries(data)
+            .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value as string)}`)
+            .join('&');
+        const inst = ranaMinder.Post<{ message: string; code: string; timeSlot: timeSlot }>('/time_slot', formBody, {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }).send();
         return await to<{ message: string; code: string; timeSlot: timeSlot }>(inst)
     }
 }
