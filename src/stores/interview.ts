@@ -203,13 +203,11 @@ export const useInterviewStore = defineStore('interview', () => {
     // 更新面试活动
     async function updateCampaign(data: { id: number; title: string; description: string; startDate: Date; endDate: Date; isActive: boolean }) {
         interviewDataStatus.value = 'loading'
-        
         // 时间格式化函数
         function formatDate(date: Date): string {
             const pad = (n: number) => n < 10 ? '0' + n : n;
             return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
         }
-        
         const payload = {
             title: data.title,
             description: data.description,
@@ -218,15 +216,28 @@ export const useInterviewStore = defineStore('interview', () => {
             end_date: formatDate(data.endDate),
         }
         
-        const { err, res } = await interviewApi.updateCampaign(data.id, payload)
-        if (res) {
-            toast.success('更新面试成功')
-            interviewDataStatus.value = 'loaded'
-            return res
-        } else {
-            toast.error(err?.data?.message || '更新面试失败')
+        console.log('更新面试活动 payload:', payload, '请求ID:', data.id)
+        
+        try {
+            const { err, res } = await interviewApi.updateCampaign(data.id, payload)
+            console.log('updateCampaign 原始响应:', { err, res })
+            
+            if (res) {
+                toast.success('更新面试成功')
+                interviewDataStatus.value = 'loaded'
+                return res
+            } else {
+                // 详细记录错误
+                const errorDetail = err?.data ? JSON.stringify(err.data) : (err?.message || '未知错误')
+                console.error('更新面试失败详情:', errorDetail)
+                toast.error(`更新面试失败: ${errorDetail}`)
+                interviewDataStatus.value = 'error'
+                throw err
+            }
+        } catch (e) {
+            console.error('updateCampaign 捕获到异常:', e)
             interviewDataStatus.value = 'error'
-            throw err
+            throw e
         }
     }
 

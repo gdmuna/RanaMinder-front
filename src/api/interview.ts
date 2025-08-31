@@ -96,11 +96,14 @@ export const interviewApi = {
     },
 
     // 更新面试活动
-    async updateCampaign(id: number, data: { title: string; description: string; is_active: boolean }) {
+    async updateCampaign(id: number, data: { title: string; description: string;start_date: string; end_date: string; is_active: boolean }) {
         // x-www-form-urlencoded 序列化
         const formBody = Object.entries(data)
-            .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value as string)}`)
+            .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(typeof value === 'boolean' ? String(value) : value as string)}`)
             .join('&');
+        
+        console.log(`API请求: PUT /campaign/${id}, 请求体:`, data, '序列化后:', formBody);
+        
         const inst = ranaMinder.Put<{ message: string; code: string; campaign: Campaign }>(`/campaign/${id}`, formBody, {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'

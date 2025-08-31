@@ -46,7 +46,7 @@
 
 <script setup lang="ts">
 // 逻辑代码
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import InterviewShow from '@/components/interviewShow.vue';
 import NewInterview from '@/components/newInterview.vue';
 import InterviewCreate from '@/components/interviewCreate.vue';
@@ -64,23 +64,19 @@ const editData = ref<Campaign | null>(null)
 
 async function handleEdit(id: number) {
     try {
-        console.log('开始处理编辑操作，ID:', id);
         
         // 1. 获取面试基本信息（本地缓存）
         const campaign = interviewStore.campaigns.find(item => item.id === id)
         if (!campaign) {
-            console.error('找不到对应的面试数据，ID:', id);
             return;
         }
         
-        console.log('找到面试基本信息:', campaign);
 
         // 2. 查询环节
         let stages: any[] = [];
         try {
             const stageRes = await interviewStore.getStage(id);
             stages = stageRes?.stages || [];
-            console.log('获取到环节数据:', stages);
         } catch (err) {
             console.error('获取环节数据失败:', err);
             // 即使获取环节失败，也继续执行
@@ -88,7 +84,6 @@ async function handleEdit(id: number) {
 
         // 如果没有获取到环节数据，创建一个默认环节
         if (!stages || stages.length === 0) {
-            console.log('没有获取到环节数据，创建默认环节');
             stages = [{
                 id: -1, // 使用临时ID
                 title: '默认环节',
@@ -100,12 +95,10 @@ async function handleEdit(id: number) {
 
         // 3. 查询每个环节的场次和时间段
         for (const stage of stages) {
-            console.log('正在处理环节:', stage.title, 'ID:', stage.id);
             try {
                 if (stage.id > 0) { // 只有有效ID才查询场次
                     const sessionRes = await interviewStore.getSession(stage.id);
                     (stage as any).sessions = sessionRes?.sessions || [];
-                    console.log('获取到场次数据:', stage.sessions);
                 } else {
                     (stage as any).sessions = [];
                 }
@@ -123,12 +116,10 @@ async function handleEdit(id: number) {
                 }
                 
                 for (const session of (stage as any).sessions) {
-                    console.log('正在处理场次:', session.title, 'ID:', session.id);
                     try {
                         if (session.id > 0) { // 只有有效ID才查询时间段
                             const timeSlotRes = await interviewStore.getTimeSlot(session.id);
                             (session as any).timeSlots = timeSlotRes?.timeSlots || [];
-                            console.log('获取到时间段数据:', session.timeSlots);
                         } else {
                             (session as any).timeSlots = [];
                         }
@@ -186,7 +177,6 @@ async function handleEdit(id: number) {
             stages
         } as any;
         
-        console.log('最终组装的编辑数据:', editData.value);
         showEdit.value = true;
     } catch (error) {
         console.error('处理编辑操作失败:', error);
@@ -208,7 +198,6 @@ async function fetchInterviews(page = 1) {
     if (loading.value) return;
     loading.value = true;
     await interviewStore.getCampaignList(page);
-    console.log('interviewStore.campaigns', interviewStore.campaigns);
     loading.value = false;
 }
 
@@ -261,7 +250,6 @@ function goToInfo(id: number) {
 }
 
 function goToApply(id: number) {
-    console.log('申请表模板 id:', id);
     currentInterviewId.value = id; // 保存当前面试id
     showApply.value = true;
 }

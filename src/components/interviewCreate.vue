@@ -142,35 +142,6 @@
                                 </FormItem>
                             </FormField>
 
-                            <!-- 环节开始时间 -->
-                            <!-- <FormField :name="`stages[${sIndex}].startTime`" v-slot="{ componentField }">
-                                <FormItem>
-                                    <FormLabel
-                                        class="text-sm font-bold tracking-wide bg-[#A5CEE9] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6.8rem]">
-                                        环节开始时间
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input type="datetime-local" v-bind="componentField"
-                                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            </FormField> -->
-
-                            <!-- 环节结束时间 -->
-                            <!-- <FormField :name="`stages[${sIndex}].endTime`" v-slot="{ componentField }">
-                                <FormItem>
-                                    <FormLabel
-                                        class="text-sm font-bold tracking-wide bg-[#F3E09C] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6.8rem]">
-                                        环节结束时间
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input type="datetime-local" v-bind="componentField"
-                                            class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            </FormField> -->
 
                             <!-- 进入环节 -->
                             <FormField :name="`stages[${sIndex}].isRequired`" type="checkbox"
@@ -189,32 +160,6 @@
                             </FormField>
                         </div>
 
-                        <!-- <h2
-                        class="text-sm font-bold tracking-wide bg-[#B6E3C4] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
-                        环节标题</h2>
-                    <Input v-model="stage.title"
-                        class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                    <h2
-                        class="text-sm font-bold tracking-wide bg-[#EDC7DB] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
-                        环节描述</h2>
-                    <Textarea v-model="stage.description"
-                        class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                    <h2
-                        class="text-sm font-bold tracking-wide bg-[#A5CEE9] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6.8rem]">
-                        环节开始时间</h2>
-                    <Input type="datetime-local" v-model="stage.startTime"
-                        class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                    <h2
-                        class="text-sm font-bold tracking-wide bg-[#F3E09C] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6.8rem]">
-                        环节结束时间</h2>
-                    <Input type="datetime-local" v-model="stage.endTime"
-                        class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                    <h2
-                        class="text-sm font-bold tracking-wide bg-[#E6CAA5] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
-                        进入环节</h2>
-                    <div class="flex items-center gap-2 mt-1">
-                        <Switch v-model:checked="stage.isRequired" class="data-[state=checked]:bg-[#50C878]" />
-                    </div> -->
 
                         <!-- 场次 -->
                         <div class="mt-9">
@@ -302,26 +247,6 @@
                                     </FormItem>
                                 </FormField>
 
-                                <!-- <h2
-                                class="text-sm font-bold tracking-wide bg-[#BBB16A] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
-                                场次标题</h2>
-                            <Input v-model="session.title"
-                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                            <h2
-                                class="text-sm font-bold tracking-wide bg-[#85c29b] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.1rem]">
-                                场次地点</h2>
-                            <Input v-model="session.location"
-                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                            <h2
-                                class="text-sm font-bold tracking-wide bg-[#DBAAB4] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6.8rem]">
-                                场次开始时间</h2>
-                            <Input type="datetime-local" v-model="session.startTime"
-                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                            <h2
-                                class="text-sm font-bold tracking-wide bg-[#E4E1A0] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6.8rem]">
-                                场次结束时间</h2>
-                            <Input type="datetime-local" v-model="session.endTime"
-                                class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" /> -->
 
                                 <!-- 时间段 -->
                                 <div class="mt-9">
@@ -397,21 +322,6 @@
                                             </FormItem>
                                         </FormField>
 
-                                        <!-- <h2
-                                        class="text-sm font-bold tracking-wide bg-[#A0DFDA] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[5.9rem]">
-                                        最大座位数</h2>
-                                    <Input v-model="slot.maxSeats"
-                                        class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                                    <h2
-                                        class="text-sm font-bold tracking-wide bg-[#C1A7D8] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[7.7rem]">
-                                        时间段开始时间</h2>
-                                    <Input type="datetime-local" v-model="slot.startTime"
-                                        class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" />
-                                    <h2
-                                        class="text-sm font-bold tracking-wide bg-[#E6A5A0] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[7.7rem]">
-                                        时间段结束时间</h2>
-                                    <Input type="datetime-local" v-model="slot.endTime"
-                                        class="border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 dark:bg-input/10" /> -->
 
                                     </div>
                                 </div>
@@ -471,7 +381,6 @@ onMounted(() => {
 
 // 添加一个初始化表单的函数
 function initFormWithEditData(data: any) {
-    console.log('初始化表单数据:', data);
     
     // 创建一个新的表单数据对象
     const newFormData = {
@@ -485,11 +394,9 @@ function initFormWithEditData(data: any) {
 
     // 环节数据填充
     if (data.stages && data.stages.length > 0) {
-        console.log('填充环节数据，共', data.stages.length, '个环节');
         
         // 处理每个环节
         data.stages.forEach((stage: any) => {
-            console.log('处理环节:', stage);
             
             const newStage: Stage = {
                 title: stage.title || '默认环节',
@@ -501,7 +408,6 @@ function initFormWithEditData(data: any) {
             // 处理场次数据
             if (stage.sessions && stage.sessions.length > 0) {
                 stage.sessions.forEach((session: any) => {
-                    console.log('处理场次:', session);
                     
                     const newSession: Session = {
                         title: session.title || '默认场次',
@@ -514,7 +420,6 @@ function initFormWithEditData(data: any) {
                     // 处理时间段数据
                     if (session.timeSlots && session.timeSlots.length > 0) {
                         session.timeSlots.forEach((slot: any) => {
-                            console.log('处理时间段:', slot);
                             
                             const newTimeSlot: TimeSlot = {
                                 startTime: formatDateForInput(slot.startTime || slot.start_time || new Date()),
@@ -593,7 +498,6 @@ function initFormWithEditData(data: any) {
     // 更新表单值（这是关键步骤）
     setValues(newFormData);
     
-    console.log('表单初始化完成:', formData);
 }
 
 // 添加日期格式化函数（用于将日期对象或ISO字符串转为input可用的格式）
@@ -820,7 +724,6 @@ const onSubmit = handleSubmit(async (values) => {
         const campaignId = (campaignReq as any).data.campaigns.id
         for (let sIndex = 0; sIndex < values.stages.length; sIndex++) {
             const stage = values.stages[sIndex];
-            console.log('准备创建环节:', stage)
             try {
                 const stageRes = await interviewStore.createStage({
                     campaign_id: campaignId,
@@ -830,11 +733,9 @@ const onSubmit = handleSubmit(async (values) => {
                     is_required: !!stage.isRequired
                 })
                 const stageId = (stageRes as any).data.stages.id
-                console.log('创建环节成功:', stageRes)
                 // 创建场次
                 for (let ssIndex = 0; ssIndex < stage.sessions.length; ssIndex++) {
                     const session = stage.sessions[ssIndex];
-                    console.log('准备创建场次:', session)
                     try {
                         const sessionRes = await interviewStore.createSession({
                             stage_id: stageId,
@@ -844,7 +745,6 @@ const onSubmit = handleSubmit(async (values) => {
                             location: session.location
                         })
                         const sessionId = (sessionRes as any).data.sessions.id
-                        console.log('创建场次成功:', sessionRes)
                         // 创建时间段
                         for (let tsIndex = 0; tsIndex < session.timeSlots.length; tsIndex++) {
                             const timeSlot = session.timeSlots[tsIndex];
@@ -855,7 +755,6 @@ const onSubmit = handleSubmit(async (values) => {
                                     end_time: timeSlot.endTime,
                                     max_seats: timeSlot.maxSeats
                                 })
-                                console.log('创建时间段成功:', timeSlotRes)
                             } catch (err) {
                                 console.error('创建时间段失败:', err)
                             }
@@ -885,27 +784,43 @@ async function updateInterview(values: any) {
             return
         }
 
-        console.log('开始更新面试信息', values)
+        console.log('开始更新面试', values)
 
         // 1. 更新面试基本信息
-        await interviewStore.updateCampaign({
-            id: campaignId,
-            title: values.title,
-            description: values.description,
-            startDate: new Date(values.startTime),
-            endDate: new Date(values.endTime),
-            isActive: !!values.isActive
-        })
+        try {
+            await interviewStore.updateCampaign({
+                id: campaignId,
+                title: values.title,
+                description: values.description,
+                startDate: new Date(values.startTime),
+                endDate: new Date(values.endTime),
+                isActive: !!values.isActive
+            })
+        } catch (updateErr: any) {
+            console.error('更新面试基本信息失败:', updateErr)
+            let errMsg = '未知错误'
+            if (updateErr && typeof updateErr === 'object') {
+                if (updateErr.data && updateErr.data.message) {
+                    errMsg = updateErr.data.message
+                } else if (updateErr.message) {
+                    errMsg = updateErr.message
+                } else {
+                    errMsg = String(updateErr)
+                }
+            } else {
+                errMsg = String(updateErr)
+            }
+            toast.error('更新面试基本信息失败: ' + errMsg)
+            throw updateErr
+        }
 
         // 2. 处理环节更新
         for (let sIndex = 0; sIndex < values.stages.length; sIndex++) {
             const stage = values.stages[sIndex]
             const stageId = props.editData?.stages?.[sIndex]?.id
             
-            console.log(`处理第${sIndex+1}个环节:`, stage)
-            console.log('环节ID:', stageId)
 
-            // 检查是否为有效的环节ID（大于0表示是真实的服务器ID）
+            // 检查是否为有效的环节ID
             if (stageId && stageId > 0) {
                 // 更新已有环节
                 await interviewStore.updateStage({
@@ -921,8 +836,6 @@ async function updateInterview(values: any) {
                     const session = stage.sessions[seIndex]
                     const sessionId = props.editData?.stages?.[sIndex]?.sessions?.[seIndex]?.id
                     
-                    console.log(`处理第${seIndex+1}个场次:`, session)
-                    console.log('场次ID:', sessionId)
 
                     // 检查是否为有效的场次ID
                     if (sessionId && sessionId > 0) {
@@ -940,8 +853,6 @@ async function updateInterview(values: any) {
                             const timeSlot = session.timeSlots[tIndex]
                             const timeSlotId = props.editData?.stages?.[sIndex]?.sessions?.[seIndex]?.timeSlots?.[tIndex]?.id
                             
-                            console.log(`处理第${tIndex+1}个时间段:`, timeSlot)
-                            console.log('时间段ID:', timeSlotId)
 
                             // 检查是否为有效的时间段ID
                             if (timeSlotId && timeSlotId > 0) {
@@ -1021,11 +932,27 @@ async function updateInterview(values: any) {
                 }
             }
         }
-
         toast.success('更新面试成功')
-    } catch (err) {
+    } catch (err: any) {
         console.error('更新面试失败:', err)
-        toast.error('更新面试失败')
+        // 处理各种可能的错误格式
+        let errorMsg = '未知错误'
+        if (typeof err === 'string') {
+            errorMsg = err
+        } else if (err && typeof err === 'object') {
+            if (err.data && err.data.message) {
+                errorMsg = err.data.message
+            } else if (err.message) {
+                errorMsg = err.message
+            } else {
+                try {
+                    errorMsg = JSON.stringify(err)
+                } catch (e) {
+                    errorMsg = String(err)
+                }
+            }
+        }
+        toast.error('更新面试失败: ' + errorMsg)
     }
 }
 
