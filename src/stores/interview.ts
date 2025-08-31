@@ -107,6 +107,20 @@ export const useInterviewStore = defineStore('interview', () => {
         }
     }
 
+    async function createSession(data: { stage_id: number; title: string; start_time: string; end_time: string; location: string }) {
+        interviewDataStatus.value = 'loading'
+        const { err, res } = await interviewApi.createSession(data)
+        if (res) {
+            toast.success('创建会话成功')
+            interviewDataStatus.value = 'loaded'
+            return res
+        } else {
+            toast.error(err?.data?.message || '创建会话失败')
+            interviewDataStatus.value = 'error'
+            throw err
+        }
+    }
+
     return {
         campaigns,
         interviewDataStatus,
@@ -115,6 +129,7 @@ export const useInterviewStore = defineStore('interview', () => {
         pageSize,
         totalPages,
         createCampaign,
-        createStage
+        createStage,
+        createSession
     }
 })

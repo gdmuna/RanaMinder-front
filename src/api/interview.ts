@@ -40,8 +40,16 @@ export const interviewApi = {
         return await to<{ message: string; code: string; stage: stage }>(inst)
     },
 
-    async createSession(data: { stageId: number; title: string; startTime: Date; endTime: Date; location: string }) {
-        const inst = ranaMinder.Post<{ message: string; code: string; session: session }>('/session', { data }).send()
+    async createSession(data: { stage_id: number; title: string; start_time: string; end_time: string; location: string }) {
+        // x-www-form-urlencoded 序列化
+        const formBody = Object.entries(data)
+            .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value as string)}`)
+            .join('&');
+        const inst = ranaMinder.Post<{ message: string; code: string; session: session }>('/session', formBody, {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }).send();
         return await to<{ message: string; code: string; session: session }>(inst)
     },
 
