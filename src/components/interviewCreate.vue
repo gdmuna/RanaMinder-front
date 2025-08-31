@@ -1,5 +1,6 @@
 <template>
-    <div data-lenis-prevent class="flex flex-col items-center md:justify-center justify-end min-h-screen w-full overflow-y-auto">
+    <div data-lenis-prevent
+        class="flex flex-col items-center md:justify-center justify-end min-h-screen w-full overflow-y-auto">
         <div class="rounded-t-lg dark:bg-[#A3A2A0] text-[#000000] md:w-[22rem] min-w-[35%] w-full">
             <div class="w-full h-13 flex">
                 <div class="px-6 py-5 cursor-pointer flex items-center"
@@ -450,6 +451,9 @@ import { toast } from 'vue-sonner';
 
 import { onMounted, onUnmounted } from 'vue'
 
+import { useInterviewStore } from '@/stores/interview'
+const interviewStore = useInterviewStore()
+
 onMounted(() => {
     document.body.style.overflow = 'hidden'
 })
@@ -657,7 +661,14 @@ const { handleSubmit, resetForm: veeResetForm } = useForm({
     validationSchema: formSchema,
 })
 
-const onSubmit = handleSubmit((values) => {
+const onSubmit = handleSubmit(async (values) => {
+    await interviewStore.createCampaign({
+        title: values.title,
+        description: values.description,
+        startDate: new Date(values.startTime),
+        endDate: new Date(values.endTime),
+        isActive: !!values.isActive
+    })
     toast(
         markRaw(
             h("pre", { class: "mt-2 w-[340px] rounded-md bg-slate-950 p-4" },

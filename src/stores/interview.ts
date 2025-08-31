@@ -38,11 +38,18 @@ export const useInterviewStore = defineStore('interview', () => {
         interviewDataStatus.value = 'loading'
         const { err, res } = await interviewApi.getCampaignList({ currentPage: page, pageSize: pageSize.value }, force)
         if (res) {
-            const newCampaigns = ((res as any).data.campaigns || []).map((item: any) => ({
-                ...item,
-                startDate: new Date(item.start_date),
-                endDate: new Date(item.end_date)
-            }));
+            const newCampaigns = ((res as any).data.campaigns || []).map((item: any) => {
+                // 时间加8小时
+                const CHN = (dateStr: string) => {
+                    const date = new Date(dateStr);
+                    return new Date(date.getTime() + 8 * 60 * 60 * 1000);
+                };
+                return {
+                    ...item,
+                    startDate: CHN(item.start_date),
+                    endDate: CHN(item.end_date)
+                };
+            });
             if (page === 1) {
                 campaigns.value = newCampaigns;
             } else {
@@ -59,6 +66,32 @@ export const useInterviewStore = defineStore('interview', () => {
         }
     }
 
+    async function createCampaign(data: { title: string; description: string; startDate: Date; endDate: Date; isActive: boolean }) {
+        interviewDataStatus.value = 'loading'
+        // 时间格式化函数
+        function formatDate(date: Date): string {
+            const pad = (n: number) => n < 10 ? '0' + n : n;
+            return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+        }
+        const payload = {
+            title: data.title,
+            description: data.description,
+            start_date: formatDate(data.startDate),
+            end_date: formatDate(data.endDate),
+            is_active: data.isActive
+        }
+        const { err, res } = await interviewApi.createCampaign(payload)
+        if (res) {
+            toast.success('创建面试成功')
+            interviewDataStatus.value = 'loaded'
+            return res
+        } else {
+            toast.error(err?.data?.message || '创建面试失败')
+            interviewDataStatus.value = 'error'
+            throw err
+        }
+    }
+
     return {
         campaigns,
         interviewDataStatus,
@@ -66,5 +99,6 @@ export const useInterviewStore = defineStore('interview', () => {
         currentPage,
         pageSize,
         totalPages,
+        createCampaign,
     }
 })
