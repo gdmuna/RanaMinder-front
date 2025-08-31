@@ -111,7 +111,7 @@
                             </div>
                         </div>
 
-                        <div v-for="(stage, sIndex) in formData.stages" :key="sIndex" class="space-y-4">
+                        <div class="space-y-4">
                             <!-- 环节标题 -->
                             <FormField :name="`stages[${sIndex}].title`" v-slot="{ componentField }">
                                 <FormItem>
@@ -143,7 +143,7 @@
                             </FormField>
 
                             <!-- 环节开始时间 -->
-                            <FormField :name="`stages[${sIndex}].startTime`" v-slot="{ componentField }">
+                            <!-- <FormField :name="`stages[${sIndex}].startTime`" v-slot="{ componentField }">
                                 <FormItem>
                                     <FormLabel
                                         class="text-sm font-bold tracking-wide bg-[#A5CEE9] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6.8rem]">
@@ -155,10 +155,10 @@
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
-                            </FormField>
+                            </FormField> -->
 
                             <!-- 环节结束时间 -->
-                            <FormField :name="`stages[${sIndex}].endTime`" v-slot="{ componentField }">
+                            <!-- <FormField :name="`stages[${sIndex}].endTime`" v-slot="{ componentField }">
                                 <FormItem>
                                     <FormLabel
                                         class="text-sm font-bold tracking-wide bg-[#F3E09C] rounded-[999px] px-[0.7rem] py-[0.3rem] w-[6.8rem]">
@@ -170,7 +170,7 @@
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
-                            </FormField>
+                            </FormField> -->
 
                             <!-- 进入环节 -->
                             <FormField :name="`stages[${sIndex}].isRequired`" type="checkbox"
@@ -474,8 +474,6 @@ const formData = reactive<InterviewForm>({
         {
             title: '',
             description: '',
-            startTime: '',
-            endTime: '',
             isRequired: false,
             sessions: [
                 {
@@ -508,8 +506,6 @@ interface InterviewForm {
 interface Stage {
     title: string
     description: string
-    startTime: string
-    endTime: string
     isRequired: boolean
     sessions: Session[]
 }
@@ -532,8 +528,6 @@ function addStage() {
     formData.stages.push({
         title: '',
         description: '',
-        startTime: '',
-        endTime: '',
         isRequired: false,
         sessions: [
             {
@@ -601,8 +595,6 @@ function resetForm() {
                 {
                     title: '',
                     description: '',
-                    startTime: '',
-                    endTime: '',
                     isRequired: false,
                     sessions: [
                         {
@@ -635,8 +627,6 @@ const formSchema = toTypedSchema(z.object({
         z.object({
             title: z.string({ required_error: '环节标题不能为空' }).min(1, '环节标题不能为空'),
             description: z.string({ required_error: '环节描述不能为空' }).min(1, '环节描述不能为空'),
-            startTime: z.string({ required_error: '环节开始时间不能为空' }).min(1, '环节开始时间不能为空'),
-            endTime: z.string({ required_error: '环节结束时间不能为空' }).min(1, '环节结束时间不能为空'),
             isRequired: z.boolean().optional(),
             sessions: z.array(
                 z.object({
@@ -662,6 +652,7 @@ const { handleSubmit, resetForm: veeResetForm } = useForm({
 })
 
 const onSubmit = handleSubmit(async (values) => {
+    // 新增面试
     await interviewStore.createCampaign({
         title: values.title,
         description: values.description,
@@ -669,6 +660,17 @@ const onSubmit = handleSubmit(async (values) => {
         endDate: new Date(values.endTime),
         isActive: !!values.isActive
     })
+    // 新增环节
+    for (let sIndex = 0; sIndex < values.stages.length; sIndex++) {
+        const stage = values.stages[sIndex];
+        await interviewStore.createStage({
+            campaign_id: interviewStore.campaigns[interviewStore.campaigns.length - 1].id,
+            title: stage.title,
+            description: stage.description,
+            sort_order: sIndex,
+            is_required: !!stage.isRequired
+        })
+    }
     toast(
         markRaw(
             h("pre", { class: "mt-2 w-[340px] rounded-md bg-slate-950 p-4" },

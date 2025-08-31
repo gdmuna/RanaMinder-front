@@ -27,8 +27,17 @@ export const interviewApi = {
         return await to<{ message: string; code: string; campaign: Campaign }>(inst)
     },
 
-    async createStage(data: { campaignId: number; title: string; description: string; sortOrder: number; isRequired: boolean }) {
-        const inst = ranaMinder.Post<{ message: string; code: string; stage: stage }>('/stage', { data }).send()
+    async createStage(data: { campaign_id: number; title: string; description: string; sort_order: number; is_required: boolean }) {
+        // x-www-form-urlencoded 序列化
+        const formBody = Object.entries(data)
+            .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value as string)}`)
+            .join('&');
+        console.log('11111111111111111',formBody);
+        const inst = ranaMinder.Post<{ message: string; code: string; stage: stage }>('/stage', formBody, {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }).send();
         return await to<{ message: string; code: string; stage: stage }>(inst)
     },
 
