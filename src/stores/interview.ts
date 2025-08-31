@@ -94,8 +94,8 @@ export const useInterviewStore = defineStore('interview', () => {
 
     async function createStage(data: { campaign_id: number; title: string; description: string; sort_order: number; is_required: boolean }) {
         interviewDataStatus.value = 'loading'
-        // 参数类型直接用snake_case，调用时传递即可
         const { err, res } = await interviewApi.createStage(data)
+        console.log('创建阶段',data);
         if (res) {
             toast.success('创建阶段成功')
             interviewDataStatus.value = 'loaded'

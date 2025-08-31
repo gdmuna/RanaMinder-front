@@ -32,7 +32,6 @@ export const interviewApi = {
         const formBody = Object.entries(data)
             .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value as string)}`)
             .join('&');
-        console.log('11111111111111111',formBody);
         const inst = ranaMinder.Post<{ message: string; code: string; stage: stage }>('/stage', formBody, {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'

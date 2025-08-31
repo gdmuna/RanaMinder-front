@@ -653,24 +653,32 @@ const { handleSubmit, resetForm: veeResetForm } = useForm({
 
 const onSubmit = handleSubmit(async (values) => {
     // 新增面试
-    await interviewStore.createCampaign({
+    const campaignReq = await interviewStore.createCampaign({
         title: values.title,
         description: values.description,
         startDate: new Date(values.startTime),
         endDate: new Date(values.endTime),
         isActive: !!values.isActive
     })
-    // 新增环节
-    for (let sIndex = 0; sIndex < values.stages.length; sIndex++) {
-        const stage = values.stages[sIndex];
-        await interviewStore.createStage({
-            campaign_id: interviewStore.campaigns[interviewStore.campaigns.length - 1].id,
+console.log('创建面试返回:', campaignReq)
+const campaignId = (campaignReq as any).data.campaigns.id
+console.log('campaignId:', campaignId)
+for (let sIndex = 0; sIndex < values.stages.length; sIndex++) {
+    const stage = values.stages[sIndex];
+    console.log('准备创建环节:', stage)
+    try {
+        const res = await interviewStore.createStage({
+            campaign_id: campaignId,
             title: stage.title,
             description: stage.description,
             sort_order: sIndex,
             is_required: !!stage.isRequired
         })
+        console.log('创建环节成功:', res)
+    } catch (err) {
+        console.error('创建环节失败:', err)
     }
+}
     toast(
         markRaw(
             h("pre", { class: "mt-2 w-[340px] rounded-md bg-slate-950 p-4" },
