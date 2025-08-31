@@ -39,7 +39,7 @@ import {
 <template>
     <DropdownMenu>
         <DropdownMenuTrigger as-child>
-            <Avatar class="w-[2.25rem] h-[2.25rem] cursor-pointer">
+            <Avatar class="w-[2.25rem] h-[2.25rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-sm cursor-pointer">
                 <AvatarImage src="https://github.com/unovue.png" alt="" />
                 <AvatarFallback>AD</AvatarFallback>
             </Avatar>

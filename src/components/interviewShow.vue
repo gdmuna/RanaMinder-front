@@ -19,7 +19,7 @@
                             <Eye />
                         </div>
                         <div
-                            class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-[#272727] text-white text-xs font-bold rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap">
+                            class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-[#272727] text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap">
                             查看详情
                         </div>
                     </div>
@@ -29,7 +29,7 @@
                             <Pencil />
                         </div>
                         <div
-                            class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-[#272727] text-white font-bold text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap">
+                            class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-[#272727] text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap">
                             编辑面试
                         </div>
                     </div>
@@ -38,7 +38,7 @@
                         <div class="text-[1rem] dark:text-[#000000]">
                             <FileUser />
                             <div
-                                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-[#272727] text-white text-xs font-bold rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap">
+                                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-[#272727] text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap">
                                 申请表模板
                             </div>
                         </div>
@@ -46,7 +46,7 @@
                     <div class="relative flex items-center justify-center rounded-2xl py-[0.3rem] px-[0.4rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md group"
                         :style="{ backgroundColor: 'var(--main-color)' }">
                         <div
-                            class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-[#272727] text-white font-bold text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap">
+                            class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-[#272727] text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap">
                             删除面试
                         </div>
                         <div class="text-[1rem] dark:text-[#000000]">

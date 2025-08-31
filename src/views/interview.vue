@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col items-center mt-[5rem] mb-[2rem]">
-        <div v-for="(item, index) in interviews" :key="item.id" class="mb-8">
-            <InterviewShow :id="index + 1" :title="item.title" :time="item.time" :style="{
+        <div v-for="(item, index) in interviewStore.campaigns" :key="item.id" class="mb-8">
+            <InterviewShow :id="index + 1" :title="item.title" :time="item.startDate" :style="{
                 '--main-color': colors[index % colors.length],
                 '--main-gradient': gradients[index % gradients.length]
             }" @view-detail="goToInfo" @apply="goToApply" />
@@ -43,57 +43,16 @@ import InterviewCreate from '@/components/interviewCreate.vue';
 import { useRouter } from 'vue-router';
 import InterviewApply from '@/components/interviewApply.vue';
 
-// 路由
-const router = useRouter();
-// 新增面试弹窗
-const showCreate = ref(false)
-// 申请表弹窗
-const showApply = ref(false)
-// 申请表id
-const currentInterviewId = ref<number | null>(null)
+import { useInterviewStore } from '@/stores/interview';
+const interviewStore = useInterviewStore();
 
-// 伪数据
-// const interviews = [
-//     { id: 1, title: '2024年干事招新面试干事招新面试', time: new Date('2024-09-12T14:00:00') },
-//     { id: 2, title: '2024年干部招新', time: new Date('2024-12-13T10:30:00') },
-//     { id: 3, title: '2025年干事招新', time: new Date('2025-09-14T09:00:00') },
-//     { id: 4, title: '2025年干部招新', time: new Date('2025-12-15T16:00:00') },
-//     { id: 5, title: '2026年干事招新', time: new Date('2026-09-16T15:00:00') },
-//     { id: 6, title: '2026年干部招新', time: new Date('2026-12-17T17:00:00') },
-// ];
-
-const interviews = ref<any[]>([]);
-const currentPage = ref(1);
-const pageSize = ref(2);
-const totalPages = ref(1);
 const loading = ref(false);
 
 async function fetchInterviews(page = 1) {
     if (loading.value) return;
     loading.value = true;
-    try {
-        const response = await alovaInstance.Get('/campaign/user', {
-            params: {
-                currentPage: page,
-                pageSize: pageSize.value,
-            }
-        });
-        const res = response as any;
-        // 首次加载覆盖，后续加载追加
-        if (page === 1) {
-            interviews.value = [];
-        }
-        console.log("获取面试列表新分页",res.data.campaigns);
-        interviews.value.push(...res.data.campaigns.map((item: any) => ({
-            id: item.id,
-            title: item.title,
-            time: new Date(item.start_date),
-        })));
-        totalPages.value = res.data.pagination.totalPages;
-        currentPage.value = res.data.pagination.currentPage;
-    } catch (error) {
-        console.error('获取面试列表失败:', error);
-    }
+    await interviewStore.getCampaignList(page);
+    console.log('interviewStore.campaigns', interviewStore.campaigns);
     loading.value = false;
 }
 
@@ -106,20 +65,28 @@ onBeforeUnmount(() => {
     window.removeEventListener('scroll', handleScroll);
 });
 
-// 滚动触发加载下一页
 function handleScroll() {
     const scrollTop = window.scrollY || document.documentElement.scrollTop;
     const windowHeight = window.innerHeight;
     const docHeight = document.documentElement.scrollHeight;
-    // 滚动到页面80%时触发
     if (
         scrollTop + windowHeight >= docHeight * 0.8 &&
-        currentPage.value < totalPages.value &&
+        interviewStore.currentPage < interviewStore.totalPages &&
         !loading.value
     ) {
-        fetchInterviews(currentPage.value + 1);
+        fetchInterviews(interviewStore.currentPage + 1);
     }
 }
+
+// 路由
+const router = useRouter();
+// 新增面试弹窗
+const showCreate = ref(false)
+// 申请表弹窗
+const showApply = ref(false)
+// 申请表id
+const currentInterviewId = ref<number | null>(null)
+
 
 // 颜色
 const colors = ['#0A90B4', '#A6C1EE', '#C4E0E5', '#FCB69F', '#71B280', '#DECBA4'];
@@ -151,16 +118,6 @@ function closeApply() {
     showApply.value = false
     currentInterviewId.value = null // 关闭弹窗时清空id
 }
-
-// 导入 alova 网络请求库
-import { createAlova } from 'alova';
-import adapterFetch from 'alova/fetch';
-
-const alovaInstance = createAlova({
-    baseURL: 'http://localhost:3001/api',
-    requestAdapter: adapterFetch(),
-    responded: response => response.json()
-});
 
 </script>
 
