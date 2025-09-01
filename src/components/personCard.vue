@@ -60,11 +60,11 @@ const props = defineProps<{
 
 // 设置默认值
 const {
-    stuId = '24201111000',
-    name = '测试',
-    department = ['网络协会', '宣传部', '会长'],
-    grade = '2024级',
-    major = '导弹维修与技术',
+    stuId = '未填写',
+    name = '未填写',
+    department = ['未分配'],
+    grade = '未填写',
+    major = '未填写',
 } = props;
 
 </script>
