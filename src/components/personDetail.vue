@@ -25,110 +25,22 @@
                     <span class="text-xl text-[#000000] font-extrabold md:tracking-wide md:-mt-0.5">{{ person.name
                     }}</span>
                 </div>
-                <!-- 年级 -->
-                <FormField v-slot="{ componentField }" name="grade">
-                    <FormItem class="flex items-center">
-                        <FormLabel class="xl:w-[4.5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">年级
-                        </FormLabel>
-                        <FormControl>
-                            <Input type="text" :placeholder="person.grade" v-bind="componentField"
-                                class="inputBadge dark:placeholder:text-[#000000] xl:text-[0.875rem]! text-[0.675rem]!"
-                                :style="{ width: gradeBadgeWidth }" />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                </FormField>
-                <!-- 专业 -->
-                <FormField v-slot="{ componentField }" name="major">
-                    <FormItem class="flex items-center">
-                        <FormLabel class="xl:w-[4.5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">专业
-                        </FormLabel>
-                        <FormControl>
-                            <Input type="text" :placeholder="person.major" v-bind="componentField"
-                                class="inputBadge dark:placeholder:text-[#000000] xl:text-[0.875rem]! text-[0.675rem]!"
-                                :style="{ width: majorBadgeWidth }" />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                </FormField>
-                <!-- 学号 -->
-                <FormField v-slot="{ componentField }" name="stuId">
-                    <FormItem class="flex items-center">
-                        <FormLabel class="xl:w-[4.5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">学号
-                        </FormLabel>
-                        <FormControl>
-                            <Input type="text" :placeholder="person.stuId" v-bind="componentField"
-                                class="inputBadge dark:placeholder:text-[#000000] xl:text-[0.875rem]! text-[0.675rem]!"
-                                :style="{ width: stuIdBadgeWidth }" />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                </FormField>
-                <!-- 性别 -->
-                <FormField v-slot="{ componentField }" name="gender">
-                    <FormItem class="flex items-center">
-                        <FormLabel class="xl:w-[4.5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">性别
-                        </FormLabel>
-                        <FormControl>
-                            <Input type="text" :placeholder="person.gender" v-bind="componentField"
-                                class="inputBadge dark:placeholder:text-[#000000] xl:text-[0.875rem]! text-[0.675rem]!"
-                                :style="{ width: genderBadgeWidth }" />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                </FormField>
-                <!-- 昵称 -->
-                <FormField v-slot="{ componentField }" name="nickName">
-                    <FormItem class="flex items-center">
-                        <FormLabel class="xl:w-[4.5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">昵称
-                        </FormLabel>
-                        <FormControl>
-                            <Input type="text" :placeholder="person.nickName" v-bind="componentField"
-                                class="inputBadge dark:placeholder:text-[#000000] xl:text-[0.875rem]! text-[0.675rem]!"
-                                :style="{ width: nickNameBadgeWidth }" />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                </FormField>
-                <!-- 外链 -->
-                <FormField v-slot="{ componentField }" name="links">
-                    <FormItem class="flex items-center">
-                        <FormLabel class="xl:w-[4.5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">外链
-                        </FormLabel>
-                        <FormControl>
-                            <Input type="text" :placeholder="person.links" v-bind="componentField"
-                                class="inputBadge dark:placeholder:text-[#000000] xl:text-[0.875rem]! text-[0.675rem]!"
-                                :style="{ width: linkBadgeWidth }" />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                </FormField>
-                <!-- 邮箱 -->
-                <FormField v-slot="{ componentField }" name="email">
-                    <FormItem class="flex items-center">
-                        <FormLabel class="xl:w-[4.5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">邮箱
-                        </FormLabel>
-                        <FormControl>
-                            <Input type="text" :placeholder="person.email" v-bind="componentField"
-                                class="inputBadge dark:placeholder:text-[#000000] xl:text-[0.875rem]! text-[0.675rem]!"
-                                :style="{ width: emailBadgeWidth }" />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                </FormField>
-                <!-- 手机号 -->
-                <FormField v-slot="{ componentField }" name="phoneNum">
-                    <FormItem class="flex items-center">
-                        <FormLabel class="xl:w-[4.5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">手机
-                        </FormLabel>
-                        <FormControl>
-                            <Input type="text" :placeholder="person.phoneNum" v-bind="componentField"
-                                class="inputBadge dark:placeholder:text-[#000000] xl:text-[0.875rem]! text-[0.675rem]!"
-                                :style="{ width: phoneNumBadgeWidth }" />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                </FormField>
+                <!-- 使用循环渲染表单字段 -->
+                <template v-for="(field, index) in formFields" :key="index">
+                    <FormField v-slot="{ componentField }" :name="field.name">
+                        <FormItem class="flex items-center">
+                            <FormLabel class="xl:w-[4.5rem] w-[3.5rem] inline-block dark:text-[#6F6E6C] text-[1rem]">
+                                {{ field.label }}
+                            </FormLabel>
+                            <FormControl>
+                                <Input type="text" :placeholder="getFieldValue(field.key)" v-bind="componentField"
+                                    class="inputBadge dark:placeholder:text-[#000000] xl:text-[0.875rem]! text-[0.675rem]!"
+                                    :style="{ width: getFieldWidth(field.name) }" />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    </FormField>
+                </template>
                 <!-- 权限组信息 -->
                 <div class="flex">
                     <div class="flex items-start">
@@ -157,20 +69,16 @@
                     </div>
                 </div>
 
-                <div class="flex">
-                    <div class="flex flex-1 justify-start">
-                        <Button
-                            class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer"
-                            @click="deliverCloseDetail">
-                            取消
-                        </Button>
-                    </div>
-                    <div class="flex justify-start">
-                        <Button type="submit"
-                            class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
-                            修改
-                        </Button>
-                    </div>
+                <div class="flex justify-between">
+                    <Button
+                        class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer"
+                        @click="deliverCloseDetail">
+                        取消
+                    </Button>
+                    <Button type="submit"
+                        class="dark:bg-[#A3A2A0] dark:text-[#000000] font-bold text-bold xl:px-[5rem] px-[4rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
+                        修改
+                    </Button>
                 </div>
             </div>
         </form>
@@ -225,7 +133,7 @@ const props = defineProps<{
         groups?: string[];
         nickName?: string;
         links?: string;
-        properties?: {[key: string]: string}; // 添加properties字段
+        properties?: { [key: string]: string }; // 添加properties字段
     }
     deliverCloseDetail?: () => void
 }>();
@@ -275,85 +183,87 @@ const { handleSubmit } = useForm({
 })
 
 const onSubmit = handleSubmit(async (values) => {
-    // 处理提交的数据，确保空数组不传递
-    const cleanedValues = { ...values };
-
-    // 处理groups字段
-    if (Array.isArray(cleanedValues.groups)) {
-        // 过滤掉"未分配"值
-        cleanedValues.groups = cleanedValues.groups.filter(group => group !== '未分配');
-
-        // 如果过滤后数组为空，从提交数据中移除groups字段
-        if (cleanedValues.groups.length === 0) {
-            delete cleanedValues.groups;
-        }
-    }
-
-    // 显示表单数据（可选）
     toast.info("正在提交修改...");
 
-    // 调用personStore的updateUser方法
     try {
-        // 初始化personStore
         const personStore = usePersonStore();
-        
-        // 确保person对象存在
-        const personData = person || {
-            stuId: '',
-            name: '',
-            email: '',
-            phoneNum: '',
-            gender: '',
-            groups: [],
-            properties: {}
-        };
-        
-        // 准备用户数据 - 合并当前用户数据与表单数据
-        const userData: CasdoorUser = {
-            id: personData.id || '',     // 确保ID存在
-            name: personData.stuId,      // 学号作为name
-            owner: 'gdmu',
-            
-            // 可能会被修改的字段
-            displayName: personData.name,  // 真实姓名
-            email: cleanedValues.email || personData.email,
-            phone: cleanedValues.phoneNum || personData.phoneNum,
-            gender: cleanedValues.gender || personData.gender,
-            groups: cleanedValues.groups || personData.groups,
-            
-            // 自定义属性
-            properties: {
-                ...(personData.properties || {}),  // 保留现有属性
-                nickname: cleanedValues.nickName || personData.nickName || '',
-                links: cleanedValues.links || personData.links || '',
-                major: cleanedValues.major || personData.major || '',
-                grade: cleanedValues.grade || personData.grade || ''
-            }
-        };
-        
-        // 调用personStore的updateCasdoorUserInfo方法
-        console.log('准备调用updateCasdoorUserInfo，userData:', userData);
-        
-        // 检查 authStore 中是否有 token
         const authStore = useAuthStore();
+
+        // 检查用户是否登录
         if (!authStore.isAuthenticated) {
-            console.error('用户未登录，无法更新用户信息');
             toast.error("请先登录后再尝试更新用户信息");
             return;
         }
-        
+
+        // 创建基础用户数据对象
+        const userData: Partial<CasdoorUser> = {
+            name: person.stuId,      // 学号作为name
+            owner: 'gdmu',          // owner信息
+        };
+
+        // 处理自定义属性
+        const modifiedProperties: Record<string, string> = {};
+
+        // 处理常规字段
+        if (values.email && values.email !== person.email) {
+            userData.email = values.email;
+        }
+
+        if (values.phoneNum && values.phoneNum !== person.phoneNum) {
+            userData.phone = values.phoneNum;
+        }
+
+        if (values.gender && values.gender !== person.gender) {
+            userData.gender = values.gender;
+        }
+
+        // 处理自定义属性字段
+        if (values.nickName && values.nickName !== person.nickName) {
+            modifiedProperties.nickname = values.nickName;
+        }
+
+        if (values.links && values.links !== person.links) {
+            modifiedProperties.links = values.links;
+        }
+
+        if (values.major && values.major !== person.major) {
+            modifiedProperties.major = values.major;
+        }
+
+        if (values.grade && values.grade !== person.grade) {
+            modifiedProperties.grade = values.grade;
+        }
+
+        // 处理groups字段
+        if (values.groups && JSON.stringify(values.groups) !== JSON.stringify(person.groups)) {
+            // 过滤掉"未分配"
+            userData.groups = Array.isArray(values.groups)
+                ? values.groups.filter(group => group !== '未分配')
+                : [];
+        }
+
+        // 只有存在修改过的属性时才添加properties字段
+        if (Object.keys(modifiedProperties).length > 0) {
+            userData.properties = modifiedProperties;
+        }
+
+        // 检查是否有实际需要更新的字段
+        const hasChanges = Object.keys(userData).some(key => !['name', 'owner', 'id'].includes(key)) ||
+            (userData.properties && Object.keys(userData.properties).length > 0);
+
+        if (!hasChanges) {
+            toast.info("没有发现任何修改");
+            setTimeout(() => props.deliverCloseDetail?.(), 1000);
+            return;
+        }
+
+        // 调用API更新用户信息
+        console.log('准备更新用户信息:', userData);
         const result = await personStore.updateCasdoorUserInfo(userData);
-        console.log('更新结果:', result);
-        
+
         if (result) {
             toast.success("用户信息更新成功！");
-            
-            // 如果有传入关闭函数，则调用
-            if (props.deliverCloseDetail) {
-                setTimeout(() => {
-                    props.deliverCloseDetail?.();
-                }, 1000);
-            }
+            setTimeout(() => props.deliverCloseDetail?.(), 1000);
         } else {
             toast.error("更新失败: 请检查输入是否正确");
         }
@@ -373,17 +283,84 @@ const nickNameBadgeWidth = ref<string>('auto')
 const linkBadgeWidth = ref<string>('auto')
 const groupBadgeWidths = ref<Map<string, string>>(new Map())
 
+// 表单字段定义
+const formFields = ref([
+    { name: 'grade', label: '年级', key: 'grade' },
+    { name: 'major', label: '专业', key: 'major' },
+    { name: 'stuId', label: '学号', key: 'stuId' },
+    { name: 'gender', label: '性别', key: 'gender' },
+    { name: 'nickName', label: '昵称', key: 'nickName' },
+    { name: 'links', label: '外链', key: 'links' },
+    { name: 'email', label: '邮箱', key: 'email' },
+    { name: 'phoneNum', label: '手机', key: 'phoneNum' },
+])
+
+// 字段宽度集合
+const fieldWidths = computed(() => ({
+    grade: gradeBadgeWidth.value,
+    major: majorBadgeWidth.value,
+    stuId: stuIdBadgeWidth.value,
+    gender: genderBadgeWidth.value,
+    nickName: nickNameBadgeWidth.value,
+    links: linkBadgeWidth.value,
+    email: emailBadgeWidth.value,
+    phoneNum: phoneNumBadgeWidth.value
+}))
+
 // 计算属性，过滤掉"未分配"的权限组
 const filteredGroups = computed(() => {
     if (!person.groups || !Array.isArray(person.groups)) return [];
     return person.groups.filter(group => group !== '未分配');
 })
 
+// 获取字段值的辅助函数
+function getFieldValue(key: string): string {
+    switch (key) {
+        case 'stuId': return person.stuId || '';
+        case 'name': return person.name || '';
+        case 'grade': return person.grade || '';
+        case 'major': return person.major || '';
+        case 'email': return person.email || '';
+        case 'phoneNum': return person.phoneNum || '';
+        case 'gender': return person.gender || '';
+        case 'nickName': return person.nickName || '';
+        case 'links': return person.links || '';
+        default: return '';
+    }
+}
+
+// 获取字段宽度的辅助函数
+function getFieldWidth(name: string): string {
+    switch (name) {
+        case 'grade': return gradeBadgeWidth.value;
+        case 'major': return majorBadgeWidth.value;
+        case 'stuId': return stuIdBadgeWidth.value;
+        case 'gender': return genderBadgeWidth.value;
+        case 'nickName': return nickNameBadgeWidth.value;
+        case 'links': return linkBadgeWidth.value;
+        case 'email': return emailBadgeWidth.value;
+        case 'phoneNum': return phoneNumBadgeWidth.value;
+        default: return 'auto';
+    }
+}
+
 // 处理内部滚动事件
 const { lockScroll, unlockScroll } = useScrollLock()
 
 // 滚动容器引用
 const scrollContainerRef = ref<HTMLElement | null>(null)
+
+// 更新所有字段宽度
+function updateAllBadgeWidths() {
+    gradeBadgeWidth.value = calcPlaceholderWidth(person.grade ?? '')
+    majorBadgeWidth.value = calcPlaceholderWidth(person.major ?? '')
+    stuIdBadgeWidth.value = calcPlaceholderWidth(person.stuId ?? '')
+    emailBadgeWidth.value = calcPlaceholderWidth(person.email ?? '')
+    phoneNumBadgeWidth.value = calcPlaceholderWidth(person.phoneNum ?? '')
+    genderBadgeWidth.value = calcPlaceholderWidth(person.gender ?? '')
+    nickNameBadgeWidth.value = calcPlaceholderWidth(person.nickName ?? '')
+    linkBadgeWidth.value = calcPlaceholderWidth(person.links ?? '')
+}
 
 // 动态计算 placeholder 宽度
 function calcPlaceholderWidth(text: string) {
@@ -405,85 +382,65 @@ function calcPlaceholderWidth(text: string) {
     return `${width + 3}px`
 }
 
-// 处理内部滚轮滚动
-function handleInnerScroll(event: WheelEvent) {
+// 统一处理滚动事件的函数
+function handleScroll(event: Event) {
     const container = scrollContainerRef.value;
     if (!container) return;
 
-    const { scrollTop, scrollHeight, clientHeight } = container;
-    const deltaY = event.deltaY;
+    if (event instanceof WheelEvent) {
+        const { scrollTop, scrollHeight, clientHeight } = container;
+        const deltaY = event.deltaY;
 
-    // 判断是否在顶部或底部
-    const atTop = scrollTop === 0 && deltaY < 0;
-    const atBottom = scrollTop + clientHeight >= scrollHeight && deltaY > 0;
+        // 判断是否在顶部或底部
+        const atTop = scrollTop === 0 && deltaY < 0;
+        const atBottom = scrollTop + clientHeight >= scrollHeight && deltaY > 0;
 
-    if (atTop || atBottom) {
-        // 到达边界，允许外部滚动
-        return;
+        if (!atTop && !atBottom) {
+            // 内容可滚动时，阻止外部滚动
+            event.preventDefault();
+            event.stopPropagation();
+            container.scrollTop += deltaY;
+        }
+    } else {
+        // 触摸事件，阻止事件传播，但允许内部滚动
+        event.stopPropagation();
     }
-
-    // 内容可滚动时，阻止外部滚动
-    event.preventDefault();
-    event.stopPropagation();
-    container.scrollTop += deltaY;
 }
 
-// 处理内部触摸滚动
-function handleInnerTouchMove(event: TouchEvent) {
-    if (!scrollContainerRef.value) return
-
-    // 阻止事件传播，但允许内部滚动
-    event.stopPropagation()
-}
+// 使用统一的处理函数
+const handleInnerScroll = (event: WheelEvent) => handleScroll(event);
+const handleInnerTouchMove = (event: TouchEvent) => handleScroll(event);
 
 // 初始化组件
 onMounted(async () => {
-    updateAllBadgeWidths()
+    // 更新所有字段宽度
+    updateAllBadgeWidths();
 
     // 初始化权限组宽度
-    if (person.groups && person.groups.length) {
-        // 仅处理非"未分配"的组
+    if (person.groups?.length) {
         person.groups.filter(group => group !== '未分配').forEach(group => {
-            groupBadgeWidths.value.set(group, calcPlaceholderWidth(group))
-        })
+            groupBadgeWidths.value.set(group, calcPlaceholderWidth(group));
+        });
     }
 
-    // 等待DOM更新
-    await nextTick()
+    await nextTick();
 
-    // 确保滚动容器存在
+    // 初始化滚动位置并锁定外部滚动
     if (scrollContainerRef.value) {
-        // 初始化滚动位置
-        scrollContainerRef.value.scrollTop = 0
-
-        // 锁定外部滚动
-        lockScroll()
-
-    } else {
+        scrollContainerRef.value.scrollTop = 0;
+        lockScroll();
     }
-})
+});
 
-// 组件卸载前清理
-onBeforeUnmount(() => {
-    // 恢复外部滚动
-    unlockScroll()
-})
+// 组件卸载前解锁滚动
+onBeforeUnmount(() => unlockScroll());
 
-function updateAllBadgeWidths() {
-    gradeBadgeWidth.value = calcPlaceholderWidth(person.grade ?? '')
-    majorBadgeWidth.value = calcPlaceholderWidth(person.major ?? '')
-    stuIdBadgeWidth.value = calcPlaceholderWidth(person.stuId ?? '')
-    emailBadgeWidth.value = calcPlaceholderWidth(person.email ?? '')
-    phoneNumBadgeWidth.value = calcPlaceholderWidth(person.phoneNum ?? '')
-    genderBadgeWidth.value = calcPlaceholderWidth(person.gender ?? '')
-    nickNameBadgeWidth.value = calcPlaceholderWidth(person.nickName ?? '')
-    linkBadgeWidth.value = calcPlaceholderWidth(person.links ?? '')
-}
-
+// 监听人员信息变化，更新字段宽度
 watch(
-    [() => person.grade, () => person.major, () => person.stuId, () => person.email, () => person.phoneNum, () => person.gender],
+    [() => person.grade, () => person.major, () => person.stuId,
+    () => person.email, () => person.phoneNum, () => person.gender],
     updateAllBadgeWidths
-)
+);
 
 </script>
 

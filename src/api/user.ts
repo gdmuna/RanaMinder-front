@@ -9,8 +9,8 @@ export const userApi = {
         return await to<any>(inst);
     },
     // 更新用户信息
-    async updateUserInfo(data: object) {
-        const inst = casdoor.Post('/api/update-user', data)
+    async updateUserInfo(id: string, data: object) {
+        const inst = casdoor.Post(`/api/update-user?id=${id}`, data)
         return await to<any>(inst);
     },
     async uploadAvatar(avatar: File) {

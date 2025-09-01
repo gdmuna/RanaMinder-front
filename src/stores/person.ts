@@ -140,7 +140,7 @@ export const usePersonStore = defineStore('person', () => {
         casdoorUserInfo.value = payload
     }
 
-    async function updateCasdoorUserInfo(info: object) {
+    async function updateCasdoorUserInfo(info: Partial<CasdoorUser>) {
         console.log('updateCasdoorUserInfo 函数开始执行...');
         
         // 检查并尝试初始化 casdoorUserInfo
@@ -162,31 +162,51 @@ export const usePersonStore = defineStore('person', () => {
         console.log('当前用户信息:', casdoorUserInfo.value);
         console.log('要更新的信息:', info);
         
-        const payload = structuredClone(toRaw(casdoorUserInfo.value))
-        Object.assign(payload, info)
-        
-        console.log('合并后的有效载荷:', payload);
+    // 构造 id (owner/name)，name优先用info.name（即用户学号）
+    const owner = info.owner || casdoorUserInfo.value?.owner || '';
+    const name = info.name || '';
+    const id = `${owner}/${name}`;
+
+        // 构造 body，始终包含 name、accessKey、accessSecret、accessToken、address，其他字段只传修改项
+        const body: any = {
+            name,
+            accessKey: info.accessKey || casdoorUserInfo.value?.accessKey || '',
+            accessSecret: info.accessSecret || casdoorUserInfo.value?.accessSecret || '',
+            accessToken: info.accessToken || casdoorUserInfo.value?.accessToken || '',
+            address: info.address || casdoorUserInfo.value?.address || [],
+        };
+        if (info.email !== undefined) body.email = info.email;
+        if (info.phone !== undefined) body.phone = info.phone;
+        if (info.gender !== undefined) body.gender = info.gender;
+        if (info.groups !== undefined) body.groups = info.groups;
+        if (info.properties) {
+            if (casdoorUserInfo.value && casdoorUserInfo.value.properties) {
+                const currentProperties = { ...casdoorUserInfo.value.properties };
+                Object.keys(info.properties).forEach(key => {
+                    currentProperties[key] = info.properties![key];
+                });
+                body.properties = currentProperties;
+            } else {
+                body.properties = info.properties;
+            }
+        }
+
+        console.log('最终发送的有效载荷:', body);
         console.log('正在调用API...');
-        
-        const { err, res } = await userApi.updateUserInfo(payload)
+        // id 作为 query 参数，body 只传 name 和需修改字段
+        const { err, res } = await userApi.updateUserInfo(id, body);
         console.log('API响应详情:', { 
             err: err ? { message: err.message, name: err.name, stack: err.stack } : null, 
             res: res 
         });
-        
+
         if (res) {
             console.log('API调用成功, 响应数据:', res);
-            // 不再调用刷新令牌操作，避免可能的登出问题
-            // const authStore = useAuthStore()
-            // console.log('正在刷新认证信息...');
-            // await authStore.refresh()
-            // console.log('认证信息刷新完成');
             console.log('updateCasdoorUserInfo 完成，返回true');
-            
-            return true
+            return true;
         } else {
             console.error('API调用失败，错误信息:', err);
-            throw err
+            throw err;
         }
     }
 
