@@ -1,6 +1,6 @@
 <template>
     <div
-        class="relative dark:bg-[#E8E7E2] rounded-xl overflow-hidden select-none md:w-auto min-w-[36%] w-full max-h-[80vh] flex flex-col">
+        class="relative dark:bg-[#E8E7E2] rounded-xl overflow-hidden select-none md:w-auto min-w-[38%] w-full max-h-[80vh] flex flex-col">
         <!-- 顶部装饰 -->
         <div class="w-full h-16 flex shrink-0">
             <div class="dark:bg-[#A3A2A0] text-[#000000] px-6 py-5 cursor-pointer flex items-center"

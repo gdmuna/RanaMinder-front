@@ -1,6 +1,6 @@
 <template>
     <div
-        class="relative dark:bg-[#E8E7E2] rounded-xl overflow-hidden select-none md:w-auto min-w-[36%] w-full max-h-[80vh] flex flex-col">
+        class="relative dark:bg-[#E8E7E2] rounded-xl overflow-hidden select-none md:w-auto min-w-[38%] w-full max-h-[80vh] flex flex-col">
         <!-- 顶部装饰 -->
         <div class="w-full h-16 flex shrink-0">
             <div class="dark:bg-[#A3A2A0] text-[#000000] px-6 py-5 cursor-pointer flex items-center"
@@ -303,19 +303,25 @@ function calcPlaceholderWidth(text: string) {
 
 // 处理内部滚轮滚动
 function handleInnerScroll(event: WheelEvent) {
-    if (!scrollContainerRef.value) return
+    const container = scrollContainerRef.value;
+    if (!container) return;
 
-    // 获取滚动容器
-    const container = scrollContainerRef.value
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    const deltaY = event.deltaY;
 
-    // 计算新的滚动位置
-    const deltaY = event.deltaY
+    // 判断是否在顶部或底部
+    const atTop = scrollTop === 0 && deltaY < 0;
+    const atBottom = scrollTop + clientHeight >= scrollHeight && deltaY > 0;
 
-    // 手动控制内部滚动
-    container.scrollTop += deltaY
+    if (atTop || atBottom) {
+        // 到达边界，允许外部滚动
+        return;
+    }
 
-    // 防止事件传播到外部，这会导致外部页面也滚动
-    event.stopPropagation()
+    // 内容可滚动时，阻止外部滚动
+    event.preventDefault();
+    event.stopPropagation();
+    container.scrollTop += deltaY;
 }
 
 // 处理内部触摸滚动
