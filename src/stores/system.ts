@@ -60,8 +60,23 @@ export const useSystemStore = defineStore('system', () => {
     }
 
     function routerBack() {
-        const toPath = localStorage.getItem('prevPath') || prevPath.value || '/'
-        router.push(toPath)
+        try {
+            const storedPath = localStorage.getItem('prevPath');
+            const memoryPath = prevPath.value;
+            const toPath = storedPath || memoryPath || '/';
+            
+            console.log('routerBack - 存储的路径:', storedPath);
+            console.log('routerBack - 内存中的路径:', memoryPath);
+            console.log('routerBack - 最终使用的路径:', toPath);
+            
+            router.push(toPath).catch(err => {
+                console.error('导航错误:', err);
+                router.push('/');
+            });
+        } catch (error) {
+            console.error('routerBack执行错误:', error);
+            router.push('/');
+        }
     }
     
     function setPrevPath(path: string | null) {

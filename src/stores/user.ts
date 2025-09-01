@@ -91,7 +91,7 @@ export const useUserStore = defineStore('user', () => {
         userInfo.createdAt = info.createdTime
         userInfo.lastLogin = info.lastSigninTime
         userInfo.groups = info.groups
-        userInfo.links = info.properties.links.split(',').filter(Boolean)
+        userInfo.links = info.properties && info.properties.links ? info.properties.links.split(',').filter(Boolean) : []
     }
 
     function cleanUserInfo() {
@@ -143,8 +143,6 @@ export const useUserStore = defineStore('user', () => {
         const { err, res } = await userApi.updateUserInfo(payload)
         console.log({ err, res });
         if (res) {
-            const authStore = useAuthStore()
-            await authStore.refresh()
             console.log('updateCasdoorUserInfo', res);
 
             return true
@@ -166,16 +164,29 @@ export const useUserStore = defineStore('user', () => {
     }
 
     async function uploadAvatar(avatar: File) {
-        const { err, res } = await userApi.uploadAvatar(avatar)
-        if (res) {
-            const url = res.data.url
-            await updateCasdoorUserInfo({ avatar: url })
-            userInfo.avatar = url
-            toast.success('上传头像成功')
-            return res
-        } else {
-            toast.error(err.data?.message || '上传头像失败')
-            throw err
+        try {
+            const { err, res } = await userApi.uploadAvatar(avatar)
+            if (res) {
+                const url = res.data.url
+                const updateResult = await updateCasdoorUserInfo({ avatar: url })
+                if (updateResult) {
+                    userInfo.avatar = url
+                    toast.success('上传头像成功')
+                    return res
+                } else {
+                    // 如果更新Casdoor用户信息失败，至少更新本地状态
+                    userInfo.avatar = url
+                    toast.warning('头像已上传，但用户信息同步失败')
+                    return res
+                }
+            } else {
+                toast.error(err.data?.message || '上传头像失败')
+                throw err
+            }
+        } catch (error) {
+            console.error('上传头像出错:', error);
+            toast.error('上传头像过程中出错');
+            throw error;
         }
     }
 

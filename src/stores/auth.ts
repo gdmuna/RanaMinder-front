@@ -31,22 +31,35 @@ export const useAuthStore = defineStore('auth', () => {
 
     // 处理登录回调
     async function loginCallback() {
-        const { err, res } = await authApi.loginCallback();
-        if (res) {
-            const userStore = useUserStore();
-            const data = res.data
-            const token = data.token
-            toast.success(data.message)
-            setToken(token)
-            userStore.generateCasdoorUserInfo(token.access_token)
-            userStore.handleUserInfo(data.userInfo)
-            initUserPermission()
-        } else {
-            toast.error(err.data.message || '登录失败')
-            setToken()
+        try {
+            const { err, res } = await authApi.loginCallback();
+            if (res) {
+                const userStore = useUserStore();
+                const data = res.data
+                const token = data.token
+                toast.success(data.message)
+                setToken(token)
+                userStore.generateCasdoorUserInfo(token.access_token)
+                userStore.handleUserInfo(data.userInfo)
+                initUserPermission()
+                const systemStore = useSystemStore();
+                console.log('准备跳转，当前保存的路径:', systemStore.prevPath);
+                systemStore.routerBack()
+            } else {
+                toast.error(err.data.message || '登录失败')
+                setToken()
+                // 登录失败也跳转到首页
+                const systemStore = useSystemStore();
+                systemStore.routerGoto('/')
+            }
+        } catch (error) {
+            console.error('登录回调处理出错:', error);
+            toast.error('登录处理过程中出错');
+            setToken();
+            // 出错时跳转到首页
+            const systemStore = useSystemStore();
+            systemStore.routerGoto('/')
         }
-        const systemStore = useSystemStore();
-        systemStore.routerBack()
     }
 
     // 设置令牌
@@ -67,18 +80,25 @@ export const useAuthStore = defineStore('auth', () => {
     // 刷新令牌
     async function refresh() {
         if (!refreshToken.value) {
-            return Promise.reject()
+            return Promise.reject(new Error('没有刷新令牌'));
         }
-        const { err, res } = await authApi.refresh(refreshToken.value)
-        if (res) {
-            const token = res.data.data
-            setToken(token)
-            return Promise.resolve()
-        } else {
-            console.log('err1', err);
-            toast.error(err.data.message || '刷新失败')
-            setToken()
-            return Promise.reject('登录态已过期，请重新登录')
+        try {
+            const { err, res } = await authApi.refresh(refreshToken.value);
+            if (res) {
+                const token = res.data.data;
+                setToken(token);
+                return Promise.resolve();
+            } else {
+                console.log('刷新令牌失败:', err);
+                // 不再自动清除令牌，而是通过返回明确的错误
+                // setToken();
+                return Promise.reject(new Error(err.data?.message || '刷新令牌失败'));
+            }
+        } catch (error) {
+            console.error('刷新令牌过程中出错:', error);
+            // 不再自动清除令牌
+            // setToken();
+            return Promise.reject(new Error('刷新令牌过程中发生错误'));
         }
     }
 

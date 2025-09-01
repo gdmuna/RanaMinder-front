@@ -176,10 +176,11 @@ export const usePersonStore = defineStore('person', () => {
         
         if (res) {
             console.log('API调用成功, 响应数据:', res);
-            const authStore = useAuthStore()
-            console.log('正在刷新认证信息...');
-            await authStore.refresh()
-            console.log('认证信息刷新完成');
+            // 不再调用刷新令牌操作，避免可能的登出问题
+            // const authStore = useAuthStore()
+            // console.log('正在刷新认证信息...');
+            // await authStore.refresh()
+            // console.log('认证信息刷新完成');
             console.log('updateCasdoorUserInfo 完成，返回true');
             
             return true
