@@ -428,68 +428,14 @@ function initFormWithEditData(data: any) {
                             };
                             newSession.timeSlots.push(newTimeSlot);
                         });
-                    } else {
-                        // 至少添加一个默认时间段
-                        const now = new Date();
-                        const later = new Date(now.getTime() + 30 * 60000); // 30分钟后
-                        
-                        newSession.timeSlots.push({
-                            startTime: formatDateForInput(now),
-                            endTime: formatDateForInput(later),
-                            maxSeats: 10
-                        });
                     }
                     
                     newStage.sessions.push(newSession);
-                });
-            } else {
-                // 至少添加一个默认场次
-                const now = new Date();
-                const later = new Date(now.getTime() + 60 * 60000); // 1小时后
-                
-                newStage.sessions.push({
-                    title: '默认场次',
-                    startTime: formatDateForInput(now),
-                    endTime: formatDateForInput(later),
-                    location: '请添加场次地点',
-                    timeSlots: [
-                        {
-                            startTime: formatDateForInput(now),
-                            endTime: formatDateForInput(new Date(now.getTime() + 30 * 60000)), // 30分钟后
-                            maxSeats: 10,
-                        }
-                    ]
                 });
             }
             
             newFormData.stages.push(newStage);
         });
-    } else {
-        // 如果没有环节，至少保留一个默认环节
-        const now = new Date();
-        
-        newFormData.stages = [
-            {
-                title: '默认环节',
-                description: '请添加环节描述',
-                isRequired: false,
-                sessions: [
-                    {
-                        title: '默认场次',
-                        startTime: formatDateForInput(now),
-                        endTime: formatDateForInput(new Date(now.getTime() + 60 * 60000)), // 1小时后
-                        location: '请添加场次地点',
-                        timeSlots: [
-                            {
-                                startTime: formatDateForInput(now),
-                                endTime: formatDateForInput(new Date(now.getTime() + 30 * 60000)), // 30分钟后
-                                maxSeats: 10,
-                            }
-                        ]
-                    }
-                ]
-            }
-        ];
     }
     
     // 更新响应式数据
@@ -707,19 +653,28 @@ const { handleSubmit, resetForm: veeResetForm, setValues } = useForm({
 })
 
 const onSubmit = handleSubmit(async (values) => {
-    if (props.isEdit) {
-        // 编辑模式：调用更新接口
-        await updateInterview(values)
-    } else {
-        // 创建模式：调用创建接口
-        // 创建面试
-        const campaignReq = await interviewStore.createCampaign({
-            title: values.title,
-            description: values.description,
-            startDate: new Date(values.startTime),
-            endDate: new Date(values.endTime),
-            isActive: !!values.isActive
-        })
+    try {
+        if (props.isEdit) {
+            // 编辑模式：调用更新接口
+            const updateSuccess = await updateInterview(values)
+            // 只有在更新成功时才关闭弹窗并刷新页面
+            if (updateSuccess) {
+                if (props.deliverClose) {
+                    props.deliverClose()
+                }
+                window.location.reload();
+            }
+            // 如果更新失败，不关闭弹窗，允许用户继续编辑
+        } else {
+            // 创建模式：调用创建接口
+            // 创建面试
+            const campaignReq = await interviewStore.createCampaign({
+                title: values.title,
+                description: values.description,
+                startDate: new Date(values.startTime),
+                endDate: new Date(values.endTime),
+                isActive: !!values.isActive
+            })
         // 创建环节
         const campaignId = (campaignReq as any).data.campaigns.id
         for (let sIndex = 0; sIndex < values.stages.length; sIndex++) {
@@ -767,12 +722,17 @@ const onSubmit = handleSubmit(async (values) => {
                 console.error('创建环节失败:', err)
             }
         }
+        
+        // 创建成功后，关闭弹窗并刷新页面
+        if (props.deliverClose) {
+            props.deliverClose()
+        }
+        window.location.reload();
     }
-    // 关闭弹窗
-    if (props.deliverClose) {
-        props.deliverClose()
+    } catch (error) {
+        console.error('表单提交失败:', error);
+        // 出错时不关闭弹窗，允许用户修改后重试
     }
-    window.location.reload();
 })
 
 // 添加更新面试的函数
@@ -781,7 +741,7 @@ async function updateInterview(values: any) {
         const campaignId = props.editData?.id
         if (!campaignId) {
             toast.error('找不到面试ID，无法更新')
-            return
+            return false
         }
 
         console.log('开始更新面试', values)
@@ -933,6 +893,7 @@ async function updateInterview(values: any) {
             }
         }
         toast.success('更新面试成功')
+        return true
     } catch (err: any) {
         console.error('更新面试失败:', err)
         // 处理各种可能的错误格式
@@ -953,6 +914,7 @@ async function updateInterview(values: any) {
             }
         }
         toast.error('更新面试失败: ' + errorMsg)
+        return false
     }
 }
 

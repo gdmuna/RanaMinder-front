@@ -5,7 +5,8 @@ import type {
     ErrTemplate,
     ReturnTemplate,
     err,
-    res
+    res,
+    DataStatus
 } from '@/types/api'
 
 import type { Method } from 'alova'
@@ -13,6 +14,7 @@ import type { Method } from 'alova'
 import dayjs from 'dayjs'
 
 import { jwtDecode } from "jwt-decode";
+import { toast } from 'vue-sonner';
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))
@@ -101,5 +103,50 @@ export function decodeJWT(token: string) {
         return payload
     } catch (e) {
         return null
+    }
+}
+
+/**
+ * 格式化日期为YYYY-MM-DD HH:MM:SS格式的字符串
+ * @param date 日期对象
+ * @returns 格式化后的日期字符串
+ */
+export function formatDateTime(date: Date): string {
+    const pad = (n: number) => n < 10 ? '0' + n : n;
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+}
+
+/**
+ * 通用API响应处理函数
+ * @param apiCall API调用函数，返回Promise<{err: any, res: any}>
+ * @param successMessage 成功时的提示消息
+ * @param errorMessage 失败时的提示消息
+ * @param showToast 是否显示提示
+ * @param statusRef 状态引用
+ * @returns Promise<T>
+ */
+export async function handleApiRequest<T>(
+    apiCall: () => Promise<ReturnTemplate>, 
+    successMessage: string, 
+    errorMessage: string,
+    statusRef?: { value: DataStatus },
+    showToast: boolean = true
+): Promise<T> {
+    if (statusRef) statusRef.value = 'loading';
+    try {
+        const { err, res } = await apiCall();
+        if (res) {
+            if (showToast && successMessage) toast.success(successMessage);
+            if (statusRef) statusRef.value = 'loaded';
+            return res as T;
+        } else {
+            const errorMsg = err?.data?.message || errorMessage;
+            if (showToast) toast.error(errorMsg);
+            if (statusRef) statusRef.value = 'error';
+            throw err;
+        }
+    } catch (e) {
+        if (statusRef) statusRef.value = 'error';
+        throw e;
     }
 }
