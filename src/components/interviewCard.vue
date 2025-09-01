@@ -6,7 +6,8 @@
             <div class="dark:bg-[#A3A2A0]">
                 <SquarePlus v-show="!checkedIds?.includes(stuId)"
                     class="w-6 h-6 ml-[1.1rem] mt-[1.1rem] text-[#000000] transition-transform duration-250 hover:scale-105 active:scale-95 cursor-pointer" />
-                <SquareMinus v-show="checkedIds?.includes(stuId)" class="w-6 h-6 ml-[1.1rem] mt-[1.1rem] text-[#ce3030] transition-transform duration-250 hover:scale-105 active:scale-95 cursor-pointer"
+                <SquareMinus v-show="checkedIds?.includes(stuId)"
+                    class="w-6 h-6 ml-[1.1rem] mt-[1.1rem] text-[#ce3030] transition-transform duration-250 hover:scale-105 active:scale-95 cursor-pointer"
                     :stroke-width="2.3" />
             </div>
             <div class="w-full h-15 dark:bg-[#A3A2A0]"></div>
@@ -20,7 +21,7 @@
         <div class="flex items-center justify-center lg:-mt-[0.5rem]" @click="handleOpen">
             <!-- 照片 -->
             <div class="bg-[#438EDB] aspect-[5/7] lg:w-[8.2rem] w-[7.2rem] rounded-lg shadow-md -ml-[1rem]">
-                <img src="@/assets/人律爱莉.png" alt="" class="w-full h-full object-cover rounded-lg">
+                <img :src="photo" :alt="name" class="w-full h-full object-cover rounded-lg">
             </div>
             <!-- 信息内容 -->
             <div
@@ -58,37 +59,66 @@
 <script setup lang="ts">
 import Badge from '@/components/ui/badge/Badge.vue';
 import { SquarePlus, SquareMinus } from 'lucide-vue-next';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 // 定义组件导出Props
 const props = defineProps<{
-    name?: string
+    application?: any // 接收完整的application对象
+    photo?: string
     intention?: string[]
-    grade?: string
-    major?: string
-    stuId?: string
     checkedIds: string[]
 }>();
 
 const emit = defineEmits(['check', 'open']);
 
+// 从application中提取必要信息
+const stuId = computed(() => props.application?.stu_id || '未填写');
+const name = computed(() => props.application?.information?.name || '未填写');
+const grade = computed(() => props.application?.information?.grade || '未填写');
+const major = computed(() => props.application?.information?.major || '未填写');
+const intention = computed(() => {
+    // 如果传入了意向字段，直接使用
+    if (props.intention && props.intention.length > 0) {
+        return props.intention;
+    }
+
+    // 尝试从information中获取意向字段
+    const info = props.application?.information || {};
+    if (info.intention) {
+        return Array.isArray(info.intention) ? info.intention : [info.intention];
+    }
+
+    // 默认值
+    return ['未填写'];
+});
+
+// 照片URL处理
+const photo = computed(() => {
+    // 1. 如果传入了独立的photo属性，优先使用
+    if (props.photo) return props.photo;
+    
+    // 2. 尝试从application对象的顶层（与information同级）查找photo字段
+    if (props.application?.photo) {
+        return props.application.photo;
+    }
+    
+    // 3. 后备方案：尝试从information内部查找相关字段
+    const info = props.application?.information || {};
+    if (info.photo || info.photoUrl || info.avatar || info.image) {
+        return info.photo || info.photoUrl || info.avatar || info.image;
+    }
+    
+    // 4. 默认照片
+    return '@/assets/妖精爱莉.png';
+});
+
 function handleCheck() {
-    emit('check', stuId); // 只负责通知父组件自己被选中
+    emit('check', stuId.value); // 只负责通知父组件自己被选中
 }
 
 function handleOpen() {
     emit('open');
 }
-
-
-// 设置默认值
-const {
-    stuId = '24201111000',
-    name = '测试',
-    intention = ['网络协会', '宣传部'],
-    grade = '2024级',
-    major = '导弹维修与技术',
-} = props;
 
 </script>
 

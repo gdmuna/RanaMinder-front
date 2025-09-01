@@ -69,3 +69,26 @@ export interface timeSlot {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export interface Application {
+    id: number;
+    campaign_id: number;
+    user_id?: number;
+    stu_id?: string;
+    infoKeyword?: string;
+    // 其他可能的申请相关字段
+    createdAt?: Date;
+    updatedAt?: Date;
+}
+
+export interface Applications {
+    message: string;
+    code: string;
+    applications: Application[];
+    pagination?: {
+        currentPage: number;
+        pageSize: number;
+        totalRecords: number;
+        totalPages: number;
+    }
+}

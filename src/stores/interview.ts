@@ -4,7 +4,7 @@ import { useAuthStore } from '@/stores/auth';
 import { interviewApi } from '@/api/interview';
 import { toast } from 'vue-sonner';
 import type { UserInfo } from '@/types/user';
-import type { Campaign, Campaigns, CampaignRes } from '@/types/interview';
+import type { Campaign, Campaigns, CampaignRes, Application, Applications } from '@/types/interview';
 import type { DataStatus } from '@/types/api';
 import { useRoute } from 'vue-router';
 import { 
@@ -22,6 +22,12 @@ export const useInterviewStore = defineStore('interview', () => {
     const currentPage = ref(1);
     const pageSize = ref(10);
     const totalPages = ref(1);
+    
+    // 面试申请相关状态
+    const applications = ref<Application[]>([]);
+    const applicationCurrentPage = ref(1);
+    const applicationPageSize = ref(10);
+    const applicationTotalPages = ref(1);
 
     // 获取面试列表
     async function getCampaignList(page = 1, force: boolean = false) {
@@ -301,6 +307,70 @@ export const useInterviewStore = defineStore('interview', () => {
             interviewDataStatus
         );
     }
+    
+    // 获取面试表
+    async function getApplications(params: { 
+        campaign_id: number; // 必选参数
+        id?: number;
+        user_id?: number;
+        stu_id?: string;
+        infoKeyword?: string;
+        currentPage?: number;
+        pageSize?: number;
+    }, force: boolean = false) {
+        interviewDataStatus.value = 'loading';
+        try {
+            console.log('Store: 开始获取面试申请表, 参数 =', params);
+            
+            // 设置页码和每页条数
+            const page = params.currentPage || applicationCurrentPage.value;
+            const size = params.pageSize || applicationPageSize.value;
+            
+            // 构造请求参数
+            const requestParams = {
+                ...params,
+                currentPage: page,
+                pageSize: size
+            };
+            
+            // 调用API获取面试申请表
+            const result = await handleApiRequest<Applications>(
+                () => interviewApi.getApplications(requestParams, force),
+                '', // 不显示成功消息
+                '获取面试申请表失败',
+                interviewDataStatus,
+                false // 不显示成功提示
+            );
+            
+            // 处理返回的数据
+            if (result && result.applications) {
+                // 更新应用状态
+                if (page === 1) {
+                    applications.value = result.applications;
+                } else {
+                    applications.value = [...applications.value, ...result.applications];
+                }
+                
+                // 更新分页信息
+                if (result.pagination) {
+                    applicationCurrentPage.value = result.pagination.currentPage || page;
+                    applicationTotalPages.value = result.pagination.totalPages || 1;
+                }
+                
+                console.log(`成功获取到 ${result.applications.length} 条面试申请记录`);
+            } else {
+                console.log('获取面试申请表成功，但没有返回数据');
+                applications.value = [];
+            }
+            
+            return result;
+        } catch (error: any) {
+            console.error('获取面试申请表异常:', error);
+            toast.error(error?.data?.message || '获取面试申请表失败');
+            applications.value = [];
+            throw error;
+        }
+    }
 
     return {
         campaigns,
@@ -321,5 +391,12 @@ export const useInterviewStore = defineStore('interview', () => {
         updateStage,
         updateSession,
         updateTimeSlot,
+        
+        // 面试申请相关
+        applications,
+        applicationCurrentPage,
+        applicationPageSize,
+        applicationTotalPages,
+        getApplications,
     }
 })

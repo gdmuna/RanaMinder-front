@@ -2,7 +2,7 @@ import { ranaMinder } from './index';
 
 import { to } from "@/lib/utils";
 
-import type { Campaigns, Campaign, stage, session, timeSlot, GenericReq } from "@/types/interview";
+import type { Campaigns, Campaign, stage, session, timeSlot, GenericReq, Applications, Application } from "@/types/interview";
 import type { ReturnTemplate } from "@/types/api";
 
 export const interviewApi = {
@@ -261,9 +261,18 @@ export const interviewApi = {
         return await to<{ message: string; code: string; timeSlot: timeSlot }>(inst)
     },
 
-    // 删除环节
-    async deleteStage(id: number, force: boolean = false) {
-        const inst = ranaMinder.Delete<{ message: string; code: string }>(`/stage/${id}`).send(force)
-        return await to<{ message: string; code: string }>(inst)
+    // 获取面试表
+    async getApplications(params: { 
+        campaign_id: number; // 必选参数
+        id?: number;
+        user_id?: number;
+        stu_id?: string;
+        infoKeyword?: string;
+        currentPage?: number;
+        pageSize?: number;
+    }, force: boolean = false) {
+        console.log('API调用: 获取面试表, 参数 =', params);
+        const inst = ranaMinder.Get<Applications>('/application/', { params }).send(force);
+        return await to<Applications>(inst);
     },
 }
