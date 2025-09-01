@@ -1,6 +1,6 @@
 <template>
     <div class="grid xl:grid-cols-3 md:grid-cols-2 grid-cols-1 md:gap-14 gap-5 md:px-15 px-5 py-5 mt-[3.5rem]">
-        <PersonCard v-for="person in personList" :key="person.stuId" :name="person.name" :department="person.department"
+        <PersonCard v-for="person in personList" :key="person.stuId" :name="person.name" :groups="person.groups"
             :grade="person.grade" :major="person.major" :stuId="person.stuId" @click="showDetail(person)" />
     </div>
     <!-- 人员详细卡片弹窗 -->
@@ -43,57 +43,42 @@ onMounted(async () => {
 // 将appUsers转换为页面需要的格式
 const personList = computed(() => {
     return appUsers.value.map(user => ({
-        stuId: user.studentId || '未填写',
-        name: user.displayName || user.nickname || user.studentId || '未填写',
-        department: getUserDepartments(user),
+        id: user.id,
+        stuId: user.stuId || '未填写',
+        name: user.displayName || user.nickname || user.stuId || '未填写',
         grade: getUserGrade(user),
-        major: user.properties?.major || user.properties?.affiliation || user.properties?.department || '未填写',
+        major: user.properties?.major || '未填写',
+        links: user.properties?.links || '未填写',
+        nickName: user.properties?.nickname || '未填写',
         email: user.email || '未填写',
         phoneNum: user.phone || '未填写',
         gender: user.gender || '未填写',
-        avatar: user.avatar || ''
+        avatar: user.avatar || '',
+        groups: getGroups(user)
     }))
 })
 
-// 从用户标签和组织中提取部门信息
-function getUserDepartments(user: any): string[] {
-    const departments: string[] = []
-
-    // 从组织信息中提取
+// 提取权限信息
+function getGroups(user: any): string[] {
     if (user.groups && user.groups.length > 0) {
-        user.groups.forEach((group: string) => {
+        return user.groups.map((group: string) => {
             // 提取组织名称，忽略owner前缀
             const parts = group.split('/');
             if (parts.length > 1) {
-                departments.push(parts[1]);
+                return parts[1];
             } else {
-                departments.push(group);
+                return group;
             }
         });
     }
-
-    // 从属性中提取部门信息
-    if (user.properties?.department) {
-        departments.push(user.properties.department);
-    }
-    
-    // 从属性中提取组织信息
-    if (user.properties?.affiliation) {
-        departments.push(user.properties.affiliation);
-    }
-
-    return departments.length > 0 ? departments : ['未分配']
+    return ['未分配']
 }
 
 // 从用户属性中提取年级信息
 function getUserGrade(user: any): string {
-    if (user.properties?.grade) {
-        return user.properties.grade + '级'
-    }
-
-    // 尝试从学号提取年级
-    if (user.studentId && user.studentId.length >= 4) {
-        return '20' + user.studentId.substring(0, 2) + '级'
+    // 从学号提取年级
+    if (user.stuId && user.stuId.length >= 4) {
+        return '20' + user.stuId.substring(0, 2) + '级'
     }
 
     return '未填写'
@@ -103,25 +88,25 @@ const showPersonDetail = ref(false)
 const selectedPerson = ref<{
     stuId: string;
     name: string;
-    department: string[];
     grade: string;
     major: string;
     email: string;
     phoneNum: string;
     gender: string;
     avatar: string;
+    groups: string[];
 } | undefined>(undefined);
 
 function showDetail(person: {
     stuId: string;
     name: string;
-    department: string[];
     grade: string;
     major: string;
     email: string;
     phoneNum: string;
     gender: string;
     avatar: string;
+    groups: string[];
 }) {
     selectedPerson.value = person
     showPersonDetail.value = true

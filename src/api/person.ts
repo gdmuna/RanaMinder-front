@@ -22,14 +22,23 @@ export const personApi = {
             const authStore = useAuthStore();
             const { accessToken } = storeToRefs(authStore);
             
+            // 构建完整的请求参数
+            const queryParams = { 
+                owner: CASDOOR_ORG,
+                ...params,
+                // 确保认证参数正确传递
+                ...(accessToken.value ? { access_token: accessToken.value } : {})
+            };
+            
+            // 打印请求参数
+            console.log('===== Casdoor getUsers 请求信息 =====');
+            console.log('请求URL: /api/get-users');
+            console.log('Query参数:', JSON.stringify(queryParams, null, 2));
+            console.log('请求体: 无 (GET请求)');
+            
             // 使用正确的API路径和参数
             const inst = casdoor.Get<UsersResponse>('/api/get-users', { 
-                params: { 
-                    owner: CASDOOR_ORG,
-                    ...params,
-                    // 确保认证参数正确传递
-                    ...(accessToken.value ? { access_token: accessToken.value } : {})
-                } 
+                params: queryParams 
             }).send(force);
             
             const result = await to<UsersResponse>(inst);
@@ -67,14 +76,10 @@ export const personApi = {
         }
     },
     
-    // 获取单个用户详情
-    async getUser(userId: string, force: boolean = false) {
-        const inst = casdoor.Get<{ message: string; code: string; user: CasdoorUser }>(
-            `/api/get-user/${userId}`,
-            {
-                params: { owner: CASDOOR_ORG }
-            }
-        ).send(force);
-        return await to<{ message: string; code: string; user: CasdoorUser }>(inst);
+        // 更新用户信息
+    async updateUserInfo(data: object) {
+        const inst = casdoor.Post('/api/update-user', data)
+        return await to<any>(inst);
     },
+    
 };

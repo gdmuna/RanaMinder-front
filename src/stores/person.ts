@@ -1,10 +1,13 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import { ref, computed, toRaw } from 'vue';
 import { personApi } from '@/api/person';
 import type { CasdoorUser, AppUser } from '@/types/person';
 import { UserTypeUtils } from '@/types/person';
 import type { DataStatus } from '@/types/api';
-import { handleApiRequest } from '@/lib/utils';
+import { handleApiRequest, decodeJWT } from '@/lib/utils';
+import { toast } from 'vue-sonner';
+import { useAuthStore } from '@/stores/auth';
+import { userApi } from '@/api/user';
 
 export const usePersonStore = defineStore('person', () => {
     // 状态
@@ -126,53 +129,66 @@ export const usePersonStore = defineStore('person', () => {
         }
     }
 
-    // 获取单个用户详情
-    async function getUser(userId: string, force: boolean = false) {
-        personDataStatus.value = 'loading';
-        try {
-            const res = await handleApiRequest(
-                () => personApi.getUser(userId, force),
-                '',
-                '获取用户详情失败',
-                personDataStatus,
-                false
-            );
+    const casdoorUserInfo = ref<any>(null)
+    function generateCasdoorUserInfo(token: string) {
+        const payload = decodeJWT(token)
+        if (!payload) {
+            toast.error("无效的JWT")
+            return
+        }
+        console.log('payload', payload);
+        casdoorUserInfo.value = payload
+    }
 
-            // 处理返回数据
-            const userData = (res as any).user;
-            if (userData) {
-                const casdoorUser = {
-                    id: userData.id,
-                    owner: userData.owner,
-                    name: userData.name,  // 学号
-                    displayName: userData.displayName,  // 真实姓名
-                    email: userData.email,
-                    phone: userData.phone,
-                    gender: userData.gender,
-                    roles: userData.roles,
-                    permissions: userData.permissions,
-                    groups: userData.groups,
-                    properties: userData.properties,  // 自定义属性如 nickname 和 links
-                    avatar: userData.avatar,
-                    affiliation: userData.affiliation,
-                    tag: userData.tag,
-                    createdTime: userData.createdTime,
-                    updatedTime: userData.updatedTime
-                } as CasdoorUser;
-
-                // 同时返回应用用户类型
-                return {
-                    casdoorUser,
-                    appUser: UserTypeUtils.casdoorToAppUser(casdoorUser)
-                };
+    async function updateCasdoorUserInfo(info: object) {
+        console.log('updateCasdoorUserInfo 函数开始执行...');
+        
+        // 检查并尝试初始化 casdoorUserInfo
+        if (!casdoorUserInfo.value) {
+            console.log('用户信息未初始化，尝试从 authStore 获取 token 并初始化');
+            const authStore = useAuthStore();
+            if (authStore.accessToken) {
+                generateCasdoorUserInfo(authStore.accessToken);
             }
-            return null;
-        } catch (error: any) {
-            personDataStatus.value = 'error';
-            console.error('获取用户详情失败:', error);
-            throw error;
+            
+            // 再次检查是否初始化成功
+            if (!casdoorUserInfo.value) {
+                console.error('用户信息初始化失败，无法更新');
+                toast.error("用户信息未初始化，请重新登录");
+                return false;
+            }
+        }
+        
+        console.log('当前用户信息:', casdoorUserInfo.value);
+        console.log('要更新的信息:', info);
+        
+        const payload = structuredClone(toRaw(casdoorUserInfo.value))
+        Object.assign(payload, info)
+        
+        console.log('合并后的有效载荷:', payload);
+        console.log('正在调用API...');
+        
+        const { err, res } = await userApi.updateUserInfo(payload)
+        console.log('API响应详情:', { 
+            err: err ? { message: err.message, name: err.name, stack: err.stack } : null, 
+            res: res 
+        });
+        
+        if (res) {
+            console.log('API调用成功, 响应数据:', res);
+            const authStore = useAuthStore()
+            console.log('正在刷新认证信息...');
+            await authStore.refresh()
+            console.log('认证信息刷新完成');
+            console.log('updateCasdoorUserInfo 完成，返回true');
+            
+            return true
+        } else {
+            console.error('API调用失败，错误信息:', err);
+            throw err
         }
     }
+
 
     // 查找用户
     function findUserById(userId: string): CasdoorUser | undefined {
@@ -185,13 +201,13 @@ export const usePersonStore = defineStore('person', () => {
     }
 
     // 根据学号查找用户
-    function findUserByStudentId(studentId: string): CasdoorUser | undefined {
-        return users.value.find(user => user.name === studentId);
+    function findUserBystuId(stuId: string): CasdoorUser | undefined {
+        return users.value.find(user => user.name === stuId);
     }
 
     // 根据学号查找应用用户
-    function findAppUserByStudentId(studentId: string): AppUser | undefined {
-        return appUsers.value.find(user => user.studentId === studentId);
+    function findAppUserBystuId(stuId: string): AppUser | undefined {
+        return appUsers.value.find(user => user.stuId === stuId);
     }
 
     // 获取用户昵称
@@ -248,16 +264,18 @@ export const usePersonStore = defineStore('person', () => {
 
         // API方法
         getUserList,
-        getUser,
 
         // 辅助方法
         findUserById,
         findAppUserById,
-        findUserByStudentId,
-        findAppUserByStudentId,
+        findUserBystuId,
+        findAppUserBystuId,
         getUserNickname,
         getUserRoles,
         getUserGroups,
-        isUserInGroup
+        isUserInGroup,
+        generateCasdoorUserInfo,
+        updateCasdoorUserInfo,
+        casdoorUserInfo,
     };
 });

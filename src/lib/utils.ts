@@ -97,15 +97,6 @@ export function formatTime(dateString: string) {
     return dayjs(dateString).format('HH:mm')
 }
 
-export function decodeJWT(token: string) {
-    try {
-        const payload = jwtDecode<object>(token)
-        return payload
-    } catch (e) {
-        return null
-    }
-}
-
 /**
  * 格式化日期为YYYY-MM-DD HH:MM:SS格式的字符串
  * @param date 日期对象
@@ -148,5 +139,14 @@ export async function handleApiRequest<T>(
     } catch (e) {
         if (statusRef) statusRef.value = 'error';
         throw e;
+    }
+}
+
+export function decodeJWT(token: string) {
+    try {
+        const payload = jwtDecode<object>(token)
+        return payload
+    } catch (e) {
+        return null
     }
 }

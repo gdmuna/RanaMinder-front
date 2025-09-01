@@ -82,16 +82,16 @@ export interface Role {
 // 应用内使用的简化用户类型
 export interface AppUser {
     id: string;
-    studentId: string;  // 对应 Casdoor 中的 name（学号）
+    stuId: string;  // 对应 Casdoor 中的 name（学号）
     displayName: string;
     email: string;
     phone: string;
     gender: string;
     avatar: string;
     nickname: string;
+    links: string;
+    major: string;
     groups: string[];
-    roles: string[];
-    isAdmin: boolean;
     properties: {[key: string]: string};
 }
 
@@ -286,7 +286,7 @@ export const UserTypeUtils = {
         // 进行一次深度拷贝，避免直接修改原始对象
         const appUser: AppUser = {
             id: casdoorUser.id || '',
-            studentId: casdoorUser.name || '未填写',  // 学号
+            stuId: casdoorUser.name || '未填写',  // 学号
             displayName: casdoorUser.displayName || '未填写',
             email: casdoorUser.email || '未填写',
             phone: casdoorUser.phone || '未填写',
@@ -294,8 +294,8 @@ export const UserTypeUtils = {
             avatar: casdoorUser.avatar || '',
             nickname: casdoorUser.properties?.nickname || casdoorUser.displayName || casdoorUser.name || '未填写',
             groups: casdoorUser.groups || [],
-            roles: (casdoorUser.roles || []).map(role => role.displayName || role.name),
-            isAdmin: casdoorUser.isAdmin || false,
+            links: casdoorUser.properties?.links || '未填写',
+            major: casdoorUser.properties?.major || '未填写',
             properties: casdoorUser.properties || {}
         };
         
@@ -325,19 +325,4 @@ export const UserTypeUtils = {
         return groups.some(group => group.includes(groupName));
     },
     
-    // 检查用户是否有特定角色
-    hasRole(user: AppUser | CasdoorUser, roleName: string): boolean {
-        if ('roles' in user && Array.isArray(user.roles)) {
-            // 如果是 AppUser
-            if (typeof user.roles[0] === 'string') {
-                return (user.roles as string[]).some(role => role.includes(roleName));
-            }
-            // 如果是 CasdoorUser
-            return (user.roles as Role[]).some(role => 
-                (role.name && role.name.includes(roleName)) || 
-                (role.displayName && role.displayName.includes(roleName))
-            );
-        }
-        return false;
-    }
 };

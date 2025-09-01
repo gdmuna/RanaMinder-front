@@ -97,7 +97,15 @@ export const useAuthStore = defineStore('auth', () => {
     function initUserPermission() {
         const userStore = useUserStore();
         userPermissions.value = userStore.userInfo.groups
-            .map(key => groupMeta[key])
+            .map(key => {
+                // 尝试直接使用key
+                let meta = groupMeta[key];
+                if (meta) return meta;
+
+                // 如果没有找到，尝试添加"gdmu/"前缀
+                const keyWithPrefix = `gdmu/${key}`;
+                return groupMeta[keyWithPrefix];
+            })
             .filter(Boolean);
     }
 
@@ -208,16 +216,44 @@ export const useAuthStore = defineStore('auth', () => {
     // 获取组权限相关方法
     function getGroupByKey(group: string) {
         const userStore = useUserStore();
-        const metas = userStore.userInfo.groups
-        return metas.includes(group) ? groupMeta[group] : null;
+        const metas = userStore.userInfo.groups;
+
+        // 先检查原始group是否存在
+        if (metas.includes(group)) {
+            // 尝试直接使用key
+            let meta = groupMeta[group];
+            if (meta) return meta;
+
+            // 如果没有找到，尝试添加"gdmu/"前缀
+            const keyWithPrefix = `gdmu/${group}`;
+            return groupMeta[keyWithPrefix];
+        }
+
+        return null;
     }
 
     function getGroupByRank(type: 'max' | 'min' = 'min') {
         const userStore = useUserStore();
+        console.log('userStore.userInfo.groups', userStore.userInfo.groups);
+
+        // 修正key格式，添加"gdmu/"前缀
         const metas = userStore.userInfo.groups
-            .map(key => groupMeta[key])
+            .map(key => {
+                // 尝试直接使用key
+                let meta = groupMeta[key];
+                if (meta) return meta;
+
+                // 如果没有找到，尝试添加"gdmu/"前缀
+                const keyWithPrefix = `gdmu/${key}`;
+                meta = groupMeta[keyWithPrefix];
+
+                // 记录查找过程
+                console.log(`映射: ${key} -> ${meta ? '找到' : '未找到'}, 使用前缀后: ${keyWithPrefix} -> ${meta ? '找到' : '未找到'}`);
+
+                return meta;
+            })
             .filter(Boolean);
-        console.log('metas', metas);
+        console.log('过滤后的metas', metas);
         if (metas.length === 0) return null;
         return metas.reduce((prev, curr) => {
             if (type === 'min') {
@@ -231,7 +267,15 @@ export const useAuthStore = defineStore('auth', () => {
     function getGroupByLevel(level: number) {
         const userStore = useUserStore();
         const metas = userStore.userInfo.groups
-            .map(key => groupMeta[key])
+            .map(key => {
+                // 尝试直接使用key
+                let meta = groupMeta[key];
+                if (meta) return meta;
+
+                // 如果没有找到，尝试添加"gdmu/"前缀
+                const keyWithPrefix = `gdmu/${key}`;
+                return groupMeta[keyWithPrefix];
+            })
             .filter(Boolean);
         if (metas.length === 0) return null;
         return metas.filter(meta => meta.level === level);

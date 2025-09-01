@@ -1,6 +1,6 @@
 <template>
     <div
-        class="relative dark:bg-[#E8E7E2] rounded-xl overflow-hidden select-none md:w-auto min-w-[38%] w-full max-h-[80vh] flex flex-col">
+        class="relative dark:bg-[#E8E7E2] rounded-xl overflow-hidden select-none md:w-auto min-w-[36%] w-full max-h-[80vh] flex flex-col">
         <!-- 顶部装饰 -->
         <div class="w-full h-16 flex shrink-0">
             <div class="dark:bg-[#A3A2A0] text-[#000000] px-6 py-5 cursor-pointer flex items-center"
@@ -103,7 +103,7 @@ const {
 const displayableInfo = computed(() => {
     const result: Record<string, any> = {};
 
-    // 首先添加核心字段（保证显示顺序）
+    // 核心字段（小卡片）
     result['name'] = person.name;
     result['intention'] = person.intention;
     result['grade'] = person.grade;
@@ -113,7 +113,7 @@ const displayableInfo = computed(() => {
     if (person.email) result['email'] = person.email;
     if (person.phoneNum) result['phone'] = person.phoneNum;
 
-    // 然后添加information中的其他字段（过滤掉已添加的和不需要显示的）
+    // 然后添加information中的其他字段
     if (person.information) {
         const skipFields = ['name', 'intention', 'grade', 'major', 'stuId', 'email', 'phone', 'phoneNum', 'id', 'createdAt', 'updatedAt'];
 
@@ -134,15 +134,14 @@ function formatLabel(key: string): string {
         'name': '姓名',
         'intention': '意向',
         'grade': '年级',
+        'college': '学院',
         'major': '专业',
         'stuId': '学号',
         'email': '邮箱',
         'phone': '手机',
-        'phoneNum': '手机',
         'sex': '性别',
         'age': '年龄',
-        'address': '地址',
-        'college': '学院'
+        'address': '住址',
     };
 
     return labelMap[key] || key;
