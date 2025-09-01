@@ -65,14 +65,12 @@ const editData = ref<Campaign | null>(null)
 
 async function handleEdit(id: number) {
     try {
-        
         // 1. 获取面试基本信息（本地缓存）
         const campaign = interviewStore.campaigns.find(item => item.id === id)
         if (!campaign) {
             return;
         }
         
-
         // 2. 查询环节
         let stages: any[] = [];
         try {
@@ -120,7 +118,16 @@ async function handleEdit(id: number) {
                     try {
                         if (session.id > 0) { // 只有有效ID才查询时间段
                             const timeSlotRes = await interviewStore.getTimeSlot(session.id);
-                            (session as any).timeSlots = (timeSlotRes as any)?.data?.timeSlots || [];
+                            console.log(`获取场次 ${session.id} 的时间段:`, timeSlotRes);
+                            
+                            // 使用标准格式，只检查data字段
+                            if (timeSlotRes && timeSlotRes.data && Array.isArray(timeSlotRes.data.timeSlots)) {
+                                console.log(`场次 ${session.id} 的时间段数据:`, timeSlotRes.data.timeSlots);
+                                (session as any).timeSlots = timeSlotRes.data.timeSlots;
+                            } else {
+                                console.warn(`场次 ${session.id} 没有时间段数据或格式不正确:`, timeSlotRes);
+                                (session as any).timeSlots = [];
+                            }
                         } else {
                             (session as any).timeSlots = [];
                         }

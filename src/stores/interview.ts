@@ -144,13 +144,105 @@ export const useInterviewStore = defineStore('interview', () => {
     }
 
     // 查询时间段
+    // 查询时间段
     async function getTimeSlot(id: number, force: boolean = false) {
-        return handleApiRequest(
-            () => interviewApi.getTimeSlot({ session_id: id }, force),
-            '查询时间段成功',
-            '查询时间段失败',
-            interviewDataStatus
-        );
+        try {
+            console.log('开始查询时间段，session_id =', id);
+            
+            // 直接调用API，不使用handleApiRequest包装器，以便直接处理原始响应
+            const apiResult = await interviewApi.getTimeSlot({ session_id: id }, force);
+            
+            console.log('时间段查询原始结果:', JSON.stringify(apiResult));
+            
+            // 构造一个标准的返回格式
+            const standardResult = {
+                data: {
+                    timeSlots: [] as any[]
+                },
+                success: true
+            };
+            
+            // 从不同的可能路径提取时间段数据
+            let timeSlots: any[] = [];
+            
+            if (apiResult && apiResult.res) {
+                const resData = apiResult.res as any;
+                
+                // 优先检查timeSlots字段
+                if (resData.timeSlots && Array.isArray(resData.timeSlots)) {
+                    timeSlots = resData.timeSlots;
+                    console.log('从 res.timeSlots 获取到', timeSlots.length, '个时间段');
+                } 
+                // 然后检查data.time_slots字段
+                else if (resData.data && Array.isArray(resData.data.time_slots)) {
+                    timeSlots = resData.data.time_slots;
+                    console.log('从 res.data.time_slots 获取到', timeSlots.length, '个时间段');
+                }
+                // 然后检查data.timeSlots字段 
+                else if (resData.data && Array.isArray(resData.data.timeSlots)) {
+                    timeSlots = resData.data.timeSlots;
+                    console.log('从 res.data.timeSlots 获取到', timeSlots.length, '个时间段');
+                }
+                // 检查单个timeSlot
+                else if (resData.timeSlot) {
+                    timeSlots = [resData.timeSlot];
+                    console.log('从 res.timeSlot 获取到1个时间段');
+                }
+                // 检查单个time_slot
+                else if (resData.time_slots && Array.isArray(resData.time_slots)) {
+                    timeSlots = resData.time_slots;
+                    console.log('从 res.time_slots 获取到', timeSlots.length, '个时间段');
+                }
+                // 检查data.timeSlot
+                else if (resData.data && resData.data.timeSlot) {
+                    timeSlots = [resData.data.timeSlot];
+                    console.log('从 res.data.timeSlot 获取到1个时间段');
+                }
+            }
+            
+            console.log(`找到 ${timeSlots.length} 个时间段`);
+            
+            // 处理时间段数据，确保字段一致性
+            const processedTimeSlots = timeSlots.map((slot: any, index: number) => {
+                // 记录原始数据
+                console.log(`处理时间段 ${index + 1}:`, slot);
+                
+                // 获取时间字段
+                const startTime = slot.startTime || slot.start_time;
+                const endTime = slot.endTime || slot.end_time;
+                
+                console.log(`  时间段 ${index + 1} 原始时间:`, { 
+                    startTime, 
+                    endTime, 
+                    startTimeType: typeof startTime, 
+                    endTimeType: typeof endTime 
+                });
+                
+                // 标准化时间段数据
+                return {
+                    ...slot,
+                    id: slot.id,
+                    sessionId: slot.sessionId || slot.session_id,
+                    startTime: startTime,
+                    endTime: endTime,
+                    maxSeats: Number(slot.maxSeats || slot.max_seats || 10),
+                    bookedSeats: Number(slot.bookedSeats || slot.booked_seats || 0)
+                };
+            });
+            
+            // 更新标准结果
+            standardResult.data.timeSlots = processedTimeSlots;
+            
+            console.log('处理后的时间段数据:', standardResult);
+            return standardResult;
+        } catch (error) {
+            console.error('时间段查询异常:', error);
+            return { 
+                data: { timeSlots: [] }, 
+                success: false, 
+                error 
+            };
+        }
     }
 
     // 更新面试活动

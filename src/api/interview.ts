@@ -3,6 +3,7 @@ import { ranaMinder } from './index';
 import { to } from "@/lib/utils";
 
 import type { Campaigns, Campaign, stage, session, timeSlot, GenericReq } from "@/types/interview";
+import type { ReturnTemplate } from "@/types/api";
 
 export const interviewApi = {
     // 获取面试列表
@@ -91,8 +92,114 @@ export const interviewApi = {
 
     // 查询时间段
     async getTimeSlot(params: { session_id: number }, force: boolean = false) {
-        const inst = ranaMinder.Get<{ message: string; code: string; timeSlots: timeSlot[] }>(`/time_slot/${params.session_id}`).send(force)
-        return await to<{ message: string; code: string; timeSlots: timeSlot[] }>(inst)
+        try {
+            console.log('API调用: 查询时间段, session_id =', params.session_id);
+            
+            // 发送请求
+            const inst = ranaMinder.Get<any>(`/time_slot/${params.session_id}`).send(force);
+            
+            // 等待响应
+            const result = await to<any>(inst);
+            
+            console.log('API时间段查询原始响应:', JSON.stringify(result, null, 2));
+            
+            // 如果有响应数据，标准化时间段数据格式
+            if (result.res) {
+                // 收集所有可能的时间段数据源
+                let timeSlots: any[] = [];
+                
+                // 使用类型断言处理各种可能的数据结构
+                const resData = result.res as any;
+                
+                // 检查直接在res中的字段
+                if (Array.isArray(resData.timeSlots)) {
+                    timeSlots = resData.timeSlots;
+                    console.log('从 res.timeSlots 字段获取到', timeSlots.length, '个时间段');
+                } else if (Array.isArray(resData.time_slots)) {
+                    timeSlots = resData.time_slots;
+                    console.log('从 res.time_slots 字段获取到', timeSlots.length, '个时间段');
+                } else if (resData.timeSlot) {
+                    timeSlots = [resData.timeSlot];
+                    console.log('从 res.timeSlot 字段获取到1个时间段');
+                } 
+                // 检查 res.data 中的字段
+                else if (resData.data) {
+                    const dataField = resData.data as any;
+                    
+                    if (Array.isArray(dataField.timeSlots)) {
+                        timeSlots = dataField.timeSlots;
+                        console.log('从 res.data.timeSlots 字段获取到', timeSlots.length, '个时间段');
+                    } else if (Array.isArray(dataField.time_slots)) {
+                        timeSlots = dataField.time_slots;
+                        console.log('从 res.data.time_slots 字段获取到', timeSlots.length, '个时间段');
+                    } else if (dataField.timeSlot) {
+                        timeSlots = [dataField.timeSlot];
+                        console.log('从 res.data.timeSlot 字段获取到1个时间段');
+                    } else {
+                        console.log('res.data中没有找到时间段数据');
+                    }
+                } else {
+                    console.log('API响应中没有找到时间段数据');
+                }
+                
+                // 如果有时间段数据，打印第一个数据样本的详细信息
+                if (timeSlots.length > 0) {
+                    const sample = timeSlots[0];
+                    console.log('时间段数据样本:', sample);
+                    console.log('字段和类型:');
+                    Object.entries(sample).forEach(([key, value]) => {
+                        console.log(`  - ${key}: ${value} (${typeof value})`);
+                    });
+                }
+                
+                // 标准化时间段数据
+                const standardizedTimeSlots = timeSlots.map((slot: any, index: number) => {
+                    // 解析并标准化开始时间和结束时间
+                    const originalStartTime = slot.startTime || slot.start_time;
+                    const originalEndTime = slot.endTime || slot.end_time;
+                    
+                    console.log(`时间段 ${index + 1} 原始时间:`, {
+                        start: originalStartTime,
+                        end: originalEndTime,
+                        startType: typeof originalStartTime,
+                        endType: typeof originalEndTime
+                    });
+                    
+                    // 创建标准化的时间段对象
+                    return {
+                        ...slot,
+                        id: slot.id,
+                        sessionId: slot.sessionId || slot.session_id,
+                        startTime: originalStartTime,
+                        endTime: originalEndTime,
+                        maxSeats: Number(slot.maxSeats || slot.max_seats || 10),
+                        bookedSeats: Number(slot.bookedSeats || slot.booked_seats || 0)
+                    };
+                });
+                
+                // 确保result.res上有一个标准化的timeSlots字段
+                (result.res as any).timeSlots = standardizedTimeSlots;
+            }
+            
+            return result;
+        } catch (error) {
+            console.error('获取时间段API异常:', error);
+            // 返回一个标准格式的错误响应
+            return {
+                err: {
+                    success: false,
+                    data: {
+                        message: '获取时间段失败',
+                        detail: error instanceof Error ? error.message : String(error)
+                    }
+                },
+                res: { 
+                    message: '获取时间段失败',
+                    code: 'ERROR',
+                    timeSlots: [] 
+                }
+            };
+        }
     },
 
     // 更新面试活动
@@ -152,5 +259,11 @@ export const interviewApi = {
             }
         }).send();
         return await to<{ message: string; code: string; timeSlot: timeSlot }>(inst)
+    },
+
+    // 删除环节
+    async deleteStage(id: number, force: boolean = false) {
+        const inst = ranaMinder.Delete<{ message: string; code: string }>(`/stage/${id}`).send(force)
+        return await to<{ message: string; code: string }>(inst)
     },
 }

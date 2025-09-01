@@ -381,6 +381,7 @@ onMounted(() => {
 
 // 添加一个初始化表单的函数
 function initFormWithEditData(data: any) {
+    console.log('初始化编辑表单数据:', JSON.stringify(data));
     
     // 创建一个新的表单数据对象
     const newFormData = {
@@ -392,11 +393,15 @@ function initFormWithEditData(data: any) {
         stages: [] as Stage[]
     };
 
+    console.log('表单基础数据初始化完成:', newFormData);
+
     // 环节数据填充
     if (data.stages && data.stages.length > 0) {
+        console.log(`处理 ${data.stages.length} 个环节数据`);
         
         // 处理每个环节
-        data.stages.forEach((stage: any) => {
+        data.stages.forEach((stage: any, stageIndex: number) => {
+            console.log(`处理环节 ${stageIndex + 1}:`, stage);
             
             const newStage: Stage = {
                 title: stage.title || '默认环节',
@@ -407,55 +412,205 @@ function initFormWithEditData(data: any) {
             
             // 处理场次数据
             if (stage.sessions && stage.sessions.length > 0) {
-                stage.sessions.forEach((session: any) => {
+                console.log(`环节 ${stageIndex + 1} 包含 ${stage.sessions.length} 个场次`);
+                
+                stage.sessions.forEach((session: any, sessionIndex: number) => {
+                    console.log(`处理环节 ${stageIndex + 1} 的场次 ${sessionIndex + 1}:`, session);
+                    
+                    const startTime = session.startTime || session.start_time || new Date();
+                    const endTime = session.endTime || session.end_time || new Date(Date.now() + 3600000);
+                    
+                    console.log('场次原始时间:', { 
+                        startTime, 
+                        endTime, 
+                        startTimeType: typeof startTime, 
+                        endTimeType: typeof endTime 
+                    });
+                    
+                    const formattedStartTime = formatDateForInput(startTime);
+                    const formattedEndTime = formatDateForInput(endTime);
+                    
+                    console.log('场次格式化后时间:', { 
+                        formattedStartTime, 
+                        formattedEndTime 
+                    });
                     
                     const newSession: Session = {
                         title: session.title || '默认场次',
-                        startTime: formatDateForInput(session.startTime || session.start_time || new Date()),
-                        endTime: formatDateForInput(session.endTime || session.end_time || new Date()),
+                        startTime: formattedStartTime,
+                        endTime: formattedEndTime,
                         location: session.location || '请添加场次地点',
                         timeSlots: []
                     };
                     
                     // 处理时间段数据
                     if (session.timeSlots && session.timeSlots.length > 0) {
-                        session.timeSlots.forEach((slot: any) => {
+                        console.log(`场次 ${sessionIndex + 1} 包含 ${session.timeSlots.length} 个时间段`);
+                        
+                        session.timeSlots.forEach((slot: any, slotIndex: number) => {
+                            console.log(`处理环节 ${stageIndex + 1} 场次 ${sessionIndex + 1} 的时间段 ${slotIndex + 1}:`, slot);
+                            
+                            // 获取时间段的开始和结束时间（处理多种可能的属性名）
+                            const slotStartTime = slot.startTime || slot.start_time || new Date();
+                            const slotEndTime = slot.endTime || slot.end_time || new Date(Date.now() + 1800000);
+                            
+                            console.log('时间段原始时间:', { 
+                                slotStartTime, 
+                                slotEndTime, 
+                                startTimeType: typeof slotStartTime, 
+                                endTimeType: typeof slotEndTime 
+                            });
+                            
+                            // 格式化时间
+                            const formattedSlotStartTime = formatDateForInput(slotStartTime);
+                            const formattedSlotEndTime = formatDateForInput(slotEndTime);
+                            
+                            console.log('时间段格式化后时间:', { 
+                                formattedSlotStartTime, 
+                                formattedSlotEndTime 
+                            });
                             
                             const newTimeSlot: TimeSlot = {
-                                startTime: formatDateForInput(slot.startTime || slot.start_time || new Date()),
-                                endTime: formatDateForInput(slot.endTime || slot.end_time || new Date()),
+                                startTime: formattedSlotStartTime,
+                                endTime: formattedSlotEndTime,
                                 maxSeats: Number(slot.maxSeats || slot.max_seats || 10)
                             };
+                            
                             newSession.timeSlots.push(newTimeSlot);
+                        });
+                    } else {
+                        console.log(`场次 ${sessionIndex + 1} 没有时间段数据，创建默认时间段`);
+                        // 添加默认时间段
+                        newSession.timeSlots.push({
+                            startTime: formatDateForInput(new Date()),
+                            endTime: formatDateForInput(new Date(Date.now() + 1800000)), // 30分钟后
+                            maxSeats: 10
                         });
                     }
                     
                     newStage.sessions.push(newSession);
                 });
+            } else {
+                console.log(`环节 ${stageIndex + 1} 没有场次数据，创建默认场次`);
+                // 添加默认场次
+                const defaultSession: Session = {
+                    title: '默认场次',
+                    startTime: formatDateForInput(new Date()),
+                    endTime: formatDateForInput(new Date(Date.now() + 3600000)), // 1小时后
+                    location: '请添加场次地点',
+                    timeSlots: [{
+                        startTime: formatDateForInput(new Date()),
+                        endTime: formatDateForInput(new Date(Date.now() + 1800000)), // 30分钟后
+                        maxSeats: 10
+                    }]
+                };
+                newStage.sessions.push(defaultSession);
             }
             
             newFormData.stages.push(newStage);
         });
+    } else {
+        console.log('没有环节数据，创建默认环节');
+        // 添加默认环节
+        newFormData.stages.push({
+            title: '默认环节',
+            description: '请添加环节描述',
+            isRequired: false,
+            sessions: [{
+                title: '默认场次',
+                startTime: formatDateForInput(new Date()),
+                endTime: formatDateForInput(new Date(Date.now() + 3600000)), // 1小时后
+                location: '请添加场次地点',
+                timeSlots: [{
+                    startTime: formatDateForInput(new Date()),
+                    endTime: formatDateForInput(new Date(Date.now() + 1800000)), // 30分钟后
+                    maxSeats: 10
+                }]
+            }]
+        });
     }
+    
+    console.log('最终处理后的表单数据:', newFormData);
     
     // 更新响应式数据
     Object.assign(formData, newFormData);
     
     // 更新表单值（这是关键步骤）
     setValues(newFormData);
-    
 }
 
 // 添加日期格式化函数（用于将日期对象或ISO字符串转为input可用的格式）
 function formatDateForInput(dateString: string | Date): string {
     if (!dateString) return ''
 
-    const date = typeof dateString === 'string' ? new Date(dateString) : dateString
+    console.log('格式化日期输入:', dateString, typeof dateString);
+    
+    let date: Date;
+    
+    if (typeof dateString === 'string') {
+        // 1. 处理 MySQL 格式: "YYYY-MM-DD HH:MM:SS"
+        if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(dateString)) {
+            console.log('检测到 MySQL 日期格式:', dateString);
+            try {
+                const parts = dateString.split(' ');
+                const dateParts = parts[0].split('-');
+                const timeParts = parts[1].split(':');
+                
+                // 使用正确的构造函数参数顺序
+                date = new Date(
+                    parseInt(dateParts[0]),      // 年
+                    parseInt(dateParts[1]) - 1,  // 月 (0-11)
+                    parseInt(dateParts[2]),      // 日
+                    parseInt(timeParts[0]),      // 时
+                    parseInt(timeParts[1]),      // 分
+                    parseInt(timeParts[2])       // 秒
+                );
+                console.log('解析 MySQL 日期结果:', date, '时间戳:', date.getTime());
+            } catch (err) {
+                console.error('MySQL 日期解析错误:', err);
+                // 尝试备用解析方法
+                date = new Date(dateString.replace(' ', 'T'));
+            }
+        } 
+        // 2. 处理ISO格式: "YYYY-MM-DDTHH:MM:SS.sssZ"
+        else if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(dateString)) {
+            console.log('检测到 ISO 日期格式:', dateString);
+            date = new Date(dateString);
+        } 
+        // 3. 处理简单日期格式: "YYYY-MM-DD"
+        else if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+            console.log('检测到简单日期格式:', dateString);
+            const dateParts = dateString.split('-');
+            date = new Date(
+                parseInt(dateParts[0]),
+                parseInt(dateParts[1]) - 1,
+                parseInt(dateParts[2]),
+                0, 0, 0
+            );
+        } 
+        // 4. 尝试直接解析其他格式
+        else {
+            console.log('尝试直接解析日期:', dateString);
+            date = new Date(dateString);
+        }
+        
+        // 检查日期是否有效
+        if (isNaN(date.getTime())) {
+            console.error('无效的日期格式:', dateString);
+            // 返回当前日期作为后备
+            return formatDateForInput(new Date());
+        }
+    } else {
+        date = dateString;
+        console.log('处理Date对象:', date);
+    }
 
     // 格式化为 yyyy-MM-ddThh:mm 格式（适用于datetime-local输入框）
-    const pad = (n: number) => n < 10 ? '0' + n : n
+    const pad = (n: number) => n < 10 ? '0' + n : n;
 
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
+    const formatted = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    console.log('格式化结果:', formatted);
+    return formatted;
 }
 
 const props = defineProps<{
@@ -825,70 +980,125 @@ async function updateInterview(values: any) {
                                 })
                             } else {
                                 // 添加新时间段
-                                await interviewStore.createTimeSlot({
-                                    session_id: sessionId,
-                                    start_time: timeSlot.startTime,
-                                    end_time: timeSlot.endTime,
-                                    max_seats: timeSlot.maxSeats
-                                })
+                                try {
+                                    const timeSlotRes = await interviewStore.createTimeSlot({
+                                        session_id: sessionId,
+                                        start_time: timeSlot.startTime,
+                                        end_time: timeSlot.endTime,
+                                        max_seats: timeSlot.maxSeats
+                                    });
+                                    console.log('新时间段创建成功:', timeSlotRes);
+                                } catch (error) {
+                                    console.error('创建时间段失败:', error);
+                                    toast.error('创建时间段失败，请重试');
+                                }
                             }
                         }
                     } else {
                         // 添加新场次
-                        const sessionRes = await interviewStore.createSession({
-                            stage_id: stageId,
-                            title: session.title,
-                            start_time: session.startTime,
-                            end_time: session.endTime,
-                            location: session.location
-                        })
-                        
-                        const newSessionId = (sessionRes as any).data.sessions.id
-                        
-                        // 为新场次添加时间段
-                        for (const timeSlot of session.timeSlots) {
-                            await interviewStore.createTimeSlot({
-                                session_id: newSessionId,
-                                start_time: timeSlot.startTime,
-                                end_time: timeSlot.endTime,
-                                max_seats: timeSlot.maxSeats
-                            })
+                        try {
+                            const sessionRes = await interviewStore.createSession({
+                                stage_id: stageId,
+                                title: session.title,
+                                start_time: session.startTime,
+                                end_time: session.endTime,
+                                location: session.location
+                            });
+                            
+                            console.log('新场次创建成功:', sessionRes);
+                            
+                            if (!sessionRes || !(sessionRes as any).data || !(sessionRes as any).data.sessions || !(sessionRes as any).data.sessions.id) {
+                                console.error('创建场次返回数据格式错误:', sessionRes);
+                                toast.error('创建场次返回数据格式错误，无法继续创建时间段');
+                                continue; // 跳过此场次的时间段创建
+                            }
+                            
+                            const newSessionId = (sessionRes as any).data.sessions.id;
+                            
+                            // 为新场次添加时间段
+                            for (const timeSlot of session.timeSlots) {
+                                try {
+                                    await interviewStore.createTimeSlot({
+                                        session_id: newSessionId,
+                                        start_time: timeSlot.startTime,
+                                        end_time: timeSlot.endTime,
+                                        max_seats: timeSlot.maxSeats
+                                    });
+                                } catch (error) {
+                                    console.error('为新场次创建时间段失败:', error);
+                                    toast.error('为新场次创建时间段失败，请检查数据');
+                                }
+                            }
+                        } catch (error) {
+                            console.error('创建场次失败:', error);
+                            toast.error('创建场次失败，请重试');
                         }
                     }
                 }
             } else {
                 // 添加新环节
-                const stageRes = await interviewStore.createStage({
-                    campaign_id: campaignId,
-                    title: stage.title,
-                    description: stage.description,
-                    sort_order: sIndex,
-                    is_required: !!stage.isRequired
-                })
-                
-                const newStageId = (stageRes as any).data.stages.id
-                
-                // 为新环节添加场次
-                for (const session of stage.sessions) {
-                    const sessionRes = await interviewStore.createSession({
-                        stage_id: newStageId,
-                        title: session.title,
-                        start_time: session.startTime,
-                        end_time: session.endTime,
-                        location: session.location
-                    })
+                try {
+                    const stageRes = await interviewStore.createStage({
+                        campaign_id: campaignId,
+                        title: stage.title,
+                        description: stage.description,
+                        sort_order: sIndex,
+                        is_required: !!stage.isRequired
+                    });
                     
-                    const newSessionId = (sessionRes as any).data.sessions.id
+                    console.log('新环节创建成功:', stageRes);
                     
-                    // 为新场次添加时间段
-                    for (const timeSlot of session.timeSlots) {
-                        await interviewStore.createTimeSlot({
-                            session_id: newSessionId,
-                            start_time: timeSlot.startTime,
-                            end_time: timeSlot.endTime,
-                            max_seats: timeSlot.maxSeats
-                        })
+                    if (!stageRes || !(stageRes as any).data || !(stageRes as any).data.stages || !(stageRes as any).data.stages.id) {
+                        console.error('创建环节返回数据格式错误:', stageRes);
+                        toast.error('创建环节返回数据格式错误，无法继续创建场次');
+                        continue; // 跳过此环节的场次创建
                     }
+                    
+                    const newStageId = (stageRes as any).data.stages.id;
+                    
+                    // 为新环节添加场次
+                    for (const session of stage.sessions) {
+                        try {
+                            const sessionRes = await interviewStore.createSession({
+                                stage_id: newStageId,
+                                title: session.title,
+                                start_time: session.startTime,
+                                end_time: session.endTime,
+                                location: session.location
+                            });
+                            
+                            console.log('新场次创建成功:', sessionRes);
+                            
+                            if (!sessionRes || !(sessionRes as any).data || !(sessionRes as any).data.sessions || !(sessionRes as any).data.sessions.id) {
+                                console.error('创建场次返回数据格式错误:', sessionRes);
+                                toast.error('创建场次返回数据格式错误，无法继续创建时间段');
+                                continue; // 跳过此场次的时间段创建
+                            }
+                            
+                            const newSessionId = (sessionRes as any).data.sessions.id;
+                            
+                            // 为新场次添加时间段
+                            for (const timeSlot of session.timeSlots) {
+                                try {
+                                    await interviewStore.createTimeSlot({
+                                        session_id: newSessionId,
+                                        start_time: timeSlot.startTime,
+                                        end_time: timeSlot.endTime,
+                                        max_seats: timeSlot.maxSeats
+                                    });
+                                } catch (error) {
+                                    console.error('为新场次创建时间段失败:', error);
+                                    toast.error('为新场次创建时间段失败，请检查数据');
+                                }
+                            }
+                        } catch (error) {
+                            console.error('创建场次失败:', error);
+                            toast.error('创建场次失败，请重试');
+                        }
+                    }
+                } catch (error) {
+                    console.error('创建环节失败:', error);
+                    toast.error('创建环节失败，请重试');
                 }
             }
         }
