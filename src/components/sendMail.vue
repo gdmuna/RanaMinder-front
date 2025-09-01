@@ -5,15 +5,25 @@
             <DialogContent class="sm:max-w-[425px] select-none">
                 <DialogHeader>
                     <DialogTitle>发送结果邮件</DialogTitle>
-                    <DialogDescription>请输入邮件标题</DialogDescription>
+                    <DialogDescription>将向 {{ checkedIds.length }} 位面试者发送邮件</DialogDescription>
                 </DialogHeader>
                 <form id="dialogForm" @submit="handleSubmit($event, (vals) => onSubmit(vals, resetForm))">
-                    <FormField v-slot="{ componentField }" name="title">
+                    <FormField v-slot="{ componentField }" name="subject">
                         <FormItem>
                             <FormLabel>邮件标题</FormLabel>
                             <FormControl class="mt-[0.2rem]">
-                                <Input type="text" placeholder="点击输入 ..." v-bind="componentField"
+                                <Input type="text" placeholder="点击输入邮件标题..." v-bind="componentField"
                                     class="border-0 shadow-0 rounded-lg" />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    </FormField>
+                    <FormField v-slot="{ componentField }" name="content">
+                        <FormItem class="mt-4">
+                            <FormLabel>邮件内容</FormLabel>
+                            <FormControl class="mt-[0.2rem]">
+                                <textarea placeholder="点击输入邮件内容..." v-bind="componentField"
+                                    class="border-0 shadow-0 rounded-lg w-full h-32 p-2 resize-none dark:bg-slate-800 dark:text-white"></textarea>
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -25,7 +35,9 @@
                             @click="dialogOpen = false; resetForm()">
                             取消
                         </Button>
-                        <Button type="submit" form="dialogForm" class="cursor-pointer">发送</Button>
+                        <Button type="submit" form="dialogForm" class="cursor-pointer" :disabled="isSubmitting">
+                            {{ isSubmitting ? '发送中...' : '发送' }}
+                        </Button>
                     </div>
                 </DialogFooter>
             </DialogContent>
@@ -34,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { toTypedSchema } from "@vee-validate/zod"
 import * as z from "zod"
 import { h } from "vue"
@@ -58,31 +70,70 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { toast } from "vue-sonner"
+import { useInterviewStore } from "@/stores/interview"
 
-const props = defineProps<{ open: boolean }>()
+const props = defineProps<{ 
+    open: boolean,
+    checkedIds: string[]
+}>()
+
 const emit = defineEmits(['update:open'])
 const dialogOpen = ref(props.open)
-const initialValues = { title: '' }
+const isSubmitting = ref(false)
+const interviewStore = useInterviewStore()
+
+// 初始值包含邮件标题和内容
+const initialValues = { 
+    subject: '', 
+    content: ''
+}
 
 watch(() => props.open, val => dialogOpen.value = val)
 watch(dialogOpen, val => {
     emit('update:open', val)
 })
 
+// 表单验证规则
 const formSchema = toTypedSchema(z.object({
-    title: z.string({ required_error: "请输入邮件标题" })
+    subject: z.string({ required_error: "请输入邮件标题" })
         .min(1, "请输入邮件标题")
         .max(50, "标题不能超过50个字符"),
+    content: z.string({ required_error: "请输入邮件内容" })
+        .min(1, "请输入邮件内容")
 }))
 
-function onSubmit(values: any, resetForm: Function) {
-    toast({
-        title: "你提交的信息：",
-        description: h("pre", { class: "mt-2 w-[340px] rounded-md bg-slate-950 p-4" }, h("code", { class: "text-black" }, JSON.stringify(values, null, 2))),
-    })
-    console.log(values);
+// 发送邮件
+async function onSubmit(values: any, resetForm: Function) {
+    console.log('发送邮件表单提交，值:', values);
+    console.log('当前选中的ID列表:', props.checkedIds);
+    
+    if (props.checkedIds.length === 0) {
+        toast.error("请先选择至少一位面试者");
+        return;
+    }
 
-    dialogOpen.value = false
-    resetForm()
+    try {
+        isSubmitting.value = true;
+        
+        // 为每个选中的ID发送邮件
+        for (const resultId of props.checkedIds) {
+            console.log('正在发送邮件到ID:', resultId);
+            await interviewStore.sendResultEmail({
+                resultId,
+                subject: values.subject,
+                content: values.content
+            });
+            console.log('邮件发送成功:', resultId);
+        }
+        
+        toast.success(`已成功向 ${props.checkedIds.length} 位面试者发送邮件`);
+        dialogOpen.value = false;
+        resetForm();
+    } catch (error: any) {
+        console.error('发送邮件失败详情:', error);
+        toast.error(error?.data?.message || '发送邮件失败');
+    } finally {
+        isSubmitting.value = false;
+    }
 }
 </script>

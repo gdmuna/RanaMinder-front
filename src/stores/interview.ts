@@ -372,6 +372,22 @@ export const useInterviewStore = defineStore('interview', () => {
         }
     }
 
+    // 发送结果邮件
+    async function sendResultEmail(data: {
+        resultId: string;
+        subject: string;
+        content: string;
+    }) {
+        console.log('调用发送邮件API，参数:', data);
+        
+        return handleApiRequest(
+            () => interviewApi.sendResultEmail(data),
+            '发送邮件成功',
+            '发送邮件失败',
+            interviewDataStatus
+        );
+    }
+
     return {
         campaigns,
         interviewDataStatus,
@@ -398,5 +414,7 @@ export const useInterviewStore = defineStore('interview', () => {
         applicationPageSize,
         applicationTotalPages,
         getApplications,
+
+        sendResultEmail
     }
 })

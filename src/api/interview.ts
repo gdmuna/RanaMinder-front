@@ -275,4 +275,14 @@ export const interviewApi = {
         const inst = ranaMinder.Get<Applications>('/application/', { params }).send(force);
         return await to<Applications>(inst);
     },
+
+    // 发送结果邮件
+    async sendResultEmail(data: {
+        resultId: string;
+        subject: string;
+        content: string;
+    }) {
+        const inst = ranaMinder.Post<{ message: string; code: string }>('/mail/send-result-email', data).send();
+        return await to<{ message: string; code: string }>(inst);
+    }
 }

@@ -90,12 +90,25 @@ function handleOpen(person: PersonData) {
 const checkedIds = ref<string[]>([]);
 
 function handleCheck(stuId: string) {
-    if (!checkedIds.value.includes(stuId)) {
-        checkedIds.value.push(stuId);
-    } else {
-        checkedIds.value = checkedIds.value.filter(id => id !== stuId);
+    console.log('处理勾选操作，学生ID:', stuId);
+    // 通过学号找到对应的应用ID
+    const person = personList.value.find(p => p.stuId === stuId);
+    if (!person) {
+        console.warn('未找到对应的人员数据:', stuId);
+        return;
     }
-    console.log('已选择卡片id:', [...checkedIds.value]);
+    
+    const applicationId = String(person.id); // 确保ID是字符串类型
+    console.log('找到对应的应用ID:', applicationId);
+    
+    if (!checkedIds.value.includes(applicationId)) {
+        checkedIds.value.push(applicationId);
+        console.log('添加到勾选列表');
+    } else {
+        checkedIds.value = checkedIds.value.filter(id => id !== applicationId);
+        console.log('从勾选列表移除');
+    }
+    console.log('当前勾选的应用ID列表:', [...checkedIds.value]);
 }
 
 // 获取应用列表

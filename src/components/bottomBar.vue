@@ -98,14 +98,14 @@
             </AlertDialogContent>
         </AlertDialog>
 
-        <SendMail v-model:open="showMail" />
+        <SendMail v-model:open="showMail" :checkedIds="checkedIds" />
 
     </div>
     <TimeTabs v-model:open="showTimeTabs" />
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { Timer, FilePen, CircleCheckBig, LoaderCircle, CircleOff, FileClock, Mail } from 'lucide-vue-next'
 import {
     DropdownMenu,
@@ -137,6 +137,12 @@ const isSmUp = ref(window.matchMedia('(min-width: 640px)').matches)
 const props = defineProps<{ checkedIds: string[] }>()
 const isDisabled = computed(() => !props.checkedIds || props.checkedIds.length === 0)
 
+// 监视checkedIds变化
+watch(() => props.checkedIds, (newIds: string[]) => {
+    console.log('底部栏接收到的勾选ID列表:', newIds);
+    console.log('底部栏按钮状态:', isDisabled.value ? '禁用' : '启用');
+}, { deep: true })
+
 function openTimeTabs() {
     showTimeTabs.value = true
 }
@@ -144,6 +150,7 @@ function openTimeTabs() {
 function handleStatusClick(status: string) {
     selectStatus.value = status
     showDialog.value = true
+    console.log('修改面试状态为:', status);
 }
 
 const interviewRounds = [
