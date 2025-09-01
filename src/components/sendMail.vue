@@ -12,8 +12,8 @@
                         <FormItem>
                             <FormLabel>邮件标题</FormLabel>
                             <FormControl class="mt-[0.2rem]">
-                                <Input type="text" placeholder="点击输入邮件标题..." v-bind="componentField"
-                                    class="border-0 shadow-0 rounded-lg" />
+                                <textarea type="text" placeholder="点击输入邮件标题..." v-bind="componentField"
+                                    class="border-0 shadow-0 rounded-lg w-full h-15 p-2 resize-none dark:bg-[#121212]" />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -23,7 +23,7 @@
                             <FormLabel>邮件内容</FormLabel>
                             <FormControl class="mt-[0.2rem]">
                                 <textarea placeholder="点击输入邮件内容..." v-bind="componentField"
-                                    class="border-0 shadow-0 rounded-lg w-full h-32 p-2 resize-none dark:bg-slate-800 dark:text-white"></textarea>
+                                    class="border-0 shadow-0 rounded-lg w-full h-30 p-2 resize-none dark:bg-[#121212]"></textarea>
                             </FormControl>
                             <FormMessage />
                         </FormItem>
