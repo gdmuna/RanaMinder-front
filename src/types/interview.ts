@@ -104,3 +104,14 @@ export type FormateTimeSlot = {
     bookedSeats: number;
     isAvailabe: boolean;
 }
+
+export interface result {
+    id: number,
+    application_id: number,
+    campaign_id: number,
+    user_id: number,
+    association: string,
+    department: string,
+    role: string,
+    status: string,
+}

@@ -17,7 +17,17 @@
             </div>
 
             <!-- 修改面试状态 -->
-            <DropdownMenu>
+            <div class="flex items-center group" :class="isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'"
+                @click="!isDisabled && (showStatusChoice = true)">
+                <div class="relative flex items-center select-none">
+                    <div
+                        class="absolute right-full translate-y-[0.3rem] mb-2 mr-1 px-3 py-2 bg-[#272727] dark:text-[#FEFCE4] text-sm font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap">
+                        修改面试状态
+                    </div>
+                    <FilePen class="inline-block w-6 h-6 dark:text-[#FEFCE4] translate-y-[0.1rem]" />
+                </div>
+            </div>
+            <!-- <DropdownMenu>
                 <DropdownMenuTrigger>
                     <div class="flex items-center group" :class="isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'">
                         <div class="relative flex items-center select-none">
@@ -51,7 +61,7 @@
                         <span>进行中</span>
                     </DropdownMenuItem>
                 </DropdownMenuContent>
-            </DropdownMenu>
+            </DropdownMenu> -->
 
             <!-- 发送结果邮件 -->
             <div class="flex items-center group" :class="isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'"
@@ -67,7 +77,7 @@
 
         </header>
 
-        <AlertDialog v-model:open="showDialog">
+        <!-- <AlertDialog v-model:open="showDialog">
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>确认将面试状态修改为{{ selectStatus }}？</AlertDialogTitle>
@@ -80,12 +90,12 @@
                     <AlertDialogAction @click="showDialog = false">确认</AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
-        </AlertDialog>
-
+        </AlertDialog> -->
+        <StatusChoice v-model:open="showStatusChoice" :checkedIds="checkedIds" :campaignId="campaignId" />
         <SendMail v-model:open="showMail" :checkedIds="checkedIds" />
-
+        <StatusDialog v-model:open="statusDialog" :result="dialogData" @select="handleTimeSlotSelect" />
     </div>
-    <StatusDialog v-model:open="statusDialog" :result="dialogData" @select="handleTimeSlotSelect" />
+
 </template>
 
 <script setup lang="ts">
@@ -112,12 +122,14 @@ import {
 import SendMail from '@/components/sendMail.vue'
 import TimeTabs from '@/components/timeTabs.vue'
 import StatusDialog from "@/components/statusDialog.vue"
+import statusChoice from '@/components/statusChice.vue'
 import { nextTick } from 'vue'
 const statusDialog = ref(false)
 
 const showDialog = ref(false)
 const showTimeTabs = ref(false)
 const selectStatus = ref('')
+const showStatusChoice = ref(false)
 const showMail = ref(false)
 const isSmUp = ref(window.matchMedia('(min-width: 640px)').matches)
 
@@ -138,13 +150,14 @@ function handleStatusClick(status: string) {
 }
 
 import { useInterviewStore } from '@/stores/interview'
+import StatusChoice from './statusChoice.vue'
 const interviewStore = useInterviewStore()
 const { getAllTimeSlotsByCampaignId } = interviewStore
 
 async function getAllTimeSlots(campaignId: number) {
     let timeSlots: any[] = [];
     try {
-    const res = await getAllTimeSlotsByCampaignId(campaignId) as any;
+        const res = await getAllTimeSlotsByCampaignId(campaignId) as any;
         if (res && res.data && Array.isArray(res.data.time_slots)) {
             timeSlots = res.data.time_slots;
         } else {
@@ -232,12 +245,12 @@ async function openStatusDialog() {
 // 处理时间段选择
 async function handleTimeSlotSelect(selection: { stage: any, session: any, slot: any }) {
     console.log('选择的时间段:', selection);
-    
+
     if (!selection.slot || !selection.slot.id || props.checkedIds.length === 0) {
         console.warn('没有选择时间段或没有选中的用户');
         return;
     }
-    
+
     // 为每个选中的用户分配时间段
     for (const userId of props.checkedIds) {
         try {

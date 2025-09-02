@@ -2,7 +2,7 @@ import { ranaMinder } from './index';
 
 import { to } from "@/lib/utils";
 
-import type { Campaigns, Campaign, stage, session, timeSlot, GenericReq, Applications, Application } from "@/types/interview";
+import type { Campaigns, Campaign, stage, session, timeSlot, GenericReq, Applications, Application, result } from "@/types/interview";
 import type { ReturnTemplate } from "@/types/api";
 
 export const interviewApi = {
@@ -299,5 +299,35 @@ export const interviewApi = {
     }) {
         const inst = ranaMinder.Post<{ message: string; code: string }>('/user_selection', data).send();
         return await to<{ message: string; code: string }>(inst);
+    },
+
+    // 更新面试状态
+    async updateInterviewStatus(data: {
+        resultId: string;
+        status: string;
+        association: string;
+        department: string;
+        notes?: string;
+    }) {
+        const inst = ranaMinder.Post<{ message: string; code: string }>('/interview/update-status', data).send();
+        return await to<{ message: string; code: string }>(inst);
+    },
+
+    // 更新面试状态结果
+    async updateInterviewResult(data: {
+        result_id: string;
+        status: string;
+        association: string;
+        department: string;
+    }) {
+        const inst = ranaMinder.Put<{ message: string; code: string }>('/result/', data).send();
+        return await to<{ message: string; code: string }>(inst);
+    },
+
+    // 获取面试结果
+    async getInterviewResult(user_id: string, campaign_id: number, force: boolean = false) {
+    const params = { user_id, campaign_id };
+    const inst = ranaMinder.Get<{ message: string; code: string; result: result }>('/result', { params }).send(force);
+    return await to<{ message: string; code: string; result: result }>(inst);
     }
 }
