@@ -890,7 +890,7 @@ const onSubmit = handleSubmit(async (values) => {
     }
 })
 
-// 添加更新面试的函数
+// 更新面试
 async function updateInterview(values: any) {
     try {
         const campaignId = props.editData?.id

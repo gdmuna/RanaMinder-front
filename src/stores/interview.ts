@@ -297,11 +297,8 @@ export const useInterviewStore = defineStore('interview', () => {
 
     // 更新面试时间段
     async function updateTimeSlot(data: { id: number; start_time: string; end_time: string; max_seats: number }) {
-        const { id, start_time, end_time, max_seats } = data;
-        const payload = { start_time, end_time, max_seats };
-
         return handleApiRequest(
-            () => interviewApi.updateTimeSlot(id, payload),
+            () => interviewApi.updateTimeSlot(data),
             '更新时间段成功',
             '更新时间段失败',
             interviewDataStatus

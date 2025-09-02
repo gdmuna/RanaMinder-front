@@ -248,12 +248,12 @@ export const interviewApi = {
     },
 
     // 更新面试时间段
-    async updateTimeSlot(id: number, data: { start_time: string; end_time: string; max_seats: number }) {
-        // x-www-form-urlencoded 序列化
-        const formBody = Object.entries(data)
+    async updateTimeSlot( data: { id: number, start_time: string; end_time: string; max_seats: number }) {
+        const bodyData = { ...data };
+        const formBody = Object.entries(bodyData)
             .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value as string)}`)
             .join('&');
-        const inst = ranaMinder.Put<{ message: string; code: string; timeSlot: timeSlot }>(`/time_slot/${id}`, formBody, {
+        const inst = ranaMinder.Put<{ message: string; code: string; timeSlot: timeSlot }>(`/time_slot/`, formBody, {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }

@@ -138,7 +138,7 @@ function formatLabel(key: string): string {
         'grade': '年级',
         'college': '学院',
         'major': '专业',
-        'stuId': '学号',    
+        'stuId': '学号',
         'studentNumber': '学号',
         'phoneNumber': '手机号',
         'email': '邮箱',
@@ -153,10 +153,10 @@ function formatLabel(key: string): string {
         'wechatId': '微信号',
         'qqNumber': 'QQ号',
         "intentionToStay": "未来意向",
-"hobbiesAndSpecialties":"爱好",
-"previousPositions":"过往职位",
-"honorsReceived":"曾获荣誉",
-"selfEvaluation":"自我评价",
+        "hobbiesAndSpecialties": "爱好",
+        "previousPositions": "过往职位",
+        "honorsReceived": "曾获荣誉",
+        "selfEvaluation": "自我评价",
     };
 
     return labelMap[key] || key;
@@ -170,7 +170,7 @@ onMounted(async () => {
     if (scrollContainerRef.value) {
         // 初始化滚动位置
         scrollContainerRef.value.scrollTop = 0;
-        
+
         // 添加滚轮事件监听
         scrollContainerRef.value.addEventListener('wheel', handleWheel, { passive: false });
     }
@@ -179,18 +179,18 @@ onMounted(async () => {
 // 处理滚轮事件
 function handleWheel(event: WheelEvent) {
     if (!scrollContainerRef.value) return;
-    
+
     // 获取滚动容器
     const container = scrollContainerRef.value;
-    
+
     // 计算新的滚动位置
     const scrollAmount = event.deltaY;
     const newScrollTop = container.scrollTop + scrollAmount;
-    
+
     // 检查是否已经到达顶部或底部边界
     const isAtTop = container.scrollTop === 0 && scrollAmount < 0;
     const isAtBottom = container.scrollTop + container.clientHeight >= container.scrollHeight - 1 && scrollAmount > 0;
-    
+
     // 如果没有到达边界，阻止事件传播，使滚动仅发生在卡片内
     if (!isAtTop && !isAtBottom) {
         event.preventDefault();
