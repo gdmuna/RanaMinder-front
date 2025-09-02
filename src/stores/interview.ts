@@ -388,6 +388,70 @@ export const useInterviewStore = defineStore('interview', () => {
         );
     }
 
+    // 获取所有面试时间段
+    async function getAllTimeSlotsByCampaignId(campaignId: number, force: boolean = false) {
+        console.log('调用获取所有面试时间段API, 参数:', campaignId);
+        return handleApiRequest(
+            () => interviewApi.getAllTimeSlotsByCampaignId(campaignId, force),
+            '获取所有面试时间段成功',
+            '获取所有面试时间段失败',
+            interviewDataStatus
+        );
+    }
+
+    // 分配面试时间段
+    async function assignTimeSlot(data: {
+        userId: number;
+        timeSlotId: number;
+    }) {
+        console.log('调用分配面试时间段API, 参数:', data);
+        try {
+            // 不直接使用统一的成功/失败消息，而是在后续根据具体返回结果处理
+            const result: any = await handleApiRequest(
+                () => interviewApi.assignTimeSlot({
+                    user_id: data.userId,
+                    time_slot_id: data.timeSlotId,
+                }),
+                '', // 不使用统一成功消息
+                '分配面试时间段失败', 
+                interviewDataStatus,
+                false // 不自动显示toast
+            );
+            
+            console.log('时间段分配结果:', result);
+            
+            // 检查返回结构中的user_selections数组
+            if (result && result.data && result.data.user_selections && Array.isArray(result.data.user_selections)) {
+                // 查找当前用户的分配结果
+                const userResult = result.data.user_selections.find(
+                    (item: any) => String(item.user_id) === String(data.userId)
+                );
+                
+                if (userResult) {
+                    if (userResult.success) {
+                        // 成功分配时间段
+                        toast.success('成功为用户分配面试时间段');
+                        return { success: true, message: '分配成功' };
+                    } else {
+                        // 已存在分配或其他错误
+                        const errorMsg = userResult.error || '该用户已有时间段分配';
+                        toast.error(errorMsg);
+                        return { success: false, message: errorMsg };
+                    }
+                }
+            }
+            
+            // 默认返回成功
+            toast.success('分配面试时间段成功');
+            return { success: true, message: '分配成功' };
+        } catch (error: any) {
+            console.error('分配时间段失败:', error);
+            const errorMsg = error?.data?.message || '分配面试时间段失败';
+            toast.error(errorMsg);
+            return { success: false, message: errorMsg };
+        }
+    }
+
     return {
         campaigns,
         interviewDataStatus,
@@ -415,6 +479,8 @@ export const useInterviewStore = defineStore('interview', () => {
         applicationTotalPages,
         getApplications,
 
-        sendResultEmail
+        sendResultEmail,
+        getAllTimeSlotsByCampaignId,
+        assignTimeSlot
     }
 })

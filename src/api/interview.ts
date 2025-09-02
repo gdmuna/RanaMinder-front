@@ -284,5 +284,20 @@ export const interviewApi = {
     }) {
         const inst = ranaMinder.Post<{ message: string; code: string }>('/mail/send-result-email', data).send();
         return await to<{ message: string; code: string }>(inst);
+    },
+
+    // 获取所有面试时间段
+    async getAllTimeSlotsByCampaignId(campaignId: number, force: boolean = false) {
+        const inst = ranaMinder.Get<{ message: string; code: string; timeSlots: timeSlot[] }>(`/time_slot/campaign/${campaignId}`).send(force);
+        return await to<{ message: string; code: string; timeSlots: timeSlot[] }>(inst);
+    },
+
+    // 分配面试时间段
+    async assignTimeSlot(data: {
+        user_id: number;
+        time_slot_id: number;
+    }) {
+        const inst = ranaMinder.Post<{ message: string; code: string }>('/user_selection', data).send();
+        return await to<{ message: string; code: string }>(inst);
     }
 }

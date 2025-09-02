@@ -92,3 +92,15 @@ export interface Applications {
         totalPages: number;
     }
 }
+
+export type FormateTimeSlot = {
+    campaignId: number;
+    stageId: number;
+    sessionId: number;
+    timeSlotId: number;
+    startTime: Date;
+    endTime: Date;
+    maxSeats: number;
+    bookedSeats: number;
+    isAvailabe: boolean;
+}

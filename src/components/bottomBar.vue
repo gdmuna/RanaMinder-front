@@ -5,32 +5,16 @@
             class="flex sm:flex-col flex-row sm:justify-normal justify-between sm:py-4 h-full flex-1 items-center *:shrink-0 sm:gap-y-[3.5rem] sm:mt-[1rem] sm:mx-0 mx-[0.5rem]">
 
             <!-- 分配面试时间 -->
-            <DropdownMenu>
-                <DropdownMenuTrigger>
-                    <div class="flex items-center group" :class="isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'">
-                        <div class="relative flex items-center select-none">
-                            <div
-                                class="absolute right-full translate-y-[0.3rem] mb-2 mr-1 px-3 py-2 bg-[#272727] dark:text-[#FEFCE4] text-sm font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap">
-                                分配面试时间
-                            </div>
-                            <Timer class="inline-block w-7 h-7 dark:text-[#FEFCE4]" />
-                        </div>
+            <div class="flex items-center group" :class="isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'"
+                @click="!isDisabled && openStatusDialog()">
+                <div class="relative flex items-center select-none">
+                    <div
+                        class="absolute right-full translate-y-[0.3rem] mb-2 mr-1 px-3 py-2 bg-[#272727] dark:text-[#FEFCE4] text-sm font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap">
+                        分配面试时间
                     </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent v-if="!isDisabled" :side="isSmUp ? 'left' : undefined"
-                    class="mb-[0.9rem] sm:mb-0 sm:mr-[0.3rem] dark:bg-[#18181A] dark:text-[#FEFCE4] font-bold ">
-                    <DropdownMenuLabel>
-                        <span class="select-none font-bold">分配面试时间</span>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <template v-for="(round, idx) in interviewRounds" :key="idx">
-                        <DropdownMenuItem @mousedown.prevent @click="round.onClick" class="cursor-pointer mt-[0.5rem]">
-                            <FileClock class="w-5 h-5 translate-y-[0.06rem] dark:text-[#FEFCE4]" />
-                            <span>{{ round.name }}</span>
-                        </DropdownMenuItem>
-                    </template>
-                </DropdownMenuContent>
-            </DropdownMenu>
+                    <Timer class="inline-block w-6 h-6 dark:text-[#FEFCE4] translate-y-[0.1rem]" />
+                </div>
+            </div>
 
             <!-- 修改面试状态 -->
             <DropdownMenu>
@@ -101,7 +85,7 @@
         <SendMail v-model:open="showMail" :checkedIds="checkedIds" />
 
     </div>
-    <TimeTabs v-model:open="showTimeTabs" />
+    <StatusDialog v-model:open="statusDialog" :result="dialogData" @select="handleTimeSlotSelect" />
 </template>
 
 <script setup lang="ts">
@@ -127,6 +111,9 @@ import {
 } from '@/components/ui/alert-dialog'
 import SendMail from '@/components/sendMail.vue'
 import TimeTabs from '@/components/timeTabs.vue'
+import StatusDialog from "@/components/statusDialog.vue"
+import { nextTick } from 'vue'
+const statusDialog = ref(false)
 
 const showDialog = ref(false)
 const showTimeTabs = ref(false)
@@ -134,8 +121,9 @@ const selectStatus = ref('')
 const showMail = ref(false)
 const isSmUp = ref(window.matchMedia('(min-width: 640px)').matches)
 
-const props = defineProps<{ checkedIds: string[] }>()
-const isDisabled = computed(() => !props.checkedIds || props.checkedIds.length === 0)
+const props = defineProps<{ campaignId: number; checkedIds: string[] }>();
+const campaignId = computed(() => props.campaignId);
+const isDisabled = computed(() => !props.checkedIds || props.checkedIds.length === 0);
 
 // 监视checkedIds变化
 watch(() => props.checkedIds, (newIds: string[]) => {
@@ -143,21 +131,126 @@ watch(() => props.checkedIds, (newIds: string[]) => {
     console.log('底部栏按钮状态:', isDisabled.value ? '禁用' : '启用');
 }, { deep: true })
 
-function openTimeTabs() {
-    showTimeTabs.value = true
-}
-
 function handleStatusClick(status: string) {
     selectStatus.value = status
     showDialog.value = true
     console.log('修改面试状态为:', status);
 }
 
-const interviewRounds = [
-    { name: '一面', onClick: () => openTimeTabs() },
-    { name: '溜面', onClick: () => openTimeTabs() },
-    { name: '三面', onClick: () => openTimeTabs() },
-]
+import { useInterviewStore } from '@/stores/interview'
+const interviewStore = useInterviewStore()
+const { getAllTimeSlotsByCampaignId } = interviewStore
+
+async function getAllTimeSlots(campaignId: number) {
+    let timeSlots: any[] = [];
+    try {
+    const res = await getAllTimeSlotsByCampaignId(campaignId) as any;
+        if (res && res.data && Array.isArray(res.data.time_slots)) {
+            timeSlots = res.data.time_slots;
+        } else {
+            console.warn('未获取到时间段数据', res);
+            return [];
+        }
+        if (!Array.isArray(timeSlots) || timeSlots.length === 0) {
+            console.warn('未获取到时间段数据', timeSlots);
+            return [];
+        }
+    } catch (err) {
+        console.error('获取时间段失败', err);
+        return [];
+    }
+
+    // 格式化为指定结构
+    const result: any = {};
+    for (const slot of timeSlots) {
+        const stage = slot.session?.stage;
+        const session = slot.session;
+        if (!stage || !session) continue;
+        // 活动ID
+        const campaignId = stage.campaign_id;
+        const campaignText = stage.title || '';
+        if (!result[campaignId]) {
+            result[campaignId] = {
+                campaignId,
+                campaignText,
+                stages: {}
+            };
+        }
+        // 环节ID
+        const stageId = stage.id;
+        if (!result[campaignId].stages[stageId]) {
+            result[campaignId].stages[stageId] = {
+                id: stageId,
+                title: stage.title,
+                sessions: {}
+            };
+        }
+        // 场次ID
+        const sessionId = session.id;
+        if (!result[campaignId].stages[stageId].sessions[sessionId]) {
+            result[campaignId].stages[stageId].sessions[sessionId] = {
+                id: sessionId,
+                title: session.title,
+                timeSlots: []
+            };
+        }
+        // 时间段
+        result[campaignId].stages[stageId].sessions[sessionId].timeSlots.push({
+            id: slot.id,
+            start_time: slot.start_time,
+            end_time: slot.end_time,
+            max_seats: slot.max_seats
+        });
+    }
+    return result;
+}
+
+const result = ref<any>({});
+
+// 获取环节列表，明确类型
+interface Stage {
+    id: number;
+    title: string;
+    sessions: Record<string, any>;
+}
+const stageList = computed<Stage[]>(() => {
+    if (!campaignId.value || !result.value[campaignId.value]) return [];
+    return Object.values(result.value[campaignId.value].stages || {}) as Stage[];
+});
+
+// 点击分配面试时间时获取时间段
+const dialogData = ref<any>(null);
+
+async function openStatusDialog() {
+    const res = await getAllTimeSlots(campaignId.value);
+    result.value = res || {}; // 保存完整结果
+    dialogData.value = res || {}; // 设置弹窗专用数据
+    console.log('父组件传递给弹窗的数据:', dialogData.value);
+    statusDialog.value = true;
+}
+
+// 处理时间段选择
+async function handleTimeSlotSelect(selection: { stage: any, session: any, slot: any }) {
+    console.log('选择的时间段:', selection);
+    
+    if (!selection.slot || !selection.slot.id || props.checkedIds.length === 0) {
+        console.warn('没有选择时间段或没有选中的用户');
+        return;
+    }
+    
+    // 为每个选中的用户分配时间段
+    for (const userId of props.checkedIds) {
+        try {
+            const result = await interviewStore.assignTimeSlot({
+                userId: parseInt(userId),
+                timeSlotId: selection.slot.id
+            });
+            console.log(`用户 ${userId} 分配时间段结果:`, result);
+        } catch (error) {
+            console.error(`为用户 ${userId} 分配时间段失败:`, error);
+        }
+    }
+}
 </script>
 
 <style scoped>

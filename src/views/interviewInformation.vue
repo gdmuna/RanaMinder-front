@@ -10,7 +10,8 @@
     </div>
     <!-- 底部导航栏 -->
     <teleport to="body">
-        <BottomBar :checkedIds="checkedIds" />
+        <!-- 保证传递给 BottomBar 的 campaignId 一定为 number 类型 -->
+        <BottomBar :checkedIds="checkedIds" :campaignId="campaignId ?? 0" />
     </teleport>
     <!-- 面试者详细卡片弹窗 -->
     <teleport to="body">

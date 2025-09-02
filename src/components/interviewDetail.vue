@@ -75,6 +75,7 @@ const props = defineProps<{
         stuId: string;
         name: string;
         intention: string[];
+        intendedDepartment?: string; // 添加这个字段，表示后端可能会传递这个数据
         grade: string;
         major: string;
         email?: string;
@@ -91,6 +92,7 @@ const {
         stuId: '',
         name: '',
         intention: [],
+        intendedDepartment: '',
         grade: '',
         major: '',
         email: '',
@@ -105,7 +107,7 @@ const displayableInfo = computed(() => {
 
     // 核心字段（小卡片）
     result['name'] = person.name;
-    result['intention'] = person.intention;
+    result['intendedDepartment'] = person.intendedDepartment;
     result['grade'] = person.grade;
     result['major'] = person.major;
     result['stuId'] = person.stuId;
@@ -115,7 +117,7 @@ const displayableInfo = computed(() => {
 
     // 然后添加information中的其他字段
     if (person.information) {
-        const skipFields = ['name', 'intention', 'grade', 'major', 'stuId', 'email', 'phone', 'phoneNum', 'id', 'createdAt', 'updatedAt'];
+        const skipFields = ['name', 'intention', 'grade', 'major', 'stuId', 'email', 'phone', 'phoneNum', 'id', 'createdAt', 'updatedAt', 'photo',];
 
         for (const [key, value] of Object.entries(person.information)) {
             // 跳过已经添加的字段和不需要显示的系统字段
@@ -132,16 +134,29 @@ const displayableInfo = computed(() => {
 function formatLabel(key: string): string {
     const labelMap: Record<string, string> = {
         'name': '姓名',
-        'intention': '意向',
+        'intendedDepartment': '意向',
         'grade': '年级',
         'college': '学院',
         'major': '专业',
-        'stuId': '学号',
+        'stuId': '学号',    
+        'studentNumber': '学号',
+        'phoneNumber': '手机号',
         'email': '邮箱',
         'phone': '手机',
         'sex': '性别',
         'age': '年龄',
         'address': '住址',
+        'nation': '民族',
+        'politicalStatus': '政治面貌',
+        'nativePlace': '籍贯',
+        'education': '学历',
+        'wechatId': '微信号',
+        'qqNumber': 'QQ号',
+        "intentionToStay": "未来意向",
+"hobbiesAndSpecialties":"爱好",
+"previousPositions":"过往职位",
+"honorsReceived":"曾获荣誉",
+"selfEvaluation":"自我评价",
     };
 
     return labelMap[key] || key;

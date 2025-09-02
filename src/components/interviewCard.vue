@@ -46,7 +46,7 @@
                     <span class="lg:w-[4.5rem] w-[3rem] inline-block dark:text-[#6F6E6C]">意向</span>
                     <div
                         class="flex flex-1 gap-2 w-[17rem] min-w-[17rem] max-w-[17rem] overflow-x-auto whitespace-nowrap hide-scrollbar">
-                        <div v-for="(item, index) in intention" :key="'dept-' + index" class="inline-block">
+                        <div v-for="(item, index) in intendedDepartment" :key="'dept-' + index" class="inline-block">
                             <Badge>{{ item }}</Badge>
                         </div>
                     </div>
@@ -75,10 +75,10 @@ const stuId = computed(() => props.application?.stu_id || '未填写');
 const name = computed(() => props.application?.information?.name || '未填写');
 const grade = computed(() => props.application?.information?.grade || '未填写');
 const major = computed(() => props.application?.information?.major || '未填写');
-const intention = computed(() => {
-    if (props.intention && props.intention.length > 0) return props.intention;
+const intendedDepartment = computed(() => {
+    if (props.application?.intendedDepartment && props.application.intendedDepartment.length > 0) return props.application.intendedDepartment;
     const info = props.application?.information || {};
-    if (info.intention) return Array.isArray(info.intention) ? info.intention : [info.intention];
+    if (info.intendedDepartment) return Array.isArray(info.intendedDepartment) ? info.intendedDepartment : [info.intendedDepartment];
     return ['未填写'];
 });
 const photo = computed(() => {
