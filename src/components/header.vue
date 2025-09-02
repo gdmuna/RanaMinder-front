@@ -7,9 +7,9 @@
         overflow-x-auto scrollbar-hide flex-nowrap">
             <ChartNoAxesGantt class="shrink-0 size-8 cursor-pointer" @click="headerAnimate.toggle()" />
             <!-- 搜索 -->
-            <div class="shrink-0">
+            <!-- <div class="shrink-0">
                 <Search v-if="route.path !== '/home' && route.path !== '/'" />
-            </div>
+            </div> -->
             <primaryButton v-if="!isAuthenticated" class="cursor-pointer border-2 mr-10" @click="authStore.login">
                 <div class="flex items-center space-x-2 text-[1rem]">
                     <span>登录</span>
@@ -89,9 +89,9 @@
                 <div v-if="isDesktop" class="flex lg:flex-row flex-col lg:items-center items-start lg:space-x-4 lg:w-auto w-full lg:p-0 p-3
                 lg:space-y-0 space-y-2 lg:dark:bg-transparent dark:bg-[#1f1e1e] rounded-lg">
                     <!-- 搜索 -->
-                    <Search v-if="route.path !== '/home' && route.path !== '/'" />
-                    <img v-if="isDesktop && route.path !== '/home' && route.path !== '/'" :src="boundary" alt=""
-                        class="ml-2 mr-4 shrink-0">
+                    <!-- <Search v-if="route.path !== '/home' && route.path !== '/'" /> -->
+                    <!-- <img v-if="isDesktop && route.path !== '/home' && route.path !== '/'" :src="boundary" alt=""
+                        class="ml-2 mr-4 shrink-0"> -->
                     <primaryButton v-if="!isAuthenticated" class="cursor-pointer border-2" @click="authStore.login">
                         <div class="flex items-center space-x-2 text-[1rem]">
                             <span>登录</span>
