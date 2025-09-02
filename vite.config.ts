@@ -8,6 +8,9 @@ export default defineConfig({
     vue(),
     tailwindcss(),
   ],
+  esbuild: {
+    drop: ['console', 'debugger'],
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
