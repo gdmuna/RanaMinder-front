@@ -16,6 +16,7 @@ export interface Campaign {
     deleteAt: Date;
     createdAt: Date;
     updatedAt: Date;
+    stages?: any[];
 }
 
 export interface Campaigns {

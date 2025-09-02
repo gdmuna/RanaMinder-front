@@ -20,6 +20,19 @@
                 </div>
             </Transition>
         </teleport>
+        <!-- 编辑面试弹窗 -->
+        <teleport to="body">
+            <Transition name="fade">
+                <div v-if="showModify"
+                    class="fixed inset-0 dark:bg-black/50 backdrop-blur-xs z-10 flex items-center md:justify-center flex-col justify-end"
+                    @click.stop.self="closeModify">
+                    <div v-if="loading" class="flex items-center justify-center w-full h-full">
+                        <span class="text-lg text-gray-500">加载中...</span>
+                    </div>
+                    <InterviewModify v-else :deliverClose="closeModify" :campaignId="(editData?.id as number)" :stages="editData?.stages" />
+                </div>
+            </Transition>
+        </teleport>
         <!-- 编辑申请表弹窗 -->
         <teleport to="body">
             <Transition name="fade">
@@ -31,177 +44,65 @@
                 </div>
             </Transition>
         </teleport>
-        <!-- 编辑面试弹窗 -->
-        <teleport to="body">
-            <Transition name="fade">
-                <div v-if="showEdit"
-                    class="fixed inset-0 dark:bg-black/50 backdrop-blur-xs z-10 flex items-center md:justify-center flex-col justify-end"
-                    @click.stop.self="closeEdit">
-                    <InterviewCreate :deliverClose="closeEdit" :isEdit="true" :editData="editData" />
-                </div>
-            </Transition>
-        </teleport>
     </div>
 </template>
 
 <script setup lang="ts">
 // 逻辑代码
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, reactive } from 'vue';
 import InterviewShow from '@/components/interviewShow.vue';
 import NewInterview from '@/components/newInterview.vue';
 import InterviewCreate from '@/components/interviewCreate.vue';
+import InterviewModify from '@/components/interviewModify.vue';
 import { useRouter } from 'vue-router';
 import InterviewApply from '@/components/interviewApply.vue';
 import type { Campaign } from '@/types/interview'
-import { formatDateTime } from '@/lib/utils';
+import { useInterviewStore } from '@/stores/interview'
 
-import { useInterviewStore } from '@/stores/interview';
 const interviewStore = useInterviewStore();
 
 const loading = ref(false);
-const showEdit = ref(false)
-
+// 编辑弹窗数据
 const editData = ref<Campaign | null>(null)
 
-async function handleEdit(id: number) {
-    try {
-        // 1. 获取面试基本信息（本地缓存）
-        const campaign = interviewStore.campaigns.find(item => item.id === id)
-        if (!campaign) {
-            return;
-        }
-        
-        // 2. 查询环节
-        let stages: any[] = [];
-        try {
-            const stageRes = await interviewStore.getStage(id);
-            stages = (stageRes as any)?.data?.stages || [];
-        } catch (err) {
-            console.error('获取环节数据失败:', err);
-            // 即使获取环节失败，也继续执行
-        }
+// 查询并组装全部流程
+async function fetchInterviewFlow(campaignId: number) {
+    // 1. 查询面试活动详情
+    const campaignRes = await interviewStore.getCampaignList() as { data?: { campaigns?: any[] } };
+    const campaign = campaignRes?.data?.campaigns?.find((c: any) => c.id === campaignId)
+    if (!campaign) return
 
-        // 如果没有获取到环节数据，创建一个默认环节
-        if (!stages || stages.length === 0) {
-            stages = [{
-                id: -1, // 使用临时ID
-                title: '默认环节',
-                description: '请填写环节描述',
-                is_required: false,
-                sessions: []
-            }];
-        }
+    // 2. 查询所有环节
+    const stageRes = await interviewStore.getStage(campaignId) as { data?: { stages?: any[] } };
+    const stages = stageRes?.data?.stages || []
 
-        // 3. 查询每个环节的场次和时间段
-        for (const stage of stages) {
-            try {
-                if (stage.id > 0) { // 只有有效ID才查询场次
-                    const sessionRes = await interviewStore.getSession(stage.id);
-                    (stage as any).sessions = (sessionRes as any)?.data?.sessions || [];
-                } else {
-                    (stage as any).sessions = [];
-                }
-                
-                // 如果没有场次数据，创建默认场次
-                if (!stage.sessions || stage.sessions.length === 0) {
-                    (stage as any).sessions = [{
-                        id: -1,
-                        title: '默认场次',
-                        start_time: formatDateTime(new Date()),
-                        end_time: formatDateTime(new Date(Date.now() + 3600000)), // 一小时后
-                        location: '请填写场次地点',
-                        timeSlots: []
-                    }];
-                }
-                
-                for (const session of (stage as any).sessions) {
-                    try {
-                        if (session.id > 0) { // 只有有效ID才查询时间段
-                            const timeSlotRes = await interviewStore.getTimeSlot(session.id);
-                            console.log(`获取场次 ${session.id} 的时间段:`, timeSlotRes);
-                            
-                            // 使用标准格式，只检查data字段
-                            if (timeSlotRes && timeSlotRes.data && Array.isArray(timeSlotRes.data.timeSlots)) {
-                                console.log(`场次 ${session.id} 的时间段数据:`, timeSlotRes.data.timeSlots);
-                                (session as any).timeSlots = timeSlotRes.data.timeSlots;
-                            } else {
-                                console.warn(`场次 ${session.id} 没有时间段数据或格式不正确:`, timeSlotRes);
-                                (session as any).timeSlots = [];
-                            }
-                        } else {
-                            (session as any).timeSlots = [];
-                        }
-                        
-                        // 如果没有时间段数据，创建默认时间段
-                        if (!session.timeSlots || session.timeSlots.length === 0) {
-                            (session as any).timeSlots = [{
-                                id: -1,
-                                start_time: formatDateTime(new Date()),
-                                end_time: formatDateTime(new Date(Date.now() + 1800000)), // 半小时后
-                                max_seats: 10
-                            }];
-                        }
-                    } catch (err) {
-                        console.error('获取时间段数据失败:', err);
-                        // 设置默认时间段
-                        (session as any).timeSlots = [{
-                            id: -1,
-                            start_time: formatDateTime(new Date()),
-                            end_time: formatDateTime(new Date(Date.now() + 1800000)), // 半小时后
-                            max_seats: 10
-                        }];
-                    }
-                }
-            } catch (err) {
-                console.error('获取场次数据失败:', err);
-                // 设置默认场次
-                (stage as any).sessions = [{
-                    id: -1,
-                    title: '默认场次',
-                    start_time: formatDateTime(new Date()),
-                    end_time: formatDateTime(new Date(Date.now() + 3600000)), // 一小时后
-                    location: '请填写场次地点',
-                    timeSlots: [{
-                        id: -1,
-                        start_time: formatDateTime(new Date()),
-                        end_time: formatDateTime(new Date(Date.now() + 1800000)), // 半小时后
-                        max_seats: 10
-                    }]
-                }];
-            }
+    // 3. 查询每个环节的场次和每个场次的时间段
+    for (const stage of stages) {
+    const sessionRes = await interviewStore.getSession(stage.id) as { data?: { sessions?: any[] } };
+    stage.sessions = sessionRes?.data?.sessions || []
+        for (const session of stage.sessions) {
+            const timeSlotRes = await interviewStore.getTimeSlot(session.id)
+            session.timeSlots = timeSlotRes.data.timeSlots || []
         }
-
-        // 4. 组装 editData
-        editData.value = {
-            id: campaign.id,
-            title: campaign.title,
-            description: campaign.description,
-            startDate: campaign.startDate,
-            endDate: campaign.endDate,
-            isActive: campaign.isActive,
-            deleteAt: campaign.deleteAt,
-            createdAt: campaign.createdAt,
-            updatedAt: campaign.updatedAt,
-            stages
-        } as any;
-        
-        showEdit.value = true;
-    } catch (error) {
-        console.error('处理编辑操作失败:', error);
     }
+
+    // 返回查询结果，供其他组件使用
+    return { campaign, stages };
 }
 
-function closeEdit() {
-    showEdit.value = false
-    editData.value = null
-}
-
+// 查询面试列表
 async function fetchInterviews(page = 1) {
     if (loading.value) return;
     loading.value = true;
     await interviewStore.getCampaignList(page);
     loading.value = false;
 }
+
+// 页面挂载时只查询列表数据
+onMounted(() => {
+    fetchInterviews(1);
+    window.addEventListener('scroll', handleScroll);
+});
 
 onMounted(() => {
     fetchInterviews(1);
@@ -231,6 +132,8 @@ const router = useRouter();
 const showCreate = ref(false)
 // 申请表弹窗
 const showApply = ref(false)
+// 编辑面试弹窗
+const showModify = ref(false)
 // 申请表id
 const currentInterviewId = ref<number | null>(null)
 
@@ -260,9 +163,27 @@ function closeCreate() {
     showCreate.value = false
 }
 
+function closeModify() {
+    showModify.value = false
+}
+
 function closeApply() {
     showApply.value = false
     currentInterviewId.value = null // 关闭弹窗时清空id
+}
+
+// 处理编辑按钮点击
+async function handleEdit(id: number) {
+    loading.value = true;
+    // 查询完整流程数据
+    const flowData = await fetchInterviewFlow(id);
+    if (flowData) {
+        editData.value = { ...flowData.campaign, stages: flowData.stages };
+        loading.value = false;
+        showModify.value = true;
+    } else {
+        loading.value = false;
+    }
 }
 
 </script>
