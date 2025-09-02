@@ -1,6 +1,6 @@
 import { ranaMinder } from './index';
 
-import { to } from "@/lib/utils";
+import { to, returnTemplate, errTemplate } from "@/lib/utils";
 
 import type { Campaigns, Campaign, stage, session, timeSlot, GenericReq, Applications, Application, result } from "@/types/interview";
 import type { ReturnTemplate } from "@/types/api";
@@ -46,16 +46,37 @@ export const interviewApi = {
 
     // 创建会话
     async createSession(data: { stage_id: number; title: string; start_time: string; end_time: string; location: string }) {
-        // x-www-form-urlencoded 序列化
-        const formBody = Object.entries(data)
-            .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value as string)}`)
-            .join('&');
-        const inst = ranaMinder.Post<{ message: string; code: string; session: session }>('/session', formBody, {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
+        try {
+            // 确保时间格式正确
+            if (typeof data.start_time !== 'string') {
+                data.start_time = String(data.start_time);
             }
-        }).send();
-        return await to<{ message: string; code: string; session: session }>(inst)
+            if (typeof data.end_time !== 'string') {
+                data.end_time = String(data.end_time);
+            }
+            
+            // 验证所有字段都存在
+            if (!data.stage_id || !data.title || !data.start_time || !data.end_time || !data.location) {
+                console.error('创建场次缺少必要字段:', data);
+                return returnTemplate(errTemplate('缺少必要字段', '请确保填写了所有必要信息'), null);
+            }
+            
+            console.log('创建场次，发送数据:', data);
+            
+            // x-www-form-urlencoded 序列化
+            const formBody = Object.entries(data)
+                .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value as string)}`)
+                .join('&');
+            const inst = ranaMinder.Post<{ message: string; code: string; session: session }>('/session', formBody, {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }).send();
+            return await to<{ message: string; code: string; session: session }>(inst);
+        } catch (error) {
+            console.error('创建场次API异常:', error);
+            return returnTemplate(errTemplate('创建场次失败', error instanceof Error ? error.message : String(error)), null);
+        }
     },
 
     // 创建时间段
@@ -75,6 +96,24 @@ export const interviewApi = {
     // 删除面试活动
     async deleteCampaign(id: number, force: boolean = false) {
         const inst = ranaMinder.Delete<{ message: string; code: string }>(`/campaign/${id}`).send(force)
+        return await to<{ message: string; code: string }>(inst)
+    },
+
+    // 删除环节
+    async deleteStage(id: number, force: boolean = false) {
+        const inst = ranaMinder.Delete<{ message: string; code: string }>(`/stage/${id}`).send(force)
+        return await to<{ message: string; code: string }>(inst)
+    },
+
+    // 删除场次
+    async deleteSession(id: number, force: boolean = false) {
+        const inst = ranaMinder.Delete<{ message: string; code: string }>(`/session/${id}`).send(force)
+        return await to<{ message: string; code: string }>(inst)
+    },
+
+    // 删除时间段
+    async deleteTimeSlot(id: number, force: boolean = false) {
+        const inst = ranaMinder.Delete<{ message: string; code: string }>(`/time_slot/${id}`).send(force)
         return await to<{ message: string; code: string }>(inst)
     },
 
@@ -203,13 +242,49 @@ export const interviewApi = {
     },
 
     // 更新面试活动
-    async updateCampaign(id: number, data: { title: string; description: string;start_date: string; end_date: string; is_active: boolean }) {
+    async updateCampaign(id: number, data: { title: string; description: string; start_date: string; end_date: string; is_active?: boolean }) {
+        // 确保所有必填字段都存在
+        if (!data.title || !data.description || !data.start_date || !data.end_date) {
+            console.error('缺少必要字段:', data);
+            return {
+                err: {
+                    success: false,
+                    data: {
+                        message: "至少需要一个字段",
+                        code: "MISSING_FIELDS"
+                    }
+                },
+                res: null
+            };
+        }
+        
+        // 确保is_active是正确的布尔值字符串
+        const dataWithStringBooleans: Record<string, string> = {
+            title: data.title,
+            description: data.description,
+            start_date: data.start_date,
+            end_date: data.end_date
+        };
+        
+        // 只有当is_active字段存在时才进行转换
+        if (data.is_active !== undefined) {
+            dataWithStringBooleans.is_active = String(data.is_active); // 确保布尔值转为"true"或"false"字符串
+        }
+        
+        console.log('API请求数据:', {
+            id,
+            ...dataWithStringBooleans,
+            is_active_original: data.is_active,
+            is_active_type: typeof data.is_active,
+            is_active_converted: String(data.is_active)
+        });
+        
         // x-www-form-urlencoded 序列化
-        const formBody = Object.entries(data)
-            .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(typeof value === 'boolean' ? String(value) : value as string)}`)
+        const formBody = Object.entries(dataWithStringBooleans)
+            .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value as string)}`)
             .join('&');
         
-        console.log(`API请求: PUT /campaign/${id}, 请求体:`, data, '序列化后:', formBody);
+        console.log(`API请求: PUT /campaign/${id}, 请求体:`, dataWithStringBooleans, '序列化后:', formBody);
         
         const inst = ranaMinder.Put<{ message: string; code: string; campaign: Campaign }>(`/campaign/${id}`, formBody, {
             headers: {
@@ -249,16 +324,37 @@ export const interviewApi = {
 
     // 更新面试时间段
     async updateTimeSlot( data: { id: number, start_time: string; end_time: string; max_seats: number }) {
-        const bodyData = { ...data };
+        console.log('更新时间段，数据:', data);
+        console.log('日期格式检查 - 开始时间:', data.start_time, '类型:', typeof data.start_time);
+        console.log('日期格式检查 - 结束时间:', data.end_time, '类型:', typeof data.end_time);
+        
+        const id = data.id;
+        
+        // 创建一个包含time_slot_id字段的对象，按照API文档格式
+        const bodyData = {
+            time_slot_id: data.id, // 使用正确的参数名time_slot_id
+            start_time: data.start_time,
+            end_time: data.end_time,
+            max_seats: data.max_seats
+        };
+        
         const formBody = Object.entries(bodyData)
-            .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value as string)}`)
+            .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`)
             .join('&');
-        const inst = ranaMinder.Put<{ message: string; code: string; timeSlot: timeSlot }>(`/time_slot/`, formBody, {
+        
+        // 根据API文档，使用正确的URL路径（保留尾部斜杠）
+        console.log(`发送请求到: /time_slot/`);
+        console.log('请求体:', formBody);
+        
+        const inst = ranaMinder.Put<{ message: string; code: string; timeSlot: timeSlot }>('/time_slot/', formBody, {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
         }).send();
-        return await to<{ message: string; code: string; timeSlot: timeSlot }>(inst)
+        
+        const result = await to<{ message: string; code: string; timeSlot: timeSlot }>(inst);
+        console.log('时间段更新响应:', result);
+        return result;
     },
 
     // 获取面试表

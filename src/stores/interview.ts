@@ -130,6 +130,36 @@ export const useInterviewStore = defineStore('interview', () => {
         );
     }
 
+    // 删除面试环节
+    async function deleteStage(id: number, force: boolean = false) {
+        return handleApiRequest(
+            () => interviewApi.deleteStage(id, force),
+            '删除环节成功',
+            '删除环节失败',
+            interviewDataStatus
+        );
+    }
+
+    // 删除场次
+    async function deleteSession(id: number, force: boolean = false) {
+        return handleApiRequest(
+            () => interviewApi.deleteSession(id, force),
+            '删除场次成功',
+            '删除场次失败',
+            interviewDataStatus
+        );
+    }
+
+    // 删除时间段
+    async function deleteTimeSlot(id: number, force: boolean = false) {
+        return handleApiRequest(
+            () => interviewApi.deleteTimeSlot(id, force),
+            '删除时间段成功',
+            '删除时间段失败',
+            interviewDataStatus
+        );
+    }
+
     // 查询环节
     async function getStage(id: number, force: boolean = false) {
         return handleApiRequest(
@@ -252,14 +282,31 @@ export const useInterviewStore = defineStore('interview', () => {
     }
 
     // 更新面试活动
-    async function updateCampaign(data: { id: number; title: string; description: string; startDate: Date; endDate: Date; isActive: boolean }) {
+    async function updateCampaign(data: { id: number; title: string; description: string; startDate: Date | string; endDate: Date | string; isActive: boolean }) {
+        // 确保提供所有必填字段，且格式化日期
+        const formatDate = (date: Date | string) => {
+            if (date instanceof Date) {
+                return formatDateTime(date);
+            } else if (typeof date === 'string') {
+                // 如果已经是字符串格式，检查是否需要格式化
+                if (date.includes('T')) {
+                    // 可能是ISO格式，转换为API期望的格式
+                    return formatDateTime(new Date(date));
+                }
+                return date; // 已经是API期望的格式
+            }
+            return formatDateTime(new Date()); // 默认值
+        };
+        
         const payload = {
             title: data.title,
             description: data.description,
             is_active: data.isActive,
-            start_date: formatDateTime(data.startDate),
-            end_date: formatDateTime(data.endDate),
+            start_date: formatDate(data.startDate),
+            end_date: formatDate(data.endDate),
         };
+        
+        console.log('更新面试活动，完整参数:', payload);
 
         return handleApiRequest(
             () => interviewApi.updateCampaign(data.id, payload),
