@@ -46,12 +46,12 @@ const config = {
 
 const ranaMinder = createAlova({
     ...config,
-    baseURL: import.meta.env.VITE_API_RANAMINDER_BASE_URL
+    baseURL: import.meta.env.VITE_API_RANAMINDER_BASE_URL || window.RANAMINDER_BASE_URL
 })
 
 const casdoor = createAlova({
     ...config,
-    baseURL: import.meta.env.VITE_API_CASDOOR_ENDPOINT
+    baseURL: import.meta.env.VITE_API_CASDOOR_ENDPOINT || window.CASDOOR_ENDPOINT
 })
 
 export { ranaMinder, casdoor };
