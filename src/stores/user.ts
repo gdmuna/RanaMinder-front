@@ -133,23 +133,23 @@ export const useUserStore = defineStore('user', () => {
         casdoorUserInfo.value = payload
     }
 
-    async function updateCasdoorUserInfo(info: object) {
-        if (!casdoorUserInfo.value) {
-            toast.error("用户信息未初始化")
-            return false
-        }
-        const payload = structuredClone(toRaw(casdoorUserInfo.value))
-        Object.assign(payload, info)
-        const { err, res } = await userApi.updateUserInfo(payload)
-        console.log({ err, res });
-        if (res) {
-            console.log('updateCasdoorUserInfo', res);
+    // async function updateCasdoorUserInfo(info: object) {
+    //     if (!casdoorUserInfo.value) {
+    //         toast.error("用户信息未初始化")
+    //         return false
+    //     }
+    //     const payload = structuredClone(toRaw(casdoorUserInfo.value))
+    //     Object.assign(payload, info)
+    //     const { err, res } = await userApi.updateUserInfo(payload)
+    //     console.log({ err, res });
+    //     if (res) {
+    //         console.log('updateCasdoorUserInfo', res);
 
-            return true
-        } else {
-            throw err
-        }
-    }
+    //         return true
+    //     } else {
+    //         throw err
+    //     }
+    // }
 
     async function setPassword(formData: FormData) {
         const { err, res } = await userApi.setPassword(formData)
@@ -163,32 +163,32 @@ export const useUserStore = defineStore('user', () => {
         }
     }
 
-    async function uploadAvatar(avatar: File) {
-        try {
-            const { err, res } = await userApi.uploadAvatar(avatar)
-            if (res) {
-                const url = res.data.url
-                const updateResult = await updateCasdoorUserInfo({ avatar: url })
-                if (updateResult) {
-                    userInfo.avatar = url
-                    toast.success('上传头像成功')
-                    return res
-                } else {
-                    // 如果更新Casdoor用户信息失败，至少更新本地状态
-                    userInfo.avatar = url
-                    toast.warning('头像已上传，但用户信息同步失败')
-                    return res
-                }
-            } else {
-                toast.error(err.data?.message || '上传头像失败')
-                throw err
-            }
-        } catch (error) {
-            console.error('上传头像出错:', error);
-            toast.error('上传头像过程中出错');
-            throw error;
-        }
-    }
+    // async function uploadAvatar(avatar: File) {
+    //     try {
+    //         const { err, res } = await userApi.uploadAvatar(avatar)
+    //         if (res) {
+    //             const url = res.data.url
+    //             const updateResult = await updateCasdoorUserInfo({ avatar: url })
+    //             if (updateResult) {
+    //                 userInfo.avatar = url
+    //                 toast.success('上传头像成功')
+    //                 return res
+    //             } else {
+    //                 // 如果更新Casdoor用户信息失败，至少更新本地状态
+    //                 userInfo.avatar = url
+    //                 toast.warning('头像已上传，但用户信息同步失败')
+    //                 return res
+    //             }
+    //         } else {
+    //             toast.error(err.data?.message || '上传头像失败')
+    //             throw err
+    //         }
+    //     } catch (error) {
+    //         console.error('上传头像出错:', error);
+    //         toast.error('上传头像过程中出错');
+    //         throw error;
+    //     }
+    // }
 
     return {
         getUserInfo,
@@ -198,9 +198,9 @@ export const useUserStore = defineStore('user', () => {
         cleanUserInfo,
         updateUserInfo,
         generateCasdoorUserInfo,
-        uploadAvatar,
+        // uploadAvatar,
         setPassword,
-        updateCasdoorUserInfo,
+        // updateCasdoorUserInfo,
         casdoorUserInfo,
         persist: true
     }

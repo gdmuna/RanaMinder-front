@@ -5,8 +5,6 @@ import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia';
 
 // Casdoor 组织从环境变量获取
-const CASDOOR_ORG = import.meta.env.VITE_CASDOOR_ORG || 'gdmu';
-console.log('Casdoor Organization:', CASDOOR_ORG);
 console.log('Casdoor Endpoint:', import.meta.env.VITE_API_CASDOOR_ENDPOINT);
 
 export const personApi = {
@@ -16,15 +14,13 @@ export const personApi = {
     }, force: boolean = false) {
         // 确保传递正确的API路径
         try {
-            console.log('Calling Casdoor API with org:', CASDOOR_ORG);
-            
             // 从AuthStore获取客户端ID和Secret
             const authStore = useAuthStore();
             const { accessToken } = storeToRefs(authStore);
             
             // 构建完整的请求参数
             const queryParams = { 
-                owner: CASDOOR_ORG,
+                owner: "gdmu",
                 ...params,
                 // 确保认证参数正确传递
                 ...(accessToken.value ? { access_token: accessToken.value } : {})
