@@ -122,7 +122,7 @@ import {
 import SendMail from '@/components/sendMail.vue'
 import TimeTabs from '@/components/timeTabs.vue'
 import StatusDialog from "@/components/statusDialog.vue"
-import statusChoice from '@/components/statusChice.vue'
+import statusChoice from '@/components/statusChoice.vue'
 import { nextTick } from 'vue'
 const statusDialog = ref(false)
 
