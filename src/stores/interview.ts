@@ -449,13 +449,18 @@ export const useInterviewStore = defineStore('interview', () => {
         timeSlotId: number;
     }) {
         console.log('调用分配面试时间段API, 参数:', data);
+        console.log('Store层接收到的userId类型:', typeof data.userId, 'userId值:', data.userId);
+        
         try {
             // 不直接使用统一的成功/失败消息，而是在后续根据具体返回结果处理
+            const apiParams = {
+                user_id: data.userId,
+                time_slot_id: data.timeSlotId,
+            };
+            console.log('转换给API的参数:', apiParams, '类型user_id:', typeof apiParams.user_id);
+            
             const result: any = await handleApiRequest(
-                () => interviewApi.assignTimeSlot({
-                    user_id: data.userId,
-                    time_slot_id: data.timeSlotId,
-                }),
+                () => interviewApi.assignTimeSlot(apiParams),
                 '', // 不使用统一成功消息
                 '分配面试时间段失败',
                 interviewDataStatus,

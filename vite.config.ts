@@ -9,7 +9,7 @@ export default defineConfig({
     tailwindcss(),
   ],
   esbuild: {
-    drop: ['console', 'debugger'],
+    drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : [],
   },
   resolve: {
     alias: {

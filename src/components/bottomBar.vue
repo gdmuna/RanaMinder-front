@@ -208,8 +208,11 @@ async function getAllTimeSlots(campaignId: number) {
             };
         }
         // 时间段
+        const timeSlotId = Number(slot.id); // 确保ID是数字类型
+        console.log(`构建时间段数据, 原始ID: ${slot.id}, 转换后: ${timeSlotId}, 类型: ${typeof timeSlotId}`);
+        
         result[campaignId].stages[stageId].sessions[sessionId].timeSlots.push({
-            id: slot.id,
+            id: timeSlotId, // 使用数字类型的ID
             start_time: slot.start_time,
             end_time: slot.end_time,
             max_seats: slot.max_seats
@@ -254,9 +257,27 @@ async function handleTimeSlotSelect(selection: { stage: any, session: any, slot:
     // 为每个选中的用户分配时间段
     for (const userId of props.checkedIds) {
         try {
+            console.log(`开始为用户分配时间段, 原始userId: ${userId}, 类型: ${typeof userId}`);
+            const numericUserId = Number(userId); // 使用Number替代parseInt，更可靠
+            console.log(`转换后userId: ${numericUserId}, 类型: ${typeof numericUserId}`);
+            
+            // 确保时间段ID是有效的数值
+            const timeSlotId = selection.slot.id;
+            console.log(`使用的时间段ID原始值: ${timeSlotId}, 类型: ${typeof timeSlotId}`);
+            
+            // 确保timeSlotId是数字
+            const numericTimeSlotId = Number(timeSlotId);
+            if (isNaN(numericTimeSlotId)) {
+                console.error(`无效的时间段ID: ${timeSlotId}`);
+                continue;
+            }
+            
+            console.log(`转换后timeSlotId: ${numericTimeSlotId}, 类型: ${typeof numericTimeSlotId}`);
+            console.log('完整slot对象:', selection.slot);
+            
             const result = await interviewStore.assignTimeSlot({
-                userId: parseInt(userId),
-                timeSlotId: selection.slot.id
+                userId: numericUserId,
+                timeSlotId: numericTimeSlotId // 使用确保是数字的timeSlotId
             });
             console.log(`用户 ${userId} 分配时间段结果:`, result);
         } catch (error) {

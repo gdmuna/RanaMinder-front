@@ -1203,7 +1203,12 @@ const addNewStage = async () => {
         
         console.log("环节创建响应:", JSON.stringify(response, null, 2));
         
-        // 无论API返回如何，都创建一个新的环节添加到界面上
+        // 检查环节创建是否失败
+        if (response && response.err) {
+            console.error("API返回环节创建错误:", response.err);
+            throw new Error("环节创建失败: " + JSON.stringify(response.err));
+        }
+        
         // 创建一个包含必要默认值的新环节
         const newStage: Stage = {
             id: Date.now(), // 使用时间戳作为临时ID
@@ -1214,31 +1219,343 @@ const addNewStage = async () => {
         };
         
         // 如果API返回了成功响应和有效数据，使用API返回的ID
+        let stageId: number | null = null;
         if (response && response.res) {
             try {
                 // 尝试从response.res中获取stage数据
                 const responseData = response.res as any;
+                console.log("环节创建返回的完整数据:", responseData);
+                
+                // 调试所有可能包含ID的路径
+                if (responseData.stage) console.log("responseData.stage:", responseData.stage);
+                if (responseData.data) console.log("responseData.data:", responseData.data);
+                
                 if (responseData.stage && responseData.stage.id) {
                     newStage.id = responseData.stage.id;
+                    stageId = responseData.stage.id;
+                    console.log("从 responseData.stage.id 获取到环节ID:", stageId);
                 } else if (responseData.data && responseData.data.id) {
                     newStage.id = responseData.data.id;
+                    stageId = responseData.data.id;
+                    console.log("从 responseData.data.id 获取到环节ID:", stageId);
+                } else if (responseData.id) {
+                    newStage.id = responseData.id;
+                    stageId = responseData.id;
+                    console.log("从 responseData.id 获取到环节ID:", stageId);
+                } else {
+                    // 尝试直接解析响应数据
+                    console.log("尝试直接从响应中提取ID");
+                    const jsonStr = JSON.stringify(responseData);
+                    const idMatch = jsonStr.match(/"id"\s*:\s*(\d+)/);
+                    if (idMatch && idMatch[1]) {
+                        stageId = parseInt(idMatch[1], 10);
+                        newStage.id = stageId;
+                        console.log("通过正则表达式从响应中提取到ID:", stageId);
+                    }
+                }
+                
+                if (!stageId) {
+                    console.error("无法从API响应中提取环节ID，响应数据:", responseData);
                 }
             } catch (err) {
                 console.warn("无法解析API返回的环节ID:", err);
             }
         }
         
-        console.log("添加的新环节:", newStage);
+        // 创建默认场次和时间段
+        // 设置默认日期时间
+        const now = new Date();
+        const oneHourLater = new Date(now.getTime() + 3600000); // 1小时后
+        const thirtyMinLater = new Date(now.getTime() + 1800000); // 30分钟后
+        
+        // 创建默认场次
+        const defaultSession: Session = {
+            id: Date.now() + 100, // 临时ID，与stage ID区分
+            title: '默认场次',
+            startTime: formatDateForInput(now),
+            endTime: formatDateForInput(oneHourLater),
+            location: '请添加场次地点',
+            timeSlots: [
+                {
+                    id: Date.now() + 200, // 临时ID，与session ID区分
+                    startTime: formatDateForInput(now),
+                    endTime: formatDateForInput(thirtyMinLater),
+                    maxSeats: 10
+                }
+            ]
+        };
+        
+        // 将默认场次添加到新环节
+        newStage.sessions.push(defaultSession);
+        
+        // 将新环节添加到表单数据
+        console.log("添加的新环节(包含默认场次和时间段):", newStage);
         formData.stages.push(newStage);
-        toast.success('新增环节成功');
+        
+        // 创建环节成功的提示会在完成所有操作后显示
+        
+        // 如果成功创建了环节并获取到ID，则通过API创建场次和时间段
+        if (stageId) {
+            try {
+                console.log(`为环节ID=${stageId}创建默认场次`);
+                // 创建场次
+                console.log("准备创建场次，参数:", {
+                    stage_id: stageId,
+                    title: defaultSession.title,
+                    start_time: defaultSession.startTime,
+                    end_time: defaultSession.endTime,
+                    location: defaultSession.location
+                });
+                
+                // 确保所有参数类型正确
+                const sessionParams = {
+                    stage_id: Number(stageId),  // 确保是数字类型
+                    title: String(defaultSession.title),
+                    start_time: String(defaultSession.startTime),
+                    end_time: String(defaultSession.endTime),
+                    location: String(defaultSession.location || '请添加场次地点')
+                };
+                
+                const sessionResponse = await interviewApi.createSession(sessionParams);
+                
+                console.log("场次创建响应:", JSON.stringify(sessionResponse, null, 2));
+                
+                // 检查是否有错误
+                if (sessionResponse && sessionResponse.err) {
+                    console.error("创建场次失败:", sessionResponse.err);
+                    
+                    // 获取更详细的错误信息
+                    let errorDetail = '';
+                    if (typeof sessionResponse.err === 'object') {
+                        if (sessionResponse.err.data) {
+                            errorDetail += ` 详情: ${JSON.stringify(sessionResponse.err.data)}`;
+                        }
+                        if (sessionResponse.err.message) {
+                            errorDetail += ` 消息: ${sessionResponse.err.message}`;
+                        }
+                        if (sessionResponse.err.status) {
+                            errorDetail += ` 状态码: ${sessionResponse.err.status}`;
+                        }
+                    }
+                    
+                    throw new Error(`创建场次失败:${errorDetail || JSON.stringify(sessionResponse.err)}`);
+                }
+                
+                // 确保有响应数据
+                if (!sessionResponse || !sessionResponse.res) {
+                    console.error("创建场次无响应数据，完整响应:", sessionResponse);
+                    throw new Error("创建场次无响应数据");
+                }
+                
+                // 尝试从响应中获取场次ID
+                let sessionId = null;
+                const responseData = sessionResponse.res as any;
+                
+                console.log("场次创建返回的完整数据:", responseData);
+                
+                // 调试所有可能包含ID的路径
+                if (responseData.session) console.log("responseData.session:", responseData.session);
+                if (responseData.data) console.log("responseData.data:", responseData.data);
+                
+                // 尝试从各种可能的路径获取场次ID
+                if (responseData.session && responseData.session.id) {
+                    sessionId = responseData.session.id;
+                    console.log("从 responseData.session.id 获取到场次ID:", sessionId);
+                } else if (responseData.data && responseData.data.id) {
+                    sessionId = responseData.data.id;
+                    console.log("从 responseData.data.id 获取到场次ID:", sessionId);
+                } else if (responseData.id) {
+                    sessionId = responseData.id;
+                    console.log("从 responseData.id 获取到场次ID:", sessionId);
+                } else {
+                    // 尝试直接解析响应数据
+                    console.log("尝试直接从响应中提取场次ID");
+                    const jsonStr = JSON.stringify(responseData);
+                    const idMatch = jsonStr.match(/"id"\s*:\s*(\d+)/);
+                    if (idMatch && idMatch[1]) {
+                        sessionId = parseInt(idMatch[1], 10);
+                        console.log("通过正则表达式从响应中提取到场次ID:", sessionId);
+                    }
+                }
+                
+                // 如果无法获取到场次ID，抛出错误
+                if (!sessionId) {
+                    throw new Error("无法获取场次ID");
+                }
+                
+                // 更新前端场次ID
+                const lastStageIndex = formData.stages.length - 1;
+                formData.stages[lastStageIndex].sessions[0].id = sessionId;
+                
+                // 创建时间段
+                const timeSlot = defaultSession.timeSlots[0];
+                console.log(`为场次ID=${sessionId}创建默认时间段`);
+                
+                console.log("准备创建时间段，参数:", {
+                    session_id: sessionId,
+                    start_time: timeSlot.startTime,
+                    end_time: timeSlot.endTime,
+                    max_seats: timeSlot.maxSeats
+                });
+                
+                // 确保所有参数类型正确
+                const timeSlotParams = {
+                    session_id: Number(sessionId), // 确保是数字类型
+                    start_time: String(timeSlot.startTime),
+                    end_time: String(timeSlot.endTime),
+                    max_seats: Number(timeSlot.maxSeats || 10) // 确保是数字类型
+                };
+                
+                const timeSlotResponse = await interviewApi.createTimeSlot(timeSlotParams);
+                
+                console.log("时间段创建响应:", JSON.stringify(timeSlotResponse, null, 2));
+                
+                // 检查时间段创建是否有错误
+                if (timeSlotResponse && timeSlotResponse.err) {
+                    console.error("创建时间段失败:", timeSlotResponse.err);
+                    
+                    // 获取更详细的错误信息
+                    let errorDetail = '';
+                    if (typeof timeSlotResponse.err === 'object') {
+                        if (timeSlotResponse.err.data) {
+                            errorDetail += ` 详情: ${JSON.stringify(timeSlotResponse.err.data)}`;
+                        }
+                        if (timeSlotResponse.err.message) {
+                            errorDetail += ` 消息: ${timeSlotResponse.err.message}`;
+                        }
+                        if (timeSlotResponse.err.status) {
+                            errorDetail += ` 状态码: ${timeSlotResponse.err.status}`;
+                        }
+                    }
+                    
+                    throw new Error(`创建时间段失败:${errorDetail || JSON.stringify(timeSlotResponse.err)}`);
+                }
+                
+                // 确保有响应数据
+                if (!timeSlotResponse || !timeSlotResponse.res) {
+                    console.error("创建时间段无响应数据，完整响应:", timeSlotResponse);
+                    throw new Error("创建时间段无响应数据");
+                }
+                
+                // 尝试获取时间段ID并更新前端
+                const timeSlotData = timeSlotResponse.res as any;
+                let timeSlotId = null;
+                
+                console.log("时间段创建返回的完整数据:", timeSlotData);
+                
+                // 调试所有可能包含ID的路径
+                if (timeSlotData.timeSlot) console.log("timeSlotData.timeSlot:", timeSlotData.timeSlot);
+                if (timeSlotData.data) console.log("timeSlotData.data:", timeSlotData.data);
+                
+                if (timeSlotData.timeSlot && timeSlotData.timeSlot.id) {
+                    timeSlotId = timeSlotData.timeSlot.id;
+                    console.log("从 timeSlotData.timeSlot.id 获取到时间段ID:", timeSlotId);
+                } else if (timeSlotData.data && timeSlotData.data.id) {
+                    timeSlotId = timeSlotData.data.id;
+                    console.log("从 timeSlotData.data.id 获取到时间段ID:", timeSlotId);
+                } else if (timeSlotData.id) {
+                    timeSlotId = timeSlotData.id;
+                    console.log("从 timeSlotData.id 获取到时间段ID:", timeSlotId);
+                } else {
+                    // 尝试直接解析响应数据
+                    console.log("尝试直接从响应中提取时间段ID");
+                    const jsonStr = JSON.stringify(timeSlotData);
+                    const idMatch = jsonStr.match(/"id"\s*:\s*(\d+)/);
+                    if (idMatch && idMatch[1]) {
+                        timeSlotId = parseInt(idMatch[1], 10);
+                        console.log("通过正则表达式从响应中提取到时间段ID:", timeSlotId);
+                    }
+                }
+                
+                if (timeSlotId) {
+                    formData.stages[lastStageIndex].sessions[0].timeSlots[0].id = timeSlotId;
+                } else {
+                    console.warn("无法获取时间段ID，但创建可能成功");
+                }
+                
+                // 全部创建成功后显示成功消息
+                const successMsg = `新增成功！环节ID: ${stageId}, 场次ID: ${sessionId}, 时间段ID: ${timeSlotId || '未知'}`;
+                console.log(successMsg);
+                toast.success(successMsg);
+                
+            } catch (apiError) {
+                console.error("创建默认场次或时间段失败:", apiError);
+                
+                // 判断错误类型，给出更具体的错误信息
+                let errorMessage = apiError instanceof Error ? apiError.message : String(apiError);
+                
+                // 如果是409冲突错误
+                if (errorMessage.includes('409') || errorMessage.toLowerCase().includes('conflict')) {
+                    errorMessage = "可能已存在相同的场次或时间段，请检查名称和时间";
+                }
+                
+                // 显示错误信息
+                toast.error(`创建场次或时间段失败: ${errorMessage}`);
+                
+                try {
+                    // 回滚，删除已创建的环节
+                    console.log(`尝试删除环节 ID=${stageId} 以保持数据一致性`);
+                    
+                    // 确保我们有有效的环节ID
+                    if (stageId) {
+                        const deleteResponse = await interviewApi.deleteStage(stageId);
+                        console.log("删除环节响应:", deleteResponse);
+                        
+                        if (deleteResponse && deleteResponse.err) {
+                            console.error("删除环节时发生错误:", deleteResponse.err);
+                            toast.error(`注意: 无法回滚删除环节(ID=${stageId})，请手动清理数据`);
+                        } else {
+                            console.log("成功删除环节");
+                            toast.info("已回滚删除环节，保持数据一致性");
+                        }
+                    } else {
+                        console.warn("无法删除环节，因为没有有效的环节ID");
+                    }
+                    
+                    // 从前端删除环节
+                    const lastStageIndex = formData.stages.length - 1;
+                    if (lastStageIndex >= 0) {
+                        formData.stages.splice(lastStageIndex, 1);
+                        console.log("已从前端删除环节");
+                    }
+                } catch (rollbackError) {
+                    console.error("回滚删除环节失败:", rollbackError);
+                    toast.error(`注意: 环节已创建(ID=${stageId})但场次或时间段创建失败，并且无法回滚，可能导致数据不一致`);
+                }
+            }
+        } else {
+            // 如果未能获取到环节ID，但前端已添加环节，则给出警告
+            toast.warning('已在前端创建环节，但未能获取环节ID，可能导致数据不一致');
+        }
         
         // 输出警告，如果API返回了错误
         if (response && response.err) {
             console.warn("API返回错误，但已在前端创建环节:", response.err);
+        } else if (!stageId) {
+            // 如果没有获取到有效的stageId，但API没有返回错误
+            toast.warning('环节可能已创建，但无法获取其ID');
+        } else if (!formData.stages[formData.stages.length - 1].sessions[0].id) {
+            // 如果没有成功创建场次
+            toast.warning('环节已创建，但场次创建可能失败');
+        } else if (!formData.stages[formData.stages.length - 1].sessions[0].timeSlots[0].id) {
+            // 如果没有成功创建时间段
+            toast.warning('环节和场次已创建，但时间段创建可能失败');
         }
     } catch (error) {
         console.error("添加环节错误:", error);
         toast.error('新增环节失败: ' + (error instanceof Error ? error.message : String(error)));
+        
+        // 尝试回滚前端状态
+        try {
+            // 如果已经添加了环节到UI，则移除它
+            if (formData.stages.length > 0) {
+                const lastStageIndex = formData.stages.length - 1;
+                formData.stages.pop();
+                console.log('已回滚前端环节状态');
+            }
+        } catch (e) {
+            console.error('回滚UI状态失败:', e);
+        }
     }
 };
 
