@@ -12,18 +12,8 @@
                         <FormItem>
                             <FormLabel>邮件标题</FormLabel>
                             <FormControl class="mt-[0.2rem]">
-                                <textarea type="text" placeholder="点击输入邮件标题..." v-bind="componentField"
+                                <textarea type="text" placeholder="请输入邮件标题..." v-bind="componentField"
                                     class="border-0 shadow-0 rounded-lg w-full h-15 p-2 resize-none dark:bg-[#121212]" />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    </FormField>
-                    <FormField v-slot="{ componentField }" name="content">
-                        <FormItem class="mt-4">
-                            <FormLabel>邮件内容</FormLabel>
-                            <FormControl class="mt-[0.2rem]">
-                                <textarea placeholder="点击输入邮件内容..." v-bind="componentField"
-                                    class="border-0 shadow-0 rounded-lg w-full h-30 p-2 resize-none dark:bg-[#121212]"></textarea>
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -82,10 +72,9 @@ const dialogOpen = ref(props.open)
 const isSubmitting = ref(false)
 const interviewStore = useInterviewStore()
 
-// 初始值包含邮件标题和内容
+// 初始值只包含邮件标题
 const initialValues = { 
-    subject: '', 
-    content: ''
+    subject: ''
 }
 
 watch(() => props.open, val => dialogOpen.value = val)
@@ -97,8 +86,7 @@ watch(dialogOpen, val => {
 const formSchema = toTypedSchema(z.object({
     subject: z.string({ required_error: "请输入邮件标题" })
         .min(1, "请输入邮件标题")
-        .max(50, "标题不能超过50个字符"),
-    content: z.string().optional()
+        .max(50, "标题不能超过50个字符")
 }))
 
 // 发送邮件
@@ -119,8 +107,7 @@ async function onSubmit(values: any, resetForm: Function) {
             console.log('正在发送邮件到ID:', resultId);
             await interviewStore.sendResultEmail({
                 resultId,
-                subject: values.subject,
-                content: values.content
+                subject: values.subject
             });
             console.log('邮件发送成功:', resultId);
         }
