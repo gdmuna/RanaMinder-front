@@ -2,7 +2,7 @@ import { ranaMinder } from './index';
 
 import { errTemplate, returnTemplate, to } from '@/lib/utils';
 
-const baseUrl = import.meta.env.VITE_API_RANAMINDER_BASE_URL;
+const baseUrl = import.meta.env.VITE_API_RANAMINDER_BASE_URL || window.RANAMINDER_BASE_URL;
 
 export const authApi = {
     // 用户登录 - 重定向到Casdoor
