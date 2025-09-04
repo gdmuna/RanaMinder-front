@@ -420,7 +420,6 @@ export const useInterviewStore = defineStore('interview', () => {
     async function sendResultEmail(data: {
         resultId: string;
         subject: string;
-        content: string;
     }) {
         console.log('调用发送邮件API，参数:', data);
 

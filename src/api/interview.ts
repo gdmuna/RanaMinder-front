@@ -376,7 +376,6 @@ export const interviewApi = {
     async sendResultEmail(data: {
         resultId: string;
         subject: string;
-        content: string;
     }) {
         const inst = ranaMinder.Post<{ message: string; code: string }>('/mail/send-result-email', data).send();
         return await to<{ message: string; code: string }>(inst);
