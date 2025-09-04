@@ -103,11 +103,22 @@ function selectSession(session: any) {
     step.value = 3
 }
 function handleTimeSlotClick(slot: any) {
+    // 确保时间段ID是数字类型
+    const slotWithNumericId = {
+        ...slot,
+        id: Number(slot.id)
+    };
+    
+    console.log('选中的时间段:', slotWithNumericId);
+    console.log('选中的时间段ID:', slotWithNumericId.id, '类型:', typeof slotWithNumericId.id);
+    
     const selection = {
         stage: selectedStage.value,
         session: selectedSession.value,
-        slot
+        slot: slotWithNumericId
     };
+    
+    console.log('发送给父组件的完整selection:', selection);
     emit('select', selection);
     closeDialog();
 }

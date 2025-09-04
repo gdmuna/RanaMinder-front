@@ -35,7 +35,8 @@ import { interviewApi } from '@/api/interview'
 
 // 处理后的人员数据类型
 interface PersonData {
-    id: number;
+    id: number;        // application_id
+    userId: number;    // 用户ID - 这是分配时间时真正需要的ID
     stuId: string;
     name: string;
     intention: string[];
@@ -99,17 +100,22 @@ function handleCheck(stuId: string) {
         return;
     }
     
-    const applicationId = String(person.id); // 确保ID是字符串类型
-    console.log('找到对应的应用ID:', applicationId);
+    console.log('找到的完整person对象:', JSON.stringify(person));
+    console.log('person.id(application_id):', person.id, '类型:', typeof person.id);
+    console.log('person.userId(user_id):', person.userId, '类型:', typeof person.userId);
     
-    if (!checkedIds.value.includes(applicationId)) {
-        checkedIds.value.push(applicationId);
-        console.log('添加到勾选列表');
+    // 使用正确的用户ID - 这是API真正需要的
+    const userId = String(person.userId); // 使用user_id而不是application_id
+    console.log('使用的用户ID:', userId, '类型:', typeof userId);
+    
+    if (!checkedIds.value.includes(userId)) {
+        checkedIds.value.push(userId);
+        console.log('添加到勾选列表，现在列表为:', [...checkedIds.value]);
     } else {
-        checkedIds.value = checkedIds.value.filter(id => id !== applicationId);
-        console.log('从勾选列表移除');
+        checkedIds.value = checkedIds.value.filter(id => id !== userId);
+        console.log('从勾选列表移除，现在列表为:', [...checkedIds.value]);
     }
-    console.log('当前勾选的应用ID列表:', [...checkedIds.value]);
+    console.log('当前勾选的用户ID列表:', [...checkedIds.value]);
 }
 
 // 获取应用列表
@@ -155,8 +161,12 @@ async function fetchApplications() {
             // 转换API数据为组件所需格式
             personList.value = applicationsData.map((app: any) => {
                 const info = app.information || {}
+                // 打印原始数据便于调试
+                console.log('原始应用数据:', app);
+                
                 return {
-                    id: app.id,
+                    id: app.id, // 这是application_id
+                    userId: app.user_id, // 添加user_id字段 - 这是真正需要的ID
                     stuId: app.stu_id,
                     name: info.name || '未填写',
                     intention: Array.isArray(info.intention) ? info.intention : info.intention ? [info.intention] : ['未填写'],

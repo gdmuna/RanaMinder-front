@@ -98,8 +98,7 @@ const formSchema = toTypedSchema(z.object({
     subject: z.string({ required_error: "请输入邮件标题" })
         .min(1, "请输入邮件标题")
         .max(50, "标题不能超过50个字符"),
-    content: z.string({ required_error: "请输入邮件内容" })
-        .min(1, "请输入邮件内容")
+    content: z.string().optional()
 }))
 
 // 发送邮件
@@ -114,7 +113,7 @@ async function onSubmit(values: any, resetForm: Function) {
 
     try {
         isSubmitting.value = true;
-        
+        console.log('发送邮件前的值:', values);
         // 为每个选中的ID发送邮件
         for (const resultId of props.checkedIds) {
             console.log('正在发送邮件到ID:', resultId);
