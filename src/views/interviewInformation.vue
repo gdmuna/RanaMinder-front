@@ -131,7 +131,11 @@ async function fetchApplications() {
         }
         
         campaignId.value = id
-        const response = await interviewApi.getApplications({ campaign_id: id })
+        const response = await interviewApi.getApplications({ 
+            campaign_id: id,
+            pageSize: 999,  // 设置一页显示999条记录，实际上就是获取全部数据
+            currentPage: 1  // 默认第一页
+        })
         
         console.log('API响应:', response)
         
