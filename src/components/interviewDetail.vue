@@ -1,6 +1,6 @@
 <template>
     <div
-        class="relative dark:bg-[#E8E7E2] rounded-xl overflow-hidden select-none md:w-auto min-w-[36%] w-full max-h-[80vh] flex flex-col">
+        class="relative dark:bg-[#E8E7E2] rounded-xl overflow-hidden select-none md:w-auto min-w-[36%] md:max-w-[36%] w-full max-h-[80vh] flex flex-col">
         <!-- 顶部装饰 -->
         <div class="w-full h-16 flex shrink-0">
             <div class="dark:bg-[#A3A2A0] text-[#000000] px-6 py-5 cursor-pointer flex items-center"
@@ -32,11 +32,11 @@
                 </template>
                 <!-- 其他普通字段 -->
                 <template v-else>
-                    <span class="inputBadge xl:text-[0.875rem]! text-[0.675rem]!">{{ value }}</span>
+                    <span class="inputBadge xl:text-[0.875rem]! text-[0.675rem]! md:max-w-[25rem] max-w-[21rem]">{{ value }}</span>
                 </template>
             </div>
 
-            <div class="flex mt-5 justify-between">
+            <!-- <div class="flex mt-5 justify-between">
                 <div class="flex">
                     <Button
                         class="dark:bg-[#D78888] dark:text-[#000000] font-bold text-bold xl:px-[3rem] px-[2rem] py-[1.5rem] transition-transform duration-250 hover:scale-105 active:scale-95 hover:shadow-md cursor-pointer">
@@ -55,7 +55,7 @@
                         通过
                     </Button>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 </template>
@@ -64,6 +64,23 @@
 import { Minimize2 } from 'lucide-vue-next';
 import { computed, ref, onMounted, nextTick, onBeforeUnmount } from 'vue';
 import { Button } from '@/components/ui/button'
+
+// 弹窗显示时禁止body滚动，关闭时恢复，并保持原滚动位置
+let scrollY = 0;
+onMounted(() => {
+    scrollY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+    document.body.style.overflow = 'hidden';
+});
+onBeforeUnmount(() => {
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.width = '';
+    document.body.style.overflow = '';
+    window.scrollTo(0, scrollY);
+});
 
 // 滚动容器引用
 const scrollContainerRef = ref<HTMLElement | null>(null);
@@ -106,29 +123,28 @@ const displayableInfo = computed(() => {
     const result: Record<string, any> = {};
 
     // 核心字段（小卡片）
-    result['name'] = person.name;
-    result['intendedDepartment'] = person.intendedDepartment;
-    result['grade'] = person.grade;
-    result['major'] = person.major;
-    result['stuId'] = person.stuId;
+        result['name'] = person.name;
+        result['intendedDepartment'] = person.intendedDepartment;
+        result['grade'] = person.grade;
+        result['major'] = person.major;
+        result['stuId'] = person.stuId;
+        if (person.email) result['email'] = person.email;
+        if (person.phoneNum) result['phone'] = person.phoneNum;
 
-    if (person.email) result['email'] = person.email;
-    if (person.phoneNum) result['phone'] = person.phoneNum;
-
-    // 然后添加information中的其他字段
-    if (person.information) {
-        const skipFields = ['name', 'intention', 'grade', 'major', 'stuId', 'email', 'phone', 'phoneNum', 'id', 'createdAt', 'updatedAt', 'photo',];
-
-        for (const [key, value] of Object.entries(person.information)) {
-            // 跳过已经添加的字段和不需要显示的系统字段
-            if (!skipFields.includes(key) && value !== null && value !== undefined) {
-                result[key] = value;
+        // 跳过所有学号和手机号相关字段
+        if (person.information) {
+            const skipFields = [
+                'name', 'intention', 'grade', 'major', 'stuId', 'studentNumber',
+                'email', 'phone', 'phoneNum', 'phoneNumber', 'id', 'createdAt', 'updatedAt', 'photo'
+            ];
+            for (const [key, value] of Object.entries(person.information)) {
+                if (!skipFields.includes(key) && value !== null && value !== undefined) {
+                    result[key] = value;
+                }
             }
         }
-    }
-
-    return result;
-});
+        return result;
+    });
 
 // 格式化标签名称
 function formatLabel(key: string): string {
@@ -221,7 +237,7 @@ onBeforeUnmount(() => {
 
 .inputBadge {
     display: inline-block;
-    border-radius: 999px;
+    border-radius: 15px;
     width: auto;
     padding: 0.5rem 1rem;
     background-color: #8FAFC4;
