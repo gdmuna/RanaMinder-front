@@ -418,7 +418,7 @@ export const useInterviewStore = defineStore('interview', () => {
 
     // 发送结果邮件
     async function sendResultEmail(data: {
-        resultId: string;
+        resultId: string | string[];
         subject: string;
     }) {
         console.log('调用发送邮件API，参数:', data);

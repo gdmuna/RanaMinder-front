@@ -374,7 +374,7 @@ export const interviewApi = {
 
     // 发送结果邮件
     async sendResultEmail(data: {
-        resultId: string;
+        resultId: string | string[];
         subject: string;
     }) {
         const inst = ranaMinder.Post<{ message: string; code: string }>('/mail/send-result-email', data).send();
