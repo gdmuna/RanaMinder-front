@@ -92,7 +92,7 @@
             </AlertDialogContent>
         </AlertDialog> -->
         <StatusChoice v-model:open="showStatusChoice" :checkedIds="checkedIds" :campaignId="campaignId" />
-        <SendMail v-model:open="showMail" :checkedIds="checkedIds" />
+        <SendMail v-model:open="showMail" :checkedIds="checkedIds" :campaignId="campaignId" />
         <StatusDialog v-model:open="statusDialog" :result="dialogData" @select="handleTimeSlotSelect" />
     </div>
 

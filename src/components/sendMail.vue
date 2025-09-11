@@ -64,7 +64,8 @@ import { useInterviewStore } from "@/stores/interview"
 
 const props = defineProps<{ 
     open: boolean,
-    checkedIds: string[]
+    checkedIds: string[],
+    campaignId: number
 }>()
 
 const emit = defineEmits(['update:open'])
@@ -72,7 +73,7 @@ const dialogOpen = ref(props.open)
 const isSubmitting = ref(false)
 const interviewStore = useInterviewStore()
 
-// 初始值只包含邮件标题
+// 邮件标题
 const initialValues = { 
     subject: ''
 }
@@ -101,18 +102,63 @@ async function onSubmit(values: any, resetForm: Function) {
 
     try {
         isSubmitting.value = true;
-        console.log('发送邮件前的值:', values);
-        // 为每个选中的ID发送邮件
-        for (const resultId of props.checkedIds) {
-            console.log('正在发送邮件到ID:', resultId);
-            await interviewStore.sendResultEmail({
-                resultId,
-                subject: values.subject
-            });
-            console.log('邮件发送成功:', resultId);
+        const campaignId = props.campaignId;
+        if (!campaignId) {
+            toast.error('未传递活动ID');
+            isSubmitting.value = false;
+            return;
         }
         
-        toast.success(`已成功向 ${props.checkedIds.length} 位面试者发送邮件`);
+        console.log('发送邮件前的值:', values);
+        
+        // 收集所有用户的 resultId
+        const resultIds: string[] = [];
+        const userErrors: string[] = [];
+        
+        // 为每个选中的用户ID获取对应的resultId
+        for (const userId of props.checkedIds) {
+            try {
+                // 获取 resultId
+                const res = await interviewStore.getInterviewResult(userId, campaignId);
+                const r = res as any;
+                
+                if (r && r.data && Array.isArray(r.data.results) && r.data.results.length > 0) {
+                    const resultId = r.data.results[0].id;
+                    if (resultId) {
+                        resultIds.push(resultId);
+                    } else {
+                        userErrors.push(userId);
+                    }
+                } else {
+                    userErrors.push(userId);
+                }
+            } catch (error) {
+                console.error(`获取用户 ${userId} 的面试结果失败:`, error);
+                userErrors.push(userId);
+            }
+        }
+        
+        // 检查是否有找到有效的 resultId
+        if (resultIds.length === 0) {
+            toast.error('未找到任何有效的面试结果ID');
+            isSubmitting.value = false;
+            return;
+        }
+        
+        // 使用数组格式一次性发送邮件
+        console.log('正在使用resultIds数组发送邮件:', resultIds);
+        await interviewStore.sendResultEmail({
+            resultId: resultIds,
+            subject: values.subject
+        });
+        
+        // 显示成功和失败的统计
+        if (userErrors.length > 0) {
+            toast.warning(`成功向 ${resultIds.length} 位面试者发送邮件，${userErrors.length} 位面试者未找到结果`);
+        } else {
+            toast.success(`已成功向 ${resultIds.length} 位面试者发送邮件`);
+        }
+        
         dialogOpen.value = false;
         resetForm();
     } catch (error: any) {
