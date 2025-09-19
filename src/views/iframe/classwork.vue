@@ -18,7 +18,7 @@ async function handleMessage(event) {
     if (event.data.type === 'query' && Array.isArray(event.data.titles)) {
         try {
             const result = await classworkApi.getNamesByTitles(event.data.titles)
-            const dataArr = result?.res?.data ?? []
+            const dataArr = result?.data ?? []
             console.log('收到后端返回的数据:', dataArr)
             event.source.postMessage({ type: 'result', data: dataArr }, event.origin)
         } catch (err) {
