@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useAuthStore } from '@/stores/auth'
 const authStore = useAuthStore()
@@ -10,6 +13,7 @@ import {
     LifeBuoy,
     LogOut,
     Award,
+    BookOpen,
     Mail,
     MessageSquare,
     Plus,
@@ -34,6 +38,10 @@ import {
     DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+
+function openNekorify() {
+    window.location.href = 'https://im.gdmuna.com';
+}
 </script>
 
 <template>
@@ -47,9 +55,13 @@ import {
         <DropdownMenuContent class="w-[12rem] translate-y-2 -translate-x-2">
             <DropdownMenuLabel>菜单栏</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem class="cursor-pointer">
+            <DropdownMenuItem class="cursor-pointer" @click="openNekorify">
                 <Award class="mr-2 h-4 w-4" />
-                <span>返回主系统</span>
+                <span>Nekorify</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem class="cursor-pointer" @click="router.push('/classwork')">
+                <BookOpen class="mr-2 h-4 w-4" />
+                <span>Classwork</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
                 <DropdownMenuItem class="cursor-pointer" @click="authStore.logout">
