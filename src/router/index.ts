@@ -5,6 +5,7 @@ import interview from '../views/interview.vue'
 import interviewInformation from '../views/interviewInformation.vue'
 import loginCallback from '../views/loginCallback/index.vue'
 import notFound from '../views/notFound/notFound.vue'
+import classwork from '../views/iframe/classwork.vue'
 
 
 import { useAuthStore } from '@/stores/auth'
@@ -74,6 +75,17 @@ const routes = [
     component: notFound,
     meta: {
       title: '404 Not Found'
+    }
+  },
+  {
+    path: '/classwork',
+    name: 'classwork',
+    component: classwork,
+    meta: {
+      title: '作业管理',
+      requireAuth: true,
+      minManageLevel: 1,
+      scrollToTop: true
     }
   }
 ]
