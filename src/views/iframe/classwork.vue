@@ -17,8 +17,10 @@ async function handleMessage(event) {
     console.log('收到目标页面发来的数据:', event.data)
     if (event.data.type === 'query' && Array.isArray(event.data.titles)) {
         try {
+            console.log('收到目标页面发来的查询请求:', event.data.titles)
             const result = await classworkApi.getNamesByTitles(event.data.titles)
-            const dataArr = result?.data ?? []
+            console.log('123123后端返回的数据:', result)
+            const dataArr = result?.res?.data ?? []
             console.log('收到后端返回的数据:', dataArr)
             event.source.postMessage({ type: 'result', data: dataArr }, event.origin)
         } catch (err) {
