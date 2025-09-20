@@ -7,20 +7,20 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { onMounted, onBeforeUnmount } from 'vue'
-import { classworkApi } from '@/api/classwork'
+import { useClassworkStore } from '@/stores/classwork'
 
 const router = useRouter();
 const targetUrl = 'https://classwork.gdmuna.com/'
+const classworkStore = useClassworkStore()
 
 // 监听 message
 async function handleMessage(event) {
-    console.log('收到目标页面发来的数据:', event.data)
     if (event.data.type === 'query' && Array.isArray(event.data.titles)) {
         try {
-            const result = await classworkApi.getNamesByTitles(event.data.titles)
-            const dataArr = result?.data ?? []
-            console.log('收到后端返回的数据:', dataArr)
-            event.source.postMessage({ type: 'result', data: dataArr }, event.origin)
+            const result = await classworkStore.fetchNamesByTitles(event.data.titles)
+            const dataArr = Array.isArray(result) ? result : []
+            const pureArr = JSON.parse(JSON.stringify(dataArr))
+            event.source.postMessage({ type: 'result', data: pureArr }, event.origin)
         } catch (err) {
             console.error('后端请求失败', err)
             event.source.postMessage({ type: 'result', data: [] }, event.origin)
